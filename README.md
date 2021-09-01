@@ -1,2 +1,2 @@
 # FMG-toolbox
-Practice repository for the team to get comfortable with git workflows.
+The Forest Management Geodatabase FMG toolbox provides a set of tools for processing field surveys into reports. 
