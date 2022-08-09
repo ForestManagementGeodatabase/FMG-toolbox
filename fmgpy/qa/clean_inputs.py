@@ -78,17 +78,25 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     if center_df[center_plot_id_field].dtype == 'int64':
         arcpy.AddMessage(f"    {os.path.basename(fc_center)} plot ID field type is correct")
     else:
-        arcpy.AddError(
-            f"{os.path.basename(fc_center)} plot ID field type must be short or long integer, quitting.")
-        sys.exit(0)
+        try:
+            center_df[center_plot_id_field] = center_df[center_plot_id_field].astype(int)
+            arcpy.AddMessage(
+                f"{os.path.basename(fc_center)} plot ID field type converted to integer.")
+        except:
+            arcpy.AddError(f"{os.path.basename(fc_center)} plot ID field type must be short or long integer, quitting.")
+            sys.exit(0)
 
     # check input plot ID field to ensure it is integer
     if check_df[check_plot_id_field].dtype == 'int64':
         arcpy.AddMessage(f"    {os.path.basename(fc_check)} plot ID field type is correct")
     else:
-        arcpy.AddError(
-            f"{os.path.basename(fc_check)} plot ID field type must be short or long integer, quitting.")
-        sys.exit(0)
+        try:
+            check_df[check_plot_id_field] = check_df[check_plot_id_field].astype(int)
+            arcpy.AddMessage(
+                f"{os.path.basename(fc_check)} plot ID field type converted to integer.")
+        except:
+            arcpy.AddError(f"{os.path.basename(fc_check)} plot ID field type must be short or long integer, quitting.")
+            sys.exit(0)
 
     # flag plot IDs not in main fc (returns boolean)
     check_df["VALID_PLOT_ID"] = check_df[check_plot_id_field].isin(center_df[center_plot_id_field])
@@ -148,8 +156,9 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
         CORRECT_PLOT_ID=fixed_df['OBJECTID'].map(join_df.set_index('OBJECTID')["CORRECT_PLOT_ID"]))
 
     # cleanup
-    fc_fixed = fc_fixed.drop(columns=['PLOT_fixed'])
+    fixed_df = fixed_df.drop(columns=['PLOT_fixed'])
     arcpy.management.DeleteField(fc_center, "PLOT_center")
+    arcpy.management.DeleteField(fc_fixed, "PLOT_fixed")
     arcpy.management.Delete(center_fixed_join)
 
     arcpy.AddMessage(f"\nFlag fields populated, check of {os.path.basename(fc_center)} "
@@ -232,11 +241,11 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     prism_accuracy = join_df.groupby('PLOT_fixed')['CORRECT_PLOT_ID'].nunique()
 
     # rename field before merging with fixed
-    prism_accuracy.rename("PRISM_ID_MATCHES", inplace=True)
+    prism_accuracy = prism_accuracy.rename("PRISM_ID_MATCHES")
 
     # change series to dataframe, add index (PLOT) as series and cast as int
     prism_count = prism_accuracy.to_frame()
-    prism_count['PLOT'] = prism_df.index.astype(int)
+    prism_count['PLOT'] = prism_count.index.astype(int)
 
     def unique_val(x):
         if x == 1:
@@ -249,8 +258,8 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # convert count to Yes/No
     merge_fixed['PRISM_ID_MATCHES'] = merge_fixed.apply(lambda x: unique_val(x['PRISM_ID_MATCHES']), axis=1)
 
-    arcpy.AddMessage(f"\nFlag fields populated, check of {os.path.basename(fc_prism)} "
-                     f"and {os.path.basename(fc_fixed)} complete")
+    arcpy.AddMessage(f"\nFlag fields populated, completed check of {os.path.basename(fc_prism)} "
+                     f"and {os.path.basename(fc_fixed)}")
 
     # cleanup
     arcpy.management.DeleteField(fc_prism, "PLOT_prism")
@@ -282,10 +291,16 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
 
-    # populate HAS_AGE field for each plot where age_flag_field = A
+    # populate HAS_AGE field for each plot where age_flag_field = A (if not A, HAS_AGE = 'N/A')
     center_df.loc[center_df[age_flag_field] == 'A', 'HAS_AGE'] = center_df[center_plot_id_field].isin(
         age_df[age_plot_id])
     yes_no(center_df, 'HAS_AGE')
+
+    center_df.loc[center_df[age_flag_field] != 'A', 'HAS_AGE'] = 'N/A'
+
+    # reset plot to int
+    center_df["PLOT"] = center_df["PLOT"].astype(int)
+
     arcpy.AddMessage("\nCheck complete")
 
     # overwrite input FC
@@ -337,9 +352,7 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     arcpy.AddMessage("\nCheck complete")
 
     # overwrite input FC
-    center_df.spatial.to_featureclass(center_df,
-                                      overwrite=True,
-                                      sanitize_columns=False)
+    center_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
     return fc_center
 
 
@@ -364,8 +377,8 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
         "TR_DIA",
         "TR_CL",
         "TR_HLTH",
-        "TR_CREW",
-        "TR_DATE"
+        "COL_CREW",
+        "COL_DATE"
     ]
 
     # create dataframe
@@ -376,8 +389,8 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
     prism_df = rename_fields(prism_df, dia_name, "TR_DIA")
     prism_df = rename_fields(prism_df, class_name, "TR_CL")
     prism_df = rename_fields(prism_df, health_name, "TR_HLTH")
-    prism_df = rename_fields(prism_df, crew_name, "TR_CREW")
-    prism_df = rename_fields(prism_df, date_name, "TR_DATE")
+    prism_df = rename_fields(prism_df, crew_name, "COL_CREW")
+    prism_df = rename_fields(prism_df, date_name, "COL_DATE")
 
     # null values allowed only when TR_SP is null (no tree) or "NoTree"
     # check TR_SP against list of accepted values
@@ -389,8 +402,8 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
 
     # populate MIS_FIELDS with list of fields missing values
     # if TR_SP is 'NONE' or 'NoTree', check that TR_CREW and TR_DATE fields are filled out
-    prism_df.loc[prism_df.TR_SP.isin(["NONE", "NoTree"]), 'MIS_FIELDS'] = prism_df[["TR_CREW",
-                                                                                    "TR_DATE"]].apply(
+    prism_df.loc[prism_df.TR_SP.isin(["NONE", "NoTree"]), 'MIS_FIELDS'] = prism_df[["COL_CREW",
+                                                                                    "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     arcpy.AddMessage("    MIS_FIELDS populated for no tree records")
@@ -400,16 +413,16 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
                                                                                      "TR_DIA",
                                                                                      "TR_CL",
                                                                                      "TR_HLTH",
-                                                                                     "TR_CREW",
-                                                                                     "TR_DATE"]].apply(
+                                                                                     "COL_CREW",
+                                                                                     "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     prism_df.loc[prism_df['TR_SP'].isnull(), 'MIS_FIELDS'] = prism_df[["TR_SP",
                                                                        "TR_DIA",
                                                                        "TR_CL",
                                                                        "TR_HLTH",
-                                                                       "TR_CREW",
-                                                                       "TR_DATE"]].apply(
+                                                                       "COL_CREW",
+                                                                       "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     arcpy.AddMessage("    MIS_FIELDS populated for treed records")
@@ -465,8 +478,8 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
         "AGE_HT",
         "AGE_ORIG",
         "AGE_GRW",
-        "AGE_CREW",
-        "AGE_DATE"
+        "COL_CREW",
+        "COL_DATE"
     ]
 
     # create dataframe
@@ -478,8 +491,8 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
     age_df = rename_fields(age_df, height_name, "AGE_HT")
     age_df = rename_fields(age_df, orig_name, "AGE_ORIG")
     age_df = rename_fields(age_df, grw_name, "AGE_GRW")
-    age_df = rename_fields(age_df, crew_name, "AGE_CREW")
-    age_df = rename_fields(age_df, date_name, "AGE_DATE")
+    age_df = rename_fields(age_df, crew_name, "COL_CREW")
+    age_df = rename_fields(age_df, date_name, "COL_DATE")
 
     # replace blank strings with NaN
     for i in rf_age:
@@ -495,8 +508,8 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
                                    "AGE_HT",
                                    "AGE_ORIG",
                                    "AGE_GRW",
-                                   "AGE_CREW",
-                                   "AGE_DATE"]].apply(
+                                   "COL_CREW",
+                                   "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     arcpy.AddMessage("    MIS_FIELDS populated")
@@ -507,12 +520,18 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
 
     arcpy.AddMessage("    HAS_MIS_FIELDS populated")
 
+    # revert NA values to 0
+
     # check for valid years, must have full 4 digits
     age_df.loc[age_df['AGE_ORIG'] > 1499, 'VALID_AGE'] = "Yes"
     age_df.loc[age_df['AGE_ORIG'] <= 1499, 'VALID_AGE'] = "No"
     age_df.loc[age_df['AGE_ORIG'].isnull(), 'VALID_AGE'] = "No"
 
     arcpy.AddMessage("    VALID_AGE populated")
+
+    # recast numerical fields to correct type
+    age_df["AGE_DIA"] = age_df["AGE_DIA"].round(1)
+
     arcpy.AddMessage("\nCheck complete")
 
     # overwrite input FC
@@ -549,8 +568,8 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
         "UND_COV",
         "UND_SP1",
         "GRD_SP1",
-        "FP_CREW",
-        "FP_DATE"
+        "COL_CREW",
+        "COL_DATE"
     ]
 
     # create dataframe
@@ -563,8 +582,8 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
     fixed_df = rename_fields(fixed_df, un_cover_name, "UND_COV")
     fixed_df = rename_fields(fixed_df, un_sp_name, "UND_SP1")
     fixed_df = rename_fields(fixed_df, gr_sp_name, "GRD_SP1")
-    fixed_df = rename_fields(fixed_df, crew_name, "FP_CREW")
-    fixed_df = rename_fields(fixed_df, date_name, "FP_DATE")
+    fixed_df = rename_fields(fixed_df, crew_name, "COL_CREW")
+    fixed_df = rename_fields(fixed_df, date_name, "COL_DATE")
 
     # replace blank strings with NaN
     for i in rf_fixed:
@@ -578,8 +597,8 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
                                        "UND_COV",
                                        "UND_SP1",
                                        "GRD_SP1",
-                                       "FP_CREW",
-                                       "FP_DATE"]].apply(
+                                       "COL_CREW",
+                                       "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     arcpy.AddMessage("    MIS_FIELDS populated")
@@ -607,6 +626,8 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age):
     fc_fixed  -- Path to fixed feature class
     fc_age    -- Path to age feature class
     """
+
+    arcpy.AddMessage("Checking for and removing duplicates")
 
     # create dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
@@ -639,6 +660,9 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age):
                                    overwrite=True,
                                    sanitize_columns=False)
 
-    arcpy.AddMessage("\nCheck complete")
+    arcpy.AddMessage("\nCheck complete"
+                     f"Removed {len(prism_duplicates.index)} duplicates from prism plots"
+                     f"Removed {len(fixed_duplicates.index)} duplicates from fixed plots"
+                     f"Removed {len(age_duplicates.index)} duplicates from age plots")
 
     return fc_prism, fc_fixed, fc_age
