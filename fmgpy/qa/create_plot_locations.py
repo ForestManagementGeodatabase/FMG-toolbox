@@ -8,14 +8,14 @@ From feature layer create persisted water buffer (negative, full)
 From feature layer create persisted walkthrough buffer (negative, outside only)
 Create Fishnet with label points using feature layer extent info
 Using Erase Points remove label points outside of water buffer
-Spatial join with FOREST Stand Dataset to populate POOL COMP UNTI SITE STAND Fields
+Spatial join with FOREST Stand Dataset to populate POOL COMP UNIT SITE STAND Fields
 Add PLOT Field
 Add Age Field
 Add Walkthrough Field
 Add WorkUnitName Field
 Populate PLOT Field
 Populate WorkUnitName
-Create layerfile from erased points
+Create layer file from erased points
 Create a selection based on walkthrough buffer
 Populate walkthrough field based on selection
 Remove selection
@@ -24,7 +24,7 @@ Persist layer file
 
 Consider creating an option for auto populating Age field based on rules
 Need to debug the removal of spatial join business fields
-May skip adding the POOL COMP UNIT SITE STAND IDs untill the SDE datasets get refined a bit
+May skip adding the POOL COMP UNIT SITE STAND IDs until the SDE datasets get refined a bit
 
 """
 
