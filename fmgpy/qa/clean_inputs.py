@@ -105,6 +105,9 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     arcpy.AddMessage(f"VALID_PLOT_ID populated, check complete")
 
     # overwrite input FC
+    center_df.spatial.to_featureclass(fc_center,
+                                      overwrite=True,
+                                      sanitize_columns=False)
     check_df.spatial.to_featureclass(fc_check,
                                      overwrite=True,
                                      sanitize_columns=False)
@@ -193,6 +196,10 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
 
+    # clear flag field from any previous run
+    if 'PRISM_ID_MATCHES' in fixed_df.columns:
+        fixed_df = fixed_df.drop(columns=['PRISM_ID_MATCHES'])
+
     # flag prism plot IDs without corresponding fixed plot
     prism_df["HAS_FIXED"] = prism_df[prism_plot_id].isin(fixed_df[fixed_plot_id])
     yes_no(prism_df, 'HAS_FIXED')
@@ -245,7 +252,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
 
     # change series to dataframe, add index (PLOT) as series and cast as int
     prism_count = prism_accuracy.to_frame()
-    prism_count['PLOT'] = prism_count.index.astype(int)
+    prism_count[fixed_plot_id] = prism_count.index.astype(int)
 
     def unique_val(x):
         if x == 1:
@@ -254,7 +261,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
             return "No"
 
     # merge dataframes on fixed plot ID
-    merge_fixed = fixed_df.merge(prism_count, on='PLOT')
+    merge_fixed = fixed_df.merge(prism_count, on=fixed_plot_id)
     # convert count to Yes/No
     merge_fixed['PRISM_ID_MATCHES'] = merge_fixed.apply(lambda x: unique_val(x['PRISM_ID_MATCHES']), axis=1)
 
@@ -269,7 +276,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # overwrite input FC
     prism_df.spatial.to_featureclass(fc_prism, sanitize_columns=False)
     merge_fixed.spatial.to_featureclass(fc_fixed, sanitize_columns=False)
-    return [fc_prism, fc_fixed]
+    return fc_prism, fc_fixed
 
 
 def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, fc_age, age_plot_id):
@@ -356,11 +363,13 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     return fc_center
 
 
-def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, health_name, crew_name, date_name):
+def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, class_name, health_name, crew_name,
+                                date_name):
     """Checks prism plots for presence of required fields and for missing values in those fields.
 
     Keyword Arguments:
     fc_prism     -- Path to prism feature class
+    plot_name -- Name of plot field
     species_name -- Name of tree species field
     dia_name     -- Name of tree diameter field
     class_name   -- Name of tree class field
@@ -373,6 +382,7 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
 
     # list of required fields
     rf_prism = [
+        "PLOT",
         "TR_SP",
         "TR_DIA",
         "TR_CL",
@@ -385,6 +395,7 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
 
     # format field names
+    prism_df = rename_fields(prism_df, plot_name, "PLOT")
     prism_df = rename_fields(prism_df, species_name, "TR_SP")
     prism_df = rename_fields(prism_df, dia_name, "TR_DIA")
     prism_df = rename_fields(prism_df, class_name, "TR_CL")
@@ -435,16 +446,19 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
 
     # populate CANOPY_DBH_FLAG
     # flag all trees with dia > 50"
-    prism_df.loc[prism_df['TR_DIA'] > 50, 'CANOPY_DBH_FLAG'] = "Check diameter"
+    prism_df.loc[prism_df['TR_DIA'] > 50, 'CANOPY_DBH_FLAG'] = "Tree diameter > 50in"
 
     # flag trees where dia >18 AND intermediate
-    prism_df.loc[(prism_df.TR_DIA > 18) & (prism_df.TR_CL == 'I'), 'CANOPY_DBH_FLAG'] = "Check canopy class"
+    prism_df.loc[(prism_df.TR_DIA > 18) & (prism_df.TR_CL == 'I'),
+                 'CANOPY_DBH_FLAG'] = "Class = I and diameter > 18in"
 
     # flag trees where dia <12 AND co-dominant
-    prism_df.loc[(prism_df.TR_DIA < 12) & (prism_df.TR_CL == 'CD'), 'CANOPY_DBH_FLAG'] = "Check canopy class"
+    prism_df.loc[(prism_df.TR_DIA < 12) & (prism_df.TR_CL == 'CD'),
+                 'CANOPY_DBH_FLAG'] = "Class = CD and diameter < 12in"
 
     # flag trees where dia <30 AND dominant
-    prism_df.loc[(prism_df.TR_DIA < 30) & (prism_df.TR_CL == 'D'), 'CANOPY_DBH_FLAG'] = "Check canopy class"
+    prism_df.loc[(prism_df.TR_DIA < 30) & (prism_df.TR_CL == 'D'),
+                 'CANOPY_DBH_FLAG'] = "Class = D and diameter < 30in"
 
     arcpy.AddMessage("\nCheck complete")
 
@@ -455,11 +469,13 @@ def check_required_fields_prism(fc_prism, species_name, dia_name, class_name, he
     return fc_prism
 
 
-def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_name, grw_name, crew_name, date_name):
+def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name, orig_name, grw_name, crew_name,
+                              date_name):
     """Checks age plots for presence of required fields and for missing values in those fields.
 
     Keyword Arguments:
     fc_age       -- Path to age feature class
+    plot_name    -- Name of plot field
     species_name -- Name of tree species field
     dia_name     -- Name of tree diameter field
     height_name  -- Name of tree height field
@@ -473,6 +489,7 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
 
     # list of required fields
     rf_age = [
+        "PLOT",
         "AGE_SP",
         "AGE_DIA",
         "AGE_HT",
@@ -486,6 +503,7 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
 
     # format field names
+    age_df = rename_fields(age_df, plot_name, "PLOT")
     age_df = rename_fields(age_df, species_name, "AGE_SP")
     age_df = rename_fields(age_df, dia_name, "AGE_DIA")
     age_df = rename_fields(age_df, height_name, "AGE_HT")
@@ -542,12 +560,13 @@ def check_required_fields_age(fc_age, species_name, dia_name, height_name, orig_
     return fc_age
 
 
-def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name, un_cover_name, un_sp_name, gr_sp_name,
-                                crew_name, date_name):
+def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, un_ht_name, un_cover_name, un_sp_name,
+                                gr_sp_name, crew_name, date_name):
     """Checks fixed plots for presence of required fields and for missing values in those fields.
 
     Keyword Arguments:
     fc_fixed      -- Path to fixed feature class
+    plot_name     -- Name of plot field
     closure_name  -- Name of overstory closure field
     height_name   -- Name of overstory height field
     un_ht_name    -- Name of understory height field
@@ -562,6 +581,7 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
 
     # list of required fields
     rf_fixed = [
+        "PLOT",
         "OV_CLSR",
         "OV_HT",
         "UND_HT",
@@ -576,6 +596,7 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
 
     # format field names
+    fixed_df = rename_fields(fixed_df, plot_name, "PLOT")
     fixed_df = rename_fields(fixed_df, closure_name, "OV_CLSR")
     fixed_df = rename_fields(fixed_df, height_name, "OV_HT")
     fixed_df = rename_fields(fixed_df, un_ht_name, "UND_HT")
@@ -618,7 +639,7 @@ def check_required_fields_fixed(fc_fixed, closure_name, height_name, un_ht_name,
     return fc_fixed
 
 
-def remove_duplicates(fc_prism, fc_fixed, fc_age):
+def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age):
     """Checks prism, fixed, and age plots for duplicate geometry. Fixed plots are also checked for duplicate plot IDs.
 
     Keyword Arguments:
@@ -636,7 +657,7 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age):
 
     # generate dataframes of duplicate rows
     prism_duplicates = prism_df[prism_df.duplicated(["SHAPE"])]
-    fixed_duplicates = fixed_df[fixed_df.duplicated(["PLOT", "SHAPE"])]
+    fixed_duplicates = fixed_df[fixed_df.duplicated([fixed_plot_id, "SHAPE"])]
     age_duplicates = age_df[age_df.duplicated(["SHAPE"])]
 
     # add boolean DUPLICATE field
@@ -661,8 +682,8 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age):
                                    sanitize_columns=False)
 
     arcpy.AddMessage("\nCheck complete"
-                     f"Removed {len(prism_duplicates.index)} duplicates from prism plots"
-                     f"Removed {len(fixed_duplicates.index)} duplicates from fixed plots"
-                     f"Removed {len(age_duplicates.index)} duplicates from age plots")
+                     f"\nRemoved {len(prism_duplicates.index)} duplicates from prism plots"
+                     f"\nRemoved {len(fixed_duplicates.index)} duplicates from fixed plots"
+                     f"\nRemoved {len(age_duplicates.index)} duplicates from age plots")
 
     return fc_prism, fc_fixed, fc_age

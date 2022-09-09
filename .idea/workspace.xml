@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="24b00cc6-ae52-4a0e-b663-35945bc0553a" name="Changes" comment="debug tools after running in Pro toolbox" />
+    <list default="true" id="24b00cc6-ae52-4a0e-b663-35945bc0553a" name="Changes" comment="debug tools after running in Pro toolbox">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/02_check_required_fields_center.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/02_check_required_fields_center.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/03_check_plot_ids.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/06_check_plot_ids.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/04_check_fixed_offsets.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/07_check_fixed_offsets.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/05_verify_age_plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/08_verify_age_plots.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/06_check_prism_fixed_match.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/09_check_prism_fixed_match.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/07_check_required_fields_prism.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/03_check_required_fields_prism.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/08_check_required_fields_fixed.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/04_check_required_fields_fixed.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/09_check_required_fields_age.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/05_check_required_fields_age.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/10_remove_duplicates.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/10_remove_duplicates.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/clean_inputs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/clean_inputs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/toolbox/FMG_Tools.tbx" beforeDir="false" afterPath="$PROJECT_DIR$/toolbox/FMG_Tools.tbx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
