@@ -1,5 +1,8 @@
 #.idea directory
 .idea/workspace.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/fmg-toolbox.iml
 .idea/usage.statistics.xml
 .idea/shelf
 
