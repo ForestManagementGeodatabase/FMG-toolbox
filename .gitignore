@@ -1,3 +1,8 @@
+#.idea directory
+.idea/workspace.xml
+.idea/usage.statistics.xml
+.idea/shelf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
