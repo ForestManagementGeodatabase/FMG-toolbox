@@ -1,8 +1,12 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
+import clean_inputs
 from clean_inputs import check_required_fields_center
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_center = arcpy.GetParameterAsText(0)

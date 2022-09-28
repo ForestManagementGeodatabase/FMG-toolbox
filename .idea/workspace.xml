@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="24b00cc6-ae52-4a0e-b663-35945bc0553a" name="Changes" comment="debug tools after running in Pro toolbox">
+    <list default="true" id="24b00cc6-ae52-4a0e-b663-35945bc0553a" name="Changes" comment="update QA tools to use feature layers and add outputs to open map">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/qa/01_prep_qa_workspace.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/01_prep_qa_workspace.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/fmgpy/qa/02_check_required_fields_center.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/02_check_required_fields_center.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/03_check_plot_ids.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/06_check_plot_ids.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/04_check_fixed_offsets.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/07_check_fixed_offsets.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/05_verify_age_plots.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/08_verify_age_plots.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/06_check_prism_fixed_match.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/09_check_prism_fixed_match.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/07_check_required_fields_prism.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/03_check_required_fields_prism.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/08_check_required_fields_fixed.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/04_check_required_fields_fixed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/09_check_required_fields_age.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/05_check_required_fields_age.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/10_remove_duplicates.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/10_remove_duplicates.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/fmgpy/qa/clean_inputs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/qa/clean_inputs.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/toolbox/FMG_Tools.tbx" beforeDir="false" afterPath="$PROJECT_DIR$/toolbox/FMG_Tools.tbx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fmgpy/summaries/forest_calcs.py" beforeDir="false" afterPath="$PROJECT_DIR$/fmgpy/summaries/forest_calcs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,17 +33,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/GitHub_Repos/FMG/FMG-toolbox/fmgpy/qa&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/FMG"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\GitHub_Repos\FMG\FMG-toolbox\fmgpy\qa" />
       <recent name="C:\GitHub_Repos\FMG\FMG-toolbox\toolbox" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\FMG" />
+      <recent name="C:\FMG\" />
     </key>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -77,7 +73,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660053206794</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="update QA tools to use feature layers and add outputs to open map">
+      <created>1662730033972</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1662730033972</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -100,6 +103,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit from fmgpy" />
     <MESSAGE value="debug tools after running in Pro toolbox" />
-    <option name="LAST_COMMIT_MESSAGE" value="debug tools after running in Pro toolbox" />
+    <MESSAGE value="update QA tools to use feature layers and add outputs to open map" />
+    <option name="LAST_COMMIT_MESSAGE" value="update QA tools to use feature layers and add outputs to open map" />
   </component>
 </project>
