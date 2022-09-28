@@ -3,6 +3,9 @@
 import datetime
 import os
 import arcpy
+import importlib
+
+importlib.reload(arcpy)
 
 # define input parameters
 destinationFolder = arcpy.GetParameterAsText(0)
