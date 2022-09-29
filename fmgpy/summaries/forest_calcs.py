@@ -40,11 +40,15 @@ def ba(df):
 
     Details: Basal area per acre is the cross-section area of all the trees on an acre.
     """
+    assert isinstance(df, pd.DataFrame), "Must be a pandas DataFrame"
+    assert df.columns.isin(["TR_SP"]).any(), "df must contain column TR_SP"
+    assert df.columns.isin(["PLOT"]).any(), "df must contain column PLOT"
+
     baf = 10
     tree_count = df.TR_SP.count()
     plot_count = df.PLOT.nunique()
 
-    basal_area = (tree_count * baf)/plot_count
+    basal_area = (tree_count * baf) / plot_count
 
     return basal_area
 

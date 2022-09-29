@@ -7,18 +7,10 @@ import test_data
 import fmgpy.summaries.forest_calcs
 
 
-# Arrange
-@pytest.fixture(scope="module")
-def fmg_gdb():
-    fmg_gdb = os.path.join(test_data.data_folder(), "fmg_qad_data.gdb")
-    return fmg_gdb
-
-
-@pytest.fixture(scope="module")
-def prism_df():
-    prism_fc_path = os.path.join(fmg_gdb, "Prism")
-    prism_df = pd.DataFrame.spatial.from_featureclass(prism_fc_path)
-    return prism_df
+def test_float():
+    ba_2 = pd.DataFrame({"PLOT": [1], "TR_SP": ["ACSA2"]})
+    ba_float = fmgpy.summaries.forest_calcs.ba(ba_2)
+    assert isinstance(ba_float, float)
 
 
 def test_ba_0_plots_0_trees():
@@ -70,4 +62,3 @@ def test_ba_3_plots_3_trees():
                          "TR_SP": ["ACSA2", "ACSA2", "ACSA2"]})
     # basal area = (tree count = 3 * baf = 10) / plot count = 3 = 10
     assert fmgpy.summaries.forest_calcs.ba(ba_7) == 10
-
