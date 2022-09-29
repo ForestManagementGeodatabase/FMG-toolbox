@@ -8,17 +8,25 @@ import fmgpy.summaries.forest_calcs
 
 
 # Arrange
-@pytest.fixture(scope="module")
+@pytest.fixture
 def fmg_gdb():
     fmg_gdb = os.path.join(test_data.data_folder(), "fmg_qad_data.gdb")
     return fmg_gdb
 
 
-@pytest.fixture(scope="module")
-def prism_df():
-    prism_fc_path = os.path.join(str(fmg_gdb), "Prism")
+@pytest.fixture
+def prism_df(fmg_gdb):
+    prism_fc_path = os.path.join(fmg_gdb, "Prism")
     prism_df = pd.DataFrame.spatial.from_featureclass(prism_fc_path)
     return prism_df
+
+
+def test_fmg_gdb(fmg_gdb):
+    assert isinstance(fmg_gdb, str)
+
+
+def test_prism(prism_df):
+    assert isinstance(prism_df, pd.DataFrame)
 
 
 def test_ba_prism(prism_df):
