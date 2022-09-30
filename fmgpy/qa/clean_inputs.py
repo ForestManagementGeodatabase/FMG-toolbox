@@ -369,7 +369,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
 
     Keyword Arguments:
     fc_prism     -- Path to prism feature class
-    plot_name -- Name of plot field
+    plot_name    -- Name of plot field
     species_name -- Name of tree species field
     dia_name     -- Name of tree diameter field
     class_name   -- Name of tree class field

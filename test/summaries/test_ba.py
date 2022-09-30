@@ -21,7 +21,7 @@ def test_ba_0_plots_0_trees():
 
 def test_ba_1_plots_0_trees():
     ba_1 = pd.DataFrame({"PLOT": [1], "TR_SP": [""]})
-    # basal area = (tree count = 0 * baf = 10) / plot count = 1 = 10
+    # basal area = (tree count = 0 * baf = 10) / plot count = 1 = 0
     assert fmgpy.summaries.forest_calcs.ba(ba_1) == 0
 
 
