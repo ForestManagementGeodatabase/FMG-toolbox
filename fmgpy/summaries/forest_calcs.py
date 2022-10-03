@@ -57,8 +57,9 @@ def ba(df, plot_num):
 
     baf = 10
     trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
+    no_trees = df.TR_SP.isin(["NONE", "NoTree", "", " ", None]).values.sum()
 
-    tree_count = trees.values.sum()
+    tree_count = trees.values.sum() + no_trees
 
     if tree_count < 1:
         tree_count = 0
