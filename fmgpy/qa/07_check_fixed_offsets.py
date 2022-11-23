@@ -11,7 +11,7 @@ fc_center = arcpy.GetParameterAsText(0)
 center_plot_id_field = arcpy.GetParameterAsText(1)
 fc_fixed = arcpy.GetParameterAsText(2)
 fixed_plot_id_field = arcpy.GetParameterAsText(3)
-in_gdb = arcpy.GetParameterAsText(4)
+in_gdb = arcpy.Describe(fc_center).path
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_center)[0]:
@@ -23,4 +23,4 @@ if not split(fc_fixed)[0]:
 # check fixed plot offset from plot centers
 result = check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_field, in_gdb)
 
-arcpy.SetParameterAsText(5, result)
+arcpy.SetParameterAsText(4, result)
