@@ -11,8 +11,9 @@ species_name = arcpy.GetParameterAsText(2)
 dia_name = arcpy.GetParameterAsText(3)
 class_name = arcpy.GetParameterAsText(4)
 health_name = arcpy.GetParameterAsText(5)
-crew_name = arcpy.GetParameterAsText(6)
-date_name = arcpy.GetParameterAsText(7)
+misc_name = arcpy.GetParameterAsText(6)
+crew_name = arcpy.GetParameterAsText(7)
+date_name = arcpy.GetParameterAsText(8)
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_prism)[0]:
@@ -20,6 +21,6 @@ if not split(fc_prism)[0]:
 
 # check each field collected dataset for required fields
 result = check_required_fields_prism(fc_prism, plot_name, species_name, dia_name,
-                                     class_name, health_name, crew_name, date_name)
+                                     class_name, health_name, misc_name, crew_name, date_name)
 
-arcpy.SetParameterAsText(8, result)
+arcpy.SetParameterAsText(9, result)

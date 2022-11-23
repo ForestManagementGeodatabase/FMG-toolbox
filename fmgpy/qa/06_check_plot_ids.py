@@ -50,3 +50,5 @@ result_age = check_plot_ids(fc_center,
                             age_plot_id_field)
 
 arcpy.SetParameterAsText(10, result_age)
+
+arcpy.SetParameterAsText(11, fc_center)

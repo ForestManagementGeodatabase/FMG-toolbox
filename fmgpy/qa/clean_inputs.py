@@ -363,8 +363,8 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     return fc_center
 
 
-def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, class_name, health_name, crew_name,
-                                date_name):
+def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, class_name, health_name, misc_name,
+                                crew_name, date_name):
     """Checks prism plots for presence of required fields and for missing values in those fields.
 
     Keyword Arguments:
@@ -374,6 +374,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     dia_name     -- Name of tree diameter field
     class_name   -- Name of tree class field
     health_name  -- Name of tree health field
+    misc_name    -- Name of miscellaneous notes field (not required, but requires a standardized name)
     crew_name    -- Name of crew field
     date_name    -- Name of date field
     """
@@ -400,6 +401,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     prism_df = rename_fields(prism_df, dia_name, "TR_DIA")
     prism_df = rename_fields(prism_df, class_name, "TR_CL")
     prism_df = rename_fields(prism_df, health_name, "TR_HLTH")
+    prism_df = rename_fields(prism_df, misc_name, "MISC")
     prism_df = rename_fields(prism_df, crew_name, "COL_CREW")
     prism_df = rename_fields(prism_df, date_name, "COL_DATE")
 
@@ -469,7 +471,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     return fc_prism
 
 
-def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name, orig_name, grw_name, crew_name,
+def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name, orig_name, grw_name, misc_name, crew_name,
                               date_name):
     """Checks age plots for presence of required fields and for missing values in those fields.
 
@@ -481,6 +483,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     height_name  -- Name of tree height field
     orig_name    -- Name of tree origin date field
     grw_name     -- Name of tree growth field
+    misc_name    -- Name of miscellaneous notes field (not required, but requires a standardized name)
     crew_name    -- Name of crew field
     date_name    -- Name of date field
     """
@@ -509,6 +512,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     age_df = rename_fields(age_df, height_name, "AGE_HT")
     age_df = rename_fields(age_df, orig_name, "AGE_ORIG")
     age_df = rename_fields(age_df, grw_name, "AGE_GRW")
+    age_df = rename_fields(age_df, misc_name, "MISC")
     age_df = rename_fields(age_df, crew_name, "COL_CREW")
     age_df = rename_fields(age_df, date_name, "COL_DATE")
 
@@ -561,7 +565,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
 
 
 def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, un_ht_name, un_cover_name, un_sp_name,
-                                gr_sp_name, crew_name, date_name):
+                                gr_sp_name, misc_name, crew_name, date_name):
     """Checks fixed plots for presence of required fields and for missing values in those fields.
 
     Keyword Arguments:
@@ -573,6 +577,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     un_cover_name -- Name of understory cover field
     un_sp_name    -- Name of understory species field
     gr_sp_name    -- Name of ground species field
+    misc_name     -- Name of miscellaneous notes field (not required, but requires a standardized name)
     crew_name     -- Name of crew field
     date_name     -- Name of date field
     """
@@ -603,6 +608,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     fixed_df = rename_fields(fixed_df, un_cover_name, "UND_COV")
     fixed_df = rename_fields(fixed_df, un_sp_name, "UND_SP1")
     fixed_df = rename_fields(fixed_df, gr_sp_name, "GRD_SP1")
+    fixed_df = rename_fields(fixed_df, misc_name, "MISC")
     fixed_df = rename_fields(fixed_df, crew_name, "COL_CREW")
     fixed_df = rename_fields(fixed_df, date_name, "COL_DATE")
 

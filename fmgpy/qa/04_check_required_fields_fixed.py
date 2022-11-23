@@ -13,8 +13,9 @@ un_ht_name = arcpy.GetParameterAsText(4)
 un_cover_name = arcpy.GetParameterAsText(5)
 un_sp_name = arcpy.GetParameterAsText(6)
 gr_sp_name = arcpy.GetParameterAsText(7)
-crew_name = arcpy.GetParameterAsText(8)
-date_name = arcpy.GetParameterAsText(9)
+misc_name = arcpy.GetParameterAsText(8)
+crew_name = arcpy.GetParameterAsText(9)
+date_name = arcpy.GetParameterAsText(10)
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_fixed)[0]:
@@ -22,6 +23,6 @@ if not split(fc_fixed)[0]:
 
 # check each field collected dataset for required fields
 result = check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, un_ht_name, un_cover_name,
-                                     un_sp_name, gr_sp_name, crew_name, date_name)
+                                     un_sp_name, gr_sp_name, misc_name, crew_name, date_name)
 
-arcpy.SetParameterAsText(10, result)
+arcpy.SetParameterAsText(11, result)

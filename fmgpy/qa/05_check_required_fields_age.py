@@ -12,8 +12,10 @@ dia_name = arcpy.GetParameterAsText(3)
 height_name = arcpy.GetParameterAsText(4)
 orig_name = arcpy.GetParameterAsText(5)
 grw_name = arcpy.GetParameterAsText(6)
-crew_name = arcpy.GetParameterAsText(7)
-date_name = arcpy.GetParameterAsText(8)
+misc_name = arcpy.GetParameterAsText(7)
+crew_name = arcpy.GetParameterAsText(8)
+date_name = arcpy.GetParameterAsText(9)
+
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_age)[0]:
@@ -21,6 +23,6 @@ if not split(fc_age)[0]:
 
 # check each field collected dataset for required fields
 result = check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name,
-                                   orig_name, grw_name, crew_name, date_name)
+                                   orig_name, grw_name, misc_name, crew_name, date_name)
 
-arcpy.SetParameterAsText(9, result)
+arcpy.SetParameterAsText(10, result)
