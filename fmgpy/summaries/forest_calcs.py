@@ -16,65 +16,71 @@ def plot_count(df):
     return plot_num
 
 
+def tree_count(df):
+    # boolean series
+    trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
+
+    # sum number of True instances
+    num_trees = trees.values.sum()
+    return num_trees
+
+
 # Trees Per Acre (TPA)
-def density(df):
+def tpa(df_prism):
     """Calculates trees per acre. Returns one value.
 
     Keyword Arguments:
-    df       -- Input prism dataframe
-    plot_num -- Number of plots in the hierarchy level being summarized
+    df_prism -- Input prism dataframe
 
     Details: Trees per acre is the total number of trees in a given acre.
     """
-    assert isinstance(df, pd.DataFrame), "Must be a pandas DataFrame"
-    assert df.columns.isin(["TR_DIA"]).any(), "df must contain column TR_DIA"
-    assert df.columns.isin(["TR_SP"]).any(), "df must contain column TR_SP"
+    assert isinstance(df_prism, pd.DataFrame), "must be a pandas DataFrame"
+    assert df_prism.columns.isin(["TR_DIA"]).any(), "df must contain column TR_DIA"
+    assert df_prism.columns.isin(["TR_SP"]).any(), "df must contain column TR_SP"
 
     baf = 10
 
-    # if there is no tree, density = 0
-    df.loc[df.TR_SP.isin(["NONE", "NoTree"]), 'DENSITY'] = 0
+    # if filtered dataframe is empty (no plots), return null
+    if df_prism.PLOT.count() == 0:
+        density = None
+    # if there are no trees, tpa = 0
+    elif tree_count(df_prism) == 0:
+        density = 0
+    else:
+        # if there are trees, use density calc
+        density = (baf / (0.00545 * df_prism['TR_DIA'].mean() ** 2))
 
-    # if there is a tree, use density calc
-    df.loc[~df.TR_SP.isin(["NONE", "NoTree"]), 'DENSITY'] = (baf / (0.00545 * df['TR_DIA'] ** 2))
-
-    return df
+    return density
 
 
 # Basal Area (BA)
-def ba(df, plot_num):
-    """Calculates basal area per acre. Returns one value.
+def ba(df_prism):
+    """Calculates basal area, returns one value.
 
     Keyword Arguments:
-    df       -- Input prism dataframe
-    plot_num -- Number of plots in the hierarchy level being summarized
+    df_prism  -- Input prism dataframe
 
-    Details: Basal area per acre is the cross-section area of all the trees on an acre.
+    Details: Basal area is the cross-section area of all the trees in a given area.
     """
-    assert isinstance(df, pd.DataFrame), "must be a pandas DataFrame"
-    assert df.columns.isin(["TR_SP"]).any(), "dataframe must contain column TR_SP"
-    assert isinstance(plot_num, int), "plot_num must be an integer"
+    assert isinstance(df_prism, pd.DataFrame), "must be a pandas DataFrame"
+    assert df_prism.columns.isin(["TR_SP"]).any(), "dataframe must contain column TR_SP"
+    assert df_prism.columns.isin(["PLOT"]).any(), "dataframe must contain column TR_SP"
 
-    baf = 10
-    trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
-    no_trees = df.TR_SP.isin(["NONE", "NoTree", "", " ", None]).values.sum()
-
-    tree_count = trees.values.sum() + no_trees
-
-    if tree_count < 1:
-        tree_count = 0
-
-    basal_area = (tree_count * baf) / plot_num
+    # if filtered dataframe is empty (no plots), return null
+    if df_prism.PLOT.count() == 0:
+        basal_area = None
+    else:
+        baf = 10
+        basal_area = (tree_count(df_prism) * baf) / plot_count(df_prism)
 
     return basal_area
 
 
 # Quadratic Mean Diameter at Breast Height (QM DBH)
-def qm_dbh(df, ba, tpa):
+def qm_dbh(ba, tpa):
     """Calculates quadratic mean at diameter breast height. Returns one value.
 
     Keyword Arguments:
-    df  -- Input dataframe
     ba  -- Basal area
     tpa -- Trees per acre
 
@@ -83,7 +89,8 @@ def qm_dbh(df, ba, tpa):
     This becomes convenient in that we often have basal area per acre and trees per acre but
     not the diameters of all the trees.
     """
-    assert isinstance(df, pd.DataFrame), "Must be a pandas DataFrame"
+    assert isinstance(ba, float), "basal area must be a float"
+    assert isinstance(tpa, float), "tpa must be a float"
 
     qmdbh = math.sqrt((ba / tpa) / 0.005454154)
     return qmdbh
