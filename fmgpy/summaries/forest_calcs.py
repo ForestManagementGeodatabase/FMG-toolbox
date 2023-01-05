@@ -5,6 +5,7 @@ import sys
 import arcpy
 import math
 import pandas as pd
+import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 
 arcpy.env.overwriteOutput = True
@@ -32,7 +33,7 @@ def tpa(df_prism):
     Keyword Arguments:
     df_prism -- Input prism dataframe
 
-    Details: Trees per acre is the total number of trees in a given acre.
+    Details: Trees per acre is a measure of stand density, i.e. the total number of trees in a given area.
     """
     assert isinstance(df_prism, pd.DataFrame), "must be a pandas DataFrame"
     assert df_prism.columns.isin(["TR_DIA"]).any(), "df must contain column TR_DIA"
@@ -48,7 +49,18 @@ def tpa(df_prism):
         density = 0
     else:
         # if there are trees, use density calc
-        density = (baf / (0.00545 * df_prism['TR_DIA'].mean() ** 2))
+        # replace null TR_DIA with 0 for rows without a tree
+        no_nan = df_prism
+        no_nan.loc[no_nan.TR_SP.isin(["NONE", "NoTree"]), 'TR_DIA'] = 0
+
+        # expansion factor = BAF / Tree Basal Area [.005454 x DBH^2] / Plots
+        expansion_factor = baf / (0.005454 * (no_nan['TR_DIA'] ** 2)) / plot_count(df_prism)
+
+        # replace infinity values with 0 for rows with no tree (diameter of 0)
+        rm_inf = expansion_factor.replace([np.inf, -np.inf], 0)
+
+        # TPA = sum of expansion factors
+        density = rm_inf.values.sum()
 
     return density
 
@@ -60,7 +72,10 @@ def ba(df_prism):
     Keyword Arguments:
     df_prism  -- Input prism dataframe
 
-    Details: Basal area is the cross-section area of all the trees in a given area.
+    Details: Basal area is the cross-section area of all the trees in a given acre.
+    Total Basal Area per acre calculation from Washington State University Extension:
+    (Trees * BAF)/Plots
+    For a Basal Area Factor of 10, each "in" tree represents 10 square feet of basal area.
     """
     assert isinstance(df_prism, pd.DataFrame), "must be a pandas DataFrame"
     assert df_prism.columns.isin(["TR_SP"]).any(), "dataframe must contain column TR_SP"
