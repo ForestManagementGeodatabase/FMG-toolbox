@@ -9,9 +9,9 @@ Create a table of metrics used to calculate the Floodplain Forest HSI.
 :param: fixed           str; Path to the FMG "Fixed" point feature class.
 :param: prism           str; Path to the FMG "Prism" point feature class.
 
-:return: A geodatabase table containing a field for each metric in the
-Floodplain Forest HSI.
-
+:return: Writes a geodatabase table containing a field for each metric in the
+Floodplain Forest HSI. The table is named "floodplain_forest_metrics" with
+suffix for the level.
 """
 import os
 import arcpy
@@ -61,7 +61,8 @@ def main():
     arcpy.AddMessage("Combined metrics")
 
     # Write summary table
-    metrics_path = os.path.join(output_gdb, "floodplain_forest_metrics")
+    metrics_level = "floodplain_forest_metrics_" + level_field
+    metrics_path = os.path.join(output_gdb, metrics_level)
     metrics_df.spatial.to_table(metrics_path,
                                 overwrite=True,
                                 sanitize_columns=False)

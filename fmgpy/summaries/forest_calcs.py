@@ -182,7 +182,6 @@ def stocking_pct(avg_tpa, qm_dbh):
 # Inventory Date (year, range of years)
 
 # Percent Cover
-
 def cover_pct(fixed, level):
     """Calculate Average Plot Percent Canopy Cover of Overstory
 
@@ -200,13 +199,17 @@ def cover_pct(fixed, level):
     assert isinstance(level, str), "level must be a string"
     assert level in ["unit", "site", "stand", "plot"], "supply correct level"
 
+    # Get the FMG level to summarize by
     level_field = fmg_level(level)
 
+    # Summarize
     level_cover_pct = fixed.groupby(level_field,
                                     as_index=False)["OV_CLSR_NUM"].mean()
 
+    # Format
     level_cover_pct.rename(columns={"OV_CLSR_NUM": "canopy_per"},
                            inplace=True)
+    level_cover_pct = level_cover_pct.round({"canopy_per": 2})
 
     return level_cover_pct
 
