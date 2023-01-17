@@ -205,6 +205,9 @@ def cover_pct(fixed, level):
     level_cover_pct = fixed.groupby(level_field,
                                     as_index=False)["OV_CLSR_NUM"].mean()
 
+    level_cover_pct.rename(columns={"OV_CLSR_NUM": "canopy_per"},
+                           inplace=True)
+
     return level_cover_pct
 
 
