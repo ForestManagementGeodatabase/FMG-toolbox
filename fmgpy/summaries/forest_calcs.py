@@ -11,6 +11,28 @@ from arcgis.features import GeoAccessor, GeoSeriesAccessor
 arcpy.env.overwriteOutput = True
 
 
+def fmg_level(level):
+    """Get the FMG level field
+
+    :param: level   str; The FMG hierarchical level. One of: "unit", "site",
+                    "stand", "plot".
+
+    :return: The Field name of the FMG level.
+    """
+    assert level in ["unit", "site", "stand", "plot"], "supply correct level"
+
+    if level == "unit":
+        level_field = "UNIT"
+    elif level == "site":
+        level_field = "SITE"
+    elif level == "stand":
+        level_field = "SID"
+    elif level == "plot":
+        level_field = "PID"
+
+    return level_field
+
+
 def plot_count(df):
     """Count the number unique plots
 
@@ -168,7 +190,7 @@ def cover_pct(fixed, level):
     hierarchical level.
 
     :param: fixed   DataFrame; An FMG Fixed Plot data frame.
-    :param: level   string; The FMG hierarchical level. One of: "unit", "site",
+    :param: level   str; The FMG hierarchical level. One of: "unit", "site",
                     "stand", "plot".
 
     :return: A data frame of percent canopy cover values for the specified
@@ -176,5 +198,19 @@ def cover_pct(fixed, level):
     """
     assert isinstance(fixed, pd.DataFrame), "fixed must be a DataFrame"
     assert isinstance(level, str), "level must be a string"
+    assert level in ["unit", "site", "stand", "plot"], "supply correct level"
+
+    level_field = fmg_level(level)
+
+    level_cover_pct = fixed.groupby(level_field,
+                                    as_index=False)["OV_CLSR_NUM"].mean()
+
+    return level_cover_pct
+
+
+
+
+
+
 
 
