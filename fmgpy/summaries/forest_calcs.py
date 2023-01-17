@@ -12,12 +12,24 @@ arcpy.env.overwriteOutput = True
 
 
 def plot_count(df):
+    """Count the number unique plots
+
+    :param: df   DataFrame; An FMG "Age", Fixed", or "Prism" plot dataset.
+
+    :return: An integer count of unique plots.
+    """
     plot_num = df.PLOT.nunique()
 
     return plot_num
 
 
 def tree_count(df):
+    """Count the number of trees
+
+    :param: df   DataFrame; An FMG "Prism" plot dataset.
+
+    :return: An integer count of trees
+    """
     # boolean series
     trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
 
@@ -146,3 +158,23 @@ def stocking_pct(avg_tpa, qm_dbh):
 # Forest Community (species list, numeric ID)
 
 # Inventory Date (year, range of years)
+
+# Percent Cover
+
+def cover_pct(fixed, level):
+    """Calculate Average Plot Percent Canopy Cover of Overstory
+
+    Calculate the overstory canopy cover percent for the specified FMG
+    hierarchical level.
+
+    :param: fixed   DataFrame; An FMG Fixed Plot data frame.
+    :param: level   string; The FMG hierarchical level. One of: "unit", "site",
+                    "stand", "plot".
+
+    :return: A data frame of percent canopy cover values for the specified
+    FMG hierarchical level.
+    """
+    assert isinstance(fixed, pd.DataFrame), "fixed must be a DataFrame"
+    assert isinstance(level, str), "level must be a string"
+
+
