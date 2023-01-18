@@ -2,30 +2,18 @@
 
 """
 Tool Chain Overview -
-Convert user selection to a feature layer persisted
-Dissolve the feature layer as subsequent buffers are water and forest edge related
-From feature layer create persisted water buffer (negative, full)
-From feature layer create persisted walkthrough buffer (negative, outside only)
-Create Fishnet with label points using feature layer extent info
-Using Erase Points remove label points outside of water buffer
-Spatial join with FOREST Stand Dataset to populate POOL COMP UNIT SITE STAND Fields
-Add PLOT Field
-Add Age Field
-Add Walkthrough Field
-Add WorkUnitName Field
-Populate PLOT Field
-Populate WorkUnitName
-Create layer file from erased points
-Create a selection based on walkthrough buffer
-Populate walkthrough field based on selection
-Remove selection
-Persist layer file
 
+Spatial join FMG.ForestStands to plot center fc
 
-Consider creating an option for auto populating Age field based on rules
-Need to debug the removal of spatial join business fields
-May skip adding the POOL COMP UNIT SITE STAND IDs until the SDE datasets get refined a bit
+Append site ID (SID) to plot center
 
+Create PID field by appending plot ID to SID
+
+Extract all hierarchy levels from SID into individual fields in plot center
+(pool,  compartment,  unit,  site,  stand,  plot)
+(p11,   c002,         u006,  st08,  s004,   pl834)
+
+Append hierarchies to prism, fixed, and age tables on plot ID
 """
 
 import arcpy

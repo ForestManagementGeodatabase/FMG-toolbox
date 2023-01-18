@@ -91,7 +91,7 @@ arcpy.AddMessage('User selected area saved')
 arcpy.Delete_management(in_data='AOI')
 
 # Set workspace
-arcpy.env.Workspace = outGeodatabase
+arcpy.env.workspace = outGeodatabase
 
 # Dissolve persisted user selection
 arcpy.Dissolve_management(in_features=outUserSelection,
@@ -102,13 +102,13 @@ arcpy.AddMessage('User selection dissolved')
 # Create Shore and Walkthrough Buffers
 arcpy.Buffer_analysis(in_features=outDissolve,
                       out_feature_class=outShoreBuffer,
-                      buffer_distance_or_field=-2.835,
+                      buffer_distance_or_field=2.835,
                       line_side="FULL")
 arcpy.AddMessage('Shoreline buffer created')
 
 arcpy.Buffer_analysis(in_features=outDissolve,
                       out_feature_class=outWalkBuffer,
-                      buffer_distance_or_field=-42.672,
+                      buffer_distance_or_field=42.672,
                       line_side="OUTSIDE_ONLY")
 arcpy.AddMessage('Walkthrough buffer created')
 
