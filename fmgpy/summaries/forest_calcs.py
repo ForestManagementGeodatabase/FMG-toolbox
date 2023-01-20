@@ -203,13 +203,12 @@ def cover_pct(fixed, level):
     level_field = fmg_level(level)
 
     # Summarize
-    level_cover_pct = fixed.groupby(level_field,
-                                    as_index=False)["OV_CLSR_NUM"].mean()
-
-    # Format
-    level_cover_pct.rename(columns={"OV_CLSR_NUM": "canopy_per"},
-                           inplace=True)
-    level_cover_pct = level_cover_pct.round({"canopy_per": 2})
+    level_cover_pct = (fixed
+                       .groupby(level_field,
+                                as_index=False)["OV_CLSR_NUM"]
+                       .agg(["mean"])
+                       .rename(columns={"mean": "canopy_per"})
+                       .round({"canopy_per": 2}))
 
     return level_cover_pct
 
