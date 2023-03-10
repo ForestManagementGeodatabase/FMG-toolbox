@@ -42,4 +42,10 @@ Check out the [NEWS](NEWS.md) for details on the latest updates.
 ## Bug Reports
 If you find any bugs while using the FMG toolbox toolbox, please open an [issue](https://github.com/ForestManagementGeodatabase/FMG-toolbox/issues) in this repository. 
 
-***  
+*** 
+
+## Configure PyCharm (Devs)
+1. Set Python Interpreter - Go to File | Setings | Project <Project Name> | Python Interpreter. Configure the source to the ArcGIS Pro python interpreter installed alongside your Pro install. Generally at this path: "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe"
+2. Set Python Terminal 
+3. Set Python Console 
+
