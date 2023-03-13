@@ -46,6 +46,7 @@ If you find any bugs while using the FMG toolbox toolbox, please open an [issue]
 
 ## Configure PyCharm (Devs)
 1. Set Python Interpreter - Go to File | Setings | Project <Project Name> | Python Interpreter. Configure the source to the ArcGIS Pro python interpreter installed alongside your Pro install. Generally at this path: "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe"
-2. Set Python Terminal 
-3. Set Python Console 
+2. Set Python Terminal - Go to File | Settings | Tools | Terminal. Set the shell path to C:\Program Files\ArcGIS\Pro\bin\Python\Scripts\proenv.bat.
+3. Set Python Console - Go to File | Settings | Build, Execution, Deployment | Console. Uncheck the radio button next to 'Use IPython if available'. Note this changes the console to a more IDLE like experience, to continue using the console in a python-notebook like experience, ignore this step.
+
 
