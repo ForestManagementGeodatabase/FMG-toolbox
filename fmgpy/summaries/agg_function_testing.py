@@ -1,6 +1,6 @@
-def treecount(x):
+def treecount(tr_sp):
     trees = []
-    for val in x:
+    for val in tr_sp:
         if val == 'NoTree':
             continue
         elif val == 'NONE':
@@ -14,3 +14,10 @@ def treecount(x):
         else:
             trees.append(val)
     return float(len(trees))
+
+def plotcount(x):
+    return float(x.nunique())
+
+
+
+
