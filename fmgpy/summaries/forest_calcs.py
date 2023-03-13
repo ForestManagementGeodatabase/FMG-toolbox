@@ -40,7 +40,7 @@ def plot_count(df):
 
     :return: An integer count of unique plots.
     """
-    plot_num = df.PLOT.nunique()
+    plot_num = df.PID.nunique()
 
     return plot_num
 
@@ -76,7 +76,7 @@ def tpa(df_prism):
     baf = 10
 
     # if filtered dataframe is empty (no plots), return null
-    if df_prism.PLOT.count() == 0:
+    if df_prism.PID.count() == 0:
         density = None
     # if there are no trees, tpa = 0
     elif tree_count(df_prism) == 0:
