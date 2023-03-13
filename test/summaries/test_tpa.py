@@ -7,7 +7,7 @@ import fmgpy.summaries.forest_calcs
 
 
 def test_float():
-    tpa_2 = pd.DataFrame({"PLOT": [1],
+    tpa_2 = pd.DataFrame({"PID": [1],
                           "TR_SP": ["ACSA2"],
                           "TR_DIA": [3]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [1] = 100
@@ -16,7 +16,7 @@ def test_float():
 
 
 def test_tpa_0_plots_0_trees():
-    tpa_0 = pd.DataFrame({"PLOT": [],
+    tpa_0 = pd.DataFrame({"PID": [],
                           "TR_SP": [],
                           "TR_DIA": []})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [1]
@@ -24,7 +24,7 @@ def test_tpa_0_plots_0_trees():
 
 
 def test_tpa_1_plots_0_trees():
-    tpa_1 = pd.DataFrame({"PLOT": [1],
+    tpa_1 = pd.DataFrame({"PID": [1],
                           "TR_SP": [""],
                           "TR_DIA": [0]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [1]
@@ -32,7 +32,7 @@ def test_tpa_1_plots_0_trees():
 
 
 def test_tpa_1_plot_1_trees():
-    tpa_2 = pd.DataFrame({"PLOT": [1],
+    tpa_2 = pd.DataFrame({"PID": [1],
                           "TR_SP": ["ACSA2"],
                           "TR_DIA": [10]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [1]
@@ -41,7 +41,7 @@ def test_tpa_1_plot_1_trees():
 
 
 def test_tpa_1_plot_2_trees():
-    tpa_3 = pd.DataFrame({"PLOT": [1, 1],
+    tpa_3 = pd.DataFrame({"PID": [1, 1],
                           "TR_SP": ["ACSA2", "ACSA2"],
                           "TR_DIA": [5, 15]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [1]
@@ -50,7 +50,7 @@ def test_tpa_1_plot_2_trees():
 
 
 def test_tpa_2_plots_na_trees():
-    tpa_4 = pd.DataFrame({"PLOT": [1, 2, 1],
+    tpa_4 = pd.DataFrame({"PID": [1, 2, 1],
                           "TR_SP": ["ACSA2", "", "ACSA2"],
                           "TR_DIA": [25, 0, 10]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [2]
@@ -59,7 +59,7 @@ def test_tpa_2_plots_na_trees():
 
 
 def test_tpa_2_plots_3_trees():
-    tpa_5 = pd.DataFrame({"PLOT": [1, 2, 2],
+    tpa_5 = pd.DataFrame({"PID": [1, 2, 2],
                           "TR_SP": ["ACSA2", "ACSA2", "ACSA2"],
                           "TR_DIA": [5, 5, 30]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [2]
@@ -68,7 +68,7 @@ def test_tpa_2_plots_3_trees():
 
 
 def test_tpa_2_plots_2_trees():
-    tpa_6 = pd.DataFrame({"PLOT": [1, 2],
+    tpa_6 = pd.DataFrame({"PID": [1, 2],
                           "TR_SP": ["ACSA2", "ACSA2"],
                           "TR_DIA": [15, 10]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [2]
@@ -77,7 +77,7 @@ def test_tpa_2_plots_2_trees():
 
 
 def test_tpa_2_plots_3_trees():
-    tpa_7 = pd.DataFrame({"PLOT": [1, 2, 2],
+    tpa_7 = pd.DataFrame({"PID": [1, 2, 2],
                           "TR_SP": ["ACSA2", "ACSA2", "ACSA2"],
                           "TR_DIA": [15, 15, 11]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [2]
@@ -86,7 +86,7 @@ def test_tpa_2_plots_3_trees():
 
 
 def test_tpa_2_plots_11_trees():
-    tpa_8 = pd.DataFrame({"PLOT": [1, 1, 1, 1, 1, 1,
+    tpa_8 = pd.DataFrame({"PID": [1, 1, 1, 1, 1, 1,
                                    2, 2, 2, 2, 2],
                           "TR_SP": ["ACSA2", "ACSA2", "ACSA2", "ACSA2", "ACSA2", "ACSA2",
                                     "ACSA2", "ACSA2", "ACSA2", "ACSA2", "ACSA2"],
@@ -98,7 +98,7 @@ def test_tpa_2_plots_11_trees():
 
 
 def test_tpa_3_plots_3_trees():
-    tpa_9 = pd.DataFrame({"PLOT": [1, 2, 3],
+    tpa_9 = pd.DataFrame({"PID": [1, 2, 3],
                           "TR_SP": ["ACSA2", "ACSA2", "ACSA2"],
                           "TR_DIA": [20, 30, 40]})
     # density = sum of BAF [10] / Tree Basal Area (.005454 x DBH^2) [0.05] / Plots [2]
