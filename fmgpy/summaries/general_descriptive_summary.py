@@ -57,9 +57,10 @@ site_tpa = prism_df.groupby(level, as_index=False).apply(fmgpy.summaries.forest_
 site_tpa = prism_df.groupby(level, as_index=False).agg(10 / (0.005454 * (prism_df['TR_DIA'] ** 2)) / fmgpy.summaries.forest_calcs.plot_count(prism_df))
 
 # and then
-site_tpa = prism_df.groupby(level, as_index=False).agg(
-    plot_count=('PID', 'nunique'),
-    tree_count=('TR_SP', fmgpy.summaries.agg_function_testing.treecount)
+site_tpa = prism_df\
+    .groupby(level)\
+    .agg(plot_count=('PID', fmgpy.summaries.agg_function_testing.plotcount),
+         tree_count=('TR_SP', fmgpy.summaries.agg_function_testing.treecount)
 )
 
 
