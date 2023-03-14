@@ -452,15 +452,15 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
 
     # flag trees where dia >18 AND intermediate
     prism_df.loc[(prism_df.TR_DIA > 18) & (prism_df.TR_CL == 'I'),
-                 'CANOPY_DBH_FLAG'] = "Class = I and diameter > 18in"
+    'CANOPY_DBH_FLAG'] = "Class = I and diameter > 18in"
 
     # flag trees where dia <12 AND co-dominant
     prism_df.loc[(prism_df.TR_DIA < 12) & (prism_df.TR_CL == 'CD'),
-                 'CANOPY_DBH_FLAG'] = "Class = CD and diameter < 12in"
+    'CANOPY_DBH_FLAG'] = "Class = CD and diameter < 12in"
 
     # flag trees where dia <30 AND dominant
     prism_df.loc[(prism_df.TR_DIA < 30) & (prism_df.TR_CL == 'D'),
-                 'CANOPY_DBH_FLAG'] = "Class = D and diameter < 30in"
+    'CANOPY_DBH_FLAG'] = "Class = D and diameter < 30in"
 
     arcpy.AddMessage("\nCheck complete")
 
@@ -471,7 +471,8 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     return fc_prism
 
 
-def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name, orig_name, grw_name, misc_name, crew_name,
+def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name, orig_name, grw_name, misc_name,
+                              crew_name,
                               date_name):
     """Checks age plots for presence of required fields and for missing values in those fields.
 
@@ -693,3 +694,140 @@ def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age):
                      f"\nRemoved {len(age_duplicates.index)} duplicates from age plots")
 
     return fc_prism, fc_fixed, fc_age
+
+
+def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, comp, unit, site, stand):
+    """Adds FMG hierarchy levels to plot center fc through spatial join. Adds hierarchy levels to prism, fixed, and
+    age fc through tabular join on plot ID.
+
+    Keyword Arguments:
+    fc_polygons     -- Path to FMG polygon feature class
+    fc_center       -- Path to plot center feature class
+    fc_prism        -- Path to prism feature class
+    fc_fixed        -- Path to fixed plot feature class
+    fc_age          -- Path to fixed plot feature class
+    pool            -- FMG polygon pool ID field
+    comp            -- FMG polygon comp ID field
+    unit            -- FMG polygon unit ID field
+    site            -- FMG polygon site ID field
+    stand           -- FMG polygon stand ID field
+    """
+
+    # create dataframes
+    center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
+    prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
+    fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
+    age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
+
+    # convert PLOT to int if float
+    center_df.PLOT = center_df.PLOT.astype(int)
+
+    arcpy.AddMessage(
+        "Checking spatial relationship between plots and FMG polygons")
+
+    # location for spatial join fc
+    in_gdb = arcpy.Describe(fc_center).path
+    plots_spatial_join = os.path.join(in_gdb, "plots_spatial_join")
+
+    arcpy.analysis.SpatialJoin(target_features=fc_center,
+                               join_features=fc_polygons,
+                               out_feature_class=plots_spatial_join,
+                               join_operation="JOIN_ONE_TO_MANY",
+                               match_option="INTERSECT")
+
+    # create dataframe from spatial join
+    join_df = pd.DataFrame.spatial.from_featureclass(plots_spatial_join)
+
+    arcpy.AddMessage(
+        "Adding fields")
+
+    # pad PLOT ID with leading zeroes if less than 4 numbers
+    center_df['PLOT_PAD'] = center_df['PLOT'].astype(str)
+    center_df['PLOT_PAD'] = center_df['PLOT_PAD'].str.zfill(4)
+
+    # add fields
+    center_merge_df = center_df.merge(join_df[['PLOT', pool, comp, unit, site, stand]], on='PLOT', how='left')
+    center_merge_df['PID'] = center_merge_df['SID'] + "pl" + center_merge_df['PLOT_PAD']
+    center_df = center_df.drop(columns=['PLOT_PAD'])
+
+    prism_merge_df = prism_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+    fixed_merge_df = fixed_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+    age_merge_df = age_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+
+    # cleanup
+    center_merge_df = center_merge_df.drop(columns=['PLOT_PAD'])
+    arcpy.Delete_management(plots_spatial_join)
+
+    # flag plot centers not within a stand
+    center_df.loc[center_df['SID'] != '', 'VALID_SID'] = "Yes"
+    center_df.loc[center_df['SID'] == '', 'VALID_SID'] = "No"
+
+    return fc_polygons, center_merge_df, prism_merge_df, fixed_merge_df, age_merge_df
+
+
+def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, comp, unit, site, stand):
+    """Adds FMG hierarchy levels to plot center fc through spatial join. Adds hierarchy levels to prism, fixed, and
+    age fc through tabular join on plot ID.
+
+    Keyword Arguments:
+    fc_polygons     -- Path to FMG polygon feature class
+    fc_center       -- Path to plot center feature class
+    fc_prism        -- Path to prism feature class
+    fc_fixed        -- Path to fixed plot feature class
+    fc_age          -- Path to fixed plot feature class
+    pool            -- FMG polygon pool ID field
+    comp            -- FMG polygon comp ID field
+    unit            -- FMG polygon unit ID field
+    site            -- FMG polygon site ID field
+    stand           -- FMG polygon stand ID field
+    """
+
+    # create dataframes
+    center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
+    prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
+    fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
+    age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
+
+    # convert PLOT to int if float
+    center_df.PLOT = center_df.PLOT.astype(int)
+
+    arcpy.AddMessage(
+        "Checking spatial relationship between plots and FMG polygons")
+
+    # location for spatial join fc
+    in_gdb = arcpy.Describe(fc_center).path
+    plots_spatial_join = os.path.join(in_gdb, "plots_spatial_join")
+
+    arcpy.analysis.SpatialJoin(target_features=fc_center,
+                               join_features=fc_polygons,
+                               out_feature_class=plots_spatial_join,
+                               join_operation="JOIN_ONE_TO_MANY",
+                               match_option="INTERSECT")
+
+    # create dataframe from spatial join
+    join_df = pd.DataFrame.spatial.from_featureclass(plots_spatial_join)
+
+    arcpy.AddMessage(
+        "Adding fields")
+
+    # pad PLOT ID with leading zeroes if less than 4 numbers
+    center_df['PLOT_PAD'] = center_df['PLOT'].astype(str)
+    center_df['PLOT_PAD'] = center_df['PLOT_PAD'].str.zfill(4)
+
+    # add fields
+    center_merge_df = center_df.merge(join_df[['PLOT', pool, comp, unit, site, stand]], on='PLOT', how='left')
+    center_merge_df['PID'] = center_merge_df['SID'] + "pl" + center_merge_df['PLOT_PAD']
+
+    prism_merge_df = prism_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+    fixed_merge_df = fixed_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+    age_merge_df = age_df.merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID']], on='PLOT', how='left')
+
+    # cleanup
+    center_merge_df = center_merge_df.drop(columns=['PLOT_PAD'])
+    arcpy.Delete_management(plots_spatial_join)
+
+    # flag plot centers not within a stand
+    center_merge_df.loc[center_merge_df['SID'] != '', 'VALID_SID'] = "Yes"
+    center_merge_df.loc[center_merge_df['SID'] == '', 'VALID_SID'] = "No"
+
+    return fc_polygons, center_merge_df, prism_merge_df, fixed_merge_df, age_merge_df
