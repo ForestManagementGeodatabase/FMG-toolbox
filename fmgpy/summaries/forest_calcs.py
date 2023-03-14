@@ -113,10 +113,10 @@ def ba(df_prism):
     """
     assert isinstance(df_prism, pd.DataFrame), "must be a pandas DataFrame"
     assert df_prism.columns.isin(["TR_SP"]).any(), "dataframe must contain column TR_SP"
-    assert df_prism.columns.isin(["PLOT"]).any(), "dataframe must contain column TR_SP"
+    assert df_prism.columns.isin(["PID"]).any(), "dataframe must contain column TR_SP"
 
     # if filtered dataframe is empty (no plots), return null
-    if df_prism.PLOT.count() == 0:
+    if df_prism.PID.count() == 0:
         basal_area = None
     else:
         baf = 10
