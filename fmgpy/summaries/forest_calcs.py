@@ -45,6 +45,18 @@ def plot_count(df):
     return plot_num
 
 
+def agg_plot_count(PID):
+    """Counts unique plots, including no tree plots.
+
+    Keyword Arguments:
+    PID -- Input plot ID column.
+
+    Details: Function returns a single value and is to be used within a
+    dataframe to create a plot count column (.groupby, .agg).
+    """
+    return float(PID.nunique())
+
+
 def tree_count(df):
     """Count the number of trees
 
@@ -58,6 +70,32 @@ def tree_count(df):
     # sum number of True instances
     num_trees = trees.values.sum()
     return num_trees
+
+
+def agg_tree_count(tr_sp):
+    """Counts trees, excluding no tree records.
+
+    Keyword Arguments:
+    tr_sp -- Input tree species column.
+
+    Details: Function returns a single value and is to be used within a
+    dataframe to create a tree count column (.groupby, .agg).
+    """
+    trees = []
+    for val in tr_sp:
+        if val == 'NoTree':
+            continue
+        elif val == 'NONE':
+            continue
+        elif val == '':
+            continue
+        elif val == ' ':
+            continue
+        elif val is None:
+            continue
+        else:
+            trees.append(val)
+    return float(len(trees))
 
 
 # Trees Per Acre (TPA)
@@ -181,6 +219,7 @@ def stocking_pct(avg_tpa, qm_dbh):
 
 # Inventory Date (year, range of years)
 
+
 # Percent Cover
 def cover_pct(fixed, level):
     """Calculate Average Plot Percent Canopy Cover of Overstory
@@ -213,7 +252,102 @@ def cover_pct(fixed, level):
     return level_cover_pct
 
 
+# Assign size class categorical variable column
+def size_class_map(tr_dia):
+    """Maps a size class categorical variable onto the tree diameter range
+     as specified by USACE foresters
 
+     Keyword Args
+     tr_dia -- diameter of a given tree
+
+     Details: written to function within the pandas .loc method
+     """
+
+    if 1 <= tr_dia <=6:
+        return 'Sappling'
+    if 6 < tr_dia <= 12:
+        return 'Pole'
+    if 12 < tr_dia <= 18:
+        return 'Saw'
+    if 18 < tr_dia <= 24:
+        return 'Mature'
+    if tr_dia > 24:
+        return 'Over Mature'
+
+
+# Create tree intermediate table
+def create_tree_table(prism_df):
+    """Creates the tree dataframe for use in downstream forest summaries by:
+        Column TR_DIA is set to 0 for no tree rows
+        Column TR_SIZE is added and populated with size class based on tree diameter ranges
+        Column TR_BA is added and populated with the eq (tree_count * BAF) / plot_count
+        Column TR_DENS is added and populated with the eq (0.005454 * (tr_dia ** 2)) / plot_count
+
+    Keyword Args
+    prism_df -- the prism plot feature class directly imported as a dataframe
+
+    Details: None
+    """
+
+    # Create Tree Data Frame
+    tree_table = prism_df.drop \
+        (['CREATED_USER', 'CREATED_DATE', 'LAST_EDITED_USER', 'LAST_EDITED_DATE', 'SE_ANNO_CAD_DATA'],
+         axis=1,
+         errors='ignore')
+
+    # Set TR_DIA to 0 if TR_SP is NoTree or None
+    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree"]), 'TR_DIA'] = 0
+
+    # Add a tree size class field (Sap, Pole, Saw, Mature, Over Mature)
+    tree_table['TR_SIZE'] = tree_table['TR_DIA'].map(size_class_map)
+
+    # Define constants for BA & Density calcs, assuming 1 tree, 1 plot
+    tree_count = 1
+    plot_count = 1
+    baf = 10
+    forester_constant = 0.005454
+
+    # Add and Calculate BA column, then set BA to 0 where no tree
+    tree_table['TR_BA'] = (tree_count * baf) / plot_count
+    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree"]), 'TR_BA'] = 0
+
+    # Add and calculate density column (TPA)
+    tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
+
+    return tree_table
+
+
+# Create plot intermediate table
+def create_plot_table(fixed_df, age_df):
+    """ Create the plot dataframe for use in downstream summaries by:
+            Combining Fixed and Age Plot dataframes
+
+    Keyword Args
+    fixed_df -- the fixed plot feature class directly imported as a dataframe
+    age_df   -- the age plot feature class directly imported as a dataframe
+
+    Details: None
+    """
+
+    # Create and clean fixed plot dataframe
+    cleanfixed_df = fixed_df \
+        .drop(['CREATED_USER', 'CREATED_DATE', 'LAST_EDITED_USER', 'LAST_EDITED_DATE', 'SE_ANNO_CAD_DATA', 'OBJECTID'],
+              axis=1,
+              errors='ignore') \
+        .rename(columns={'MISC': 'FX_MISC'}) \
+        .set_index('PID')
+
+    # create and clean age plot dataframe
+    cleanage_df = age_df[['PID', 'AGE_SP', 'AGE_DIA', 'AGE_ORIG', 'AGE_GRW', 'MISC']] \
+        .rename(columns={'MISC': 'AGE_MISC'}) \
+        .set_index('PID')
+
+    # join age dataframe to fixed dataframe
+    plot_table = cleanfixed_df \
+        .merge(right=cleanage_df, how='left', left_on='PID', right_on='PID') \
+        .reset_index()
+
+    return plot_table
 
 
 
