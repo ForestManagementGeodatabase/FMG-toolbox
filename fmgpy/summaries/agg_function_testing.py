@@ -4,34 +4,42 @@
 
 # Size Class TPA, BA, QM DBH function for plots
 # Filter Tree Table for just live trees, calculate plot fields
-tree_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])]\
-    .groupby(['PID', 'TR_SIZE'], as_index=False)\
-    .agg(
-    tree_count = ('TR_SP', fcalc.agg_tree_count),
-    plot_count = ('PID', fcalc.agg_plot_count),
-    tpa = ('TR_DENS', sum),
-    ba = ('TR_BA', sum),
-    pool = ('POOL', 'first'),
-    comp = ('COMP', 'first'),
-    unit = ('UNIT', 'first'),
-    site = ('SITE', 'first'),
-    sid = ('SID', 'first')
-)
 
-# Add and Calculate QM DBH
-tree_live['qm_dbh'] = fcalc.qm_dbh(tree_live['ba'], tree_live['tpa'])
 
-# Pivot sizes and metrics to columns
-size_table = tree_live\
-    .pivot_table(
-    index='PID',
-    columns='TR_SIZE',
-    values=['ba', 'tpa', 'qm_dbh'],
-    fill_value=0)\
-    .reset_index()
 
-# flatten column multi indez
-size_table.columns = list(map("_".join, size_table.columns))
+def TPA_BA_QMDBH_Plot(tree_table, filter_statement, group_column):
+    # Example filter statement: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    tree_live = tree_table[filter_statement]\
+        .groupby(['PID', group_column], as_index=False)\
+        .agg(
+        tree_count = ('TR_SP', fcalc.agg_tree_count),
+        plot_count = ('PID', fcalc.agg_plot_count),
+        tpa = ('TR_DENS', sum),
+        ba = ('TR_BA', sum)
+    )
+
+    # Add and Calculate QM DBH
+    tree_live['qm_dbh'] = fcalc.qm_dbh(tree_live['ba'], tree_live['tpa'])
+
+    # Pivot sizes and metrics to columns
+    size_table = tree_live\
+        .pivot_table(
+        index='PID',
+        columns=group_column,
+        values=['ba', 'tpa', 'qm_dbh'],
+        fill_value=0)\
+        .reset_index()
+
+    # flatten column multi index
+    size_table.columns = list(map("_".join, size_table.columns))
+
+    return size_table
+
+
+
+
+
+
 
 # Size Class TPA, BA, QM DBH function for levels
 stand_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])]\
