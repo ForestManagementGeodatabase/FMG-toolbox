@@ -176,10 +176,10 @@ def qm_dbh(ba, tpa):
     This becomes convenient in that we often have basal area per acre and trees per acre but
     not the diameters of all the trees.
     """
-    assert isinstance(ba, float), "basal area must be a float"
-    assert isinstance(tpa, float), "tpa must be a float"
+    #assert isinstance(ba, (float, np.float64)), "basal area must be a float"
+    #assert isinstance(tpa, float, np.float64), "tpa must be a float"
 
-    qmdbh = math.sqrt((ba / tpa) / 0.005454154)
+    qmdbh = np.sqrt((ba / tpa) / 0.005454154)
     return qmdbh
 
 
