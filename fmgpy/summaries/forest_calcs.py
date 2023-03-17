@@ -257,10 +257,10 @@ def size_class_map(tr_dia):
     """Maps a size class categorical variable onto the tree diameter range
      as specified by USACE foresters
 
-     Keyword Args
-     tr_dia -- diameter of a given tree
+     Keyword Args:
+        tr_dia -- diameter of a given tree
 
-     Details: written to function within the pandas .loc method
+     Details: written to function within the pandas .map method
      """
 
     if 1 <= tr_dia <=6:
@@ -275,16 +275,39 @@ def size_class_map(tr_dia):
         return 'Over Mature'
 
 
+# Assign vertical composition categorical variable column
+def vert_comp_class_map(tr_cl):
+    """Maps a vertical forest composition variable onto the tree canopy class
+    as specified by USACE foresters
+
+    Keyword Args:
+        tr_cl -- canopy class (D:Dominant, CD:Co-Dominant, S:Suppressed, I:Intermediate)
+                 for a given tree
+
+    Details: written to function within the pandas .map method
+    """
+
+    if tr_cl == 'D':
+        return 'Canopy'
+    if tr_cl == 'CD':
+        return 'Canopy'
+    if tr_cl == 'S':
+        return 'Midstory'
+    if tr_cl == 'I':
+        return 'Midstory'
+
+
 # Create tree intermediate table
 def create_tree_table(prism_df):
     """Creates the tree dataframe for use in downstream forest summaries by:
         Column TR_DIA is set to 0 for no tree rows
         Column TR_SIZE is added and populated with size class based on tree diameter ranges
+        Column VERT_COMP is added and populated with vertical composition class based on canopy class
         Column TR_BA is added and populated with the eq (tree_count * BAF) / plot_count
         Column TR_DENS is added and populated with the eq (0.005454 * (tr_dia ** 2)) / plot_count
 
-    Keyword Args
-    prism_df -- the prism plot feature class directly imported as a dataframe
+    Keyword Args:
+        prism_df -- the prism plot feature class directly imported as a dataframe
 
     Details: None
     """
@@ -300,6 +323,9 @@ def create_tree_table(prism_df):
 
     # Add a tree size class field (Sap, Pole, Saw, Mature, Over Mature)
     tree_table['TR_SIZE'] = tree_table['TR_DIA'].map(size_class_map)
+
+    # Add a vertical composition field (Canopy, Midstory)
+    tree_table['VERT_COMP'] = tree_table['TR_CL'].map(vert_comp_class_map)
 
     # Define constants for BA & Density calcs, assuming 1 tree, 1 plot
     tree_count = 1
@@ -322,9 +348,9 @@ def create_plot_table(fixed_df, age_df):
     """ Create the plot dataframe for use in downstream summaries by:
             Combining Fixed and Age Plot dataframes
 
-    Keyword Args
-    fixed_df -- the fixed plot feature class directly imported as a dataframe
-    age_df   -- the age plot feature class directly imported as a dataframe
+    Keyword Args:
+        fixed_df -- the fixed plot feature class directly imported as a dataframe
+        age_df   -- the age plot feature class directly imported as a dataframe
 
     Details: None
     """
@@ -349,6 +375,84 @@ def create_plot_table(fixed_df, age_df):
 
     return plot_table
 
+
+def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function pivots on the
+    group column supplied resulting in BA, TPA and QM DBH columns for each category in the group column.
+    For example, if mast_type is specified as the group column BA, TPA and QM DBH will be calculated for
+    each mast type for each plot - ba_hard, ba_lightseed, ba_soft, etc.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter
+        group_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
+                            for each category in this field
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    """
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        filtered_df = tree_table[filter_statement] \
+            .groupby(['PID', group_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                tpa=('TR_DENS', sum),
+                ba=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['qm_dbh'] = qm_dbh(filtered_df['ba'], filtered_df['tpa'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df\
+            .pivot_table(
+                index='PID',
+                columns=group_column,
+                values=['ba', 'tpa', 'qm_dbh'],
+                fill_value=0)\
+            .reset_index()
+
+        # flatten column multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
+
+    elif filter_statement is None:
+        filtered_df = tree_table \
+            .groupby(['PID', group_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                tpa=('TR_DENS', sum),
+                ba=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['qm_dbh'] = qm_dbh(filtered_df['ba'], filtered_df['tpa'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df \
+            .pivot_table(
+                index='PID',
+                columns=group_column,
+                values=['ba', 'tpa', 'qm_dbh'],
+                fill_value=0) \
+            .reset_index()
+
+        # flatten column multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
 
 
 

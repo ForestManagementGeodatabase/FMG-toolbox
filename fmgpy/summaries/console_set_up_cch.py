@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import importlib
 import fmgpy.summaries.forest_calcs as fcalc
-import fmgpy.summaries.agg_function_testing as tcalc
+
 
 # Define Some input data
 output_gdb = r'C:\LocalProjects\FMG\LocalWorking\FMG_Code_Testing.gdb'
