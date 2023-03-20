@@ -78,32 +78,73 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
 
 
 # Size Class TPA, BA, QM DBH function for levels
-stand_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-    .groupby(['SID', 'TR_SIZE'], as_index=False) \
-    .agg(
-    tree_count=('TR_SP', fcalc.agg_tree_count),
-    plot_count=('PID', fcalc.agg_plot_count),
-    stand_dens=('TR_DENS', sum),
-    ba_temp=('TR_BA', sum),
-    pool=('POOL', 'first'),
-    comp=('COMP', 'first'),
-    unit=('UNIT', 'first'),
-    site=('SITE', 'first'),
-)
+def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
-# Add and calculate TPA, BA, QM_DBH
-stand_live['TPA'] = stand_live['stand_dens'] / stand_live['plot_count']
-stand_live['BA'] = (stand_live['tree_count'] * 10) / stand_live['plot_count']
-stand_live['QM_DBH'] = fcalc.qm_dbh(stand_live['BA'], stand_live['TPA'])
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
 
-# Pivot sizes and metrics to columns
-stand_size = stand_live \
-    .pivot_table(
-    index='SID',
-    columns='TR_SIZE',
-    values=['BA', 'TPA', 'QM_DBH'],
-    fill_value=0) \
-    .reset_index()
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
 
-# flatten column to multi index
-stand_size.columns = list(map("_".join, stand_size.columns))
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby([level, group_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                stand_dens=('TR_DENS', sum)
+            )
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df \
+            .pivot_table(
+                index=level,
+                columns=group_column,
+                values=['BA', 'TPA', 'QM_DBH'],
+                fill_value=0) \
+            .reset_index()
+
+        # flatten column to multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby([level, 'TR_SIZE'], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                stand_dens=('TR_DENS', sum),
+            )
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df \
+            .pivot_table(
+                index=level,
+                columns=group_column,
+                values=['BA', 'TPA', 'QM_DBH'],
+                fill_value=0) \
+            .reset_index()
+
+        # flatten column to multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
+

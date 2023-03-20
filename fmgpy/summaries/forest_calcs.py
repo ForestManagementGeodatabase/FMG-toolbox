@@ -385,13 +385,14 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
         filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
-                            statement i.e. dataframe.field.filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
         group_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
                             for each category in this field
 
     Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
     for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
     for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
     """
     # Check input parameters are valid
     assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
@@ -401,24 +402,25 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
     # Test for filter statement and run script based on filter or no filter
     if filter_statement is not None:
 
+        # Filter, group and sum tree table
         filtered_df = tree_table[filter_statement] \
             .groupby(['PID', group_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 plot_count=('PID', agg_plot_count),
-                tpa=('TR_DENS', sum),
-                ba=('TR_BA', sum)
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
             )
 
         # Add and Calculate QM DBH
-        filtered_df['qm_dbh'] = qm_dbh(filtered_df['ba'], filtered_df['tpa'])
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
         out_dataframe = filtered_df\
             .pivot_table(
                 index='PID',
                 columns=group_column,
-                values=['ba', 'tpa', 'qm_dbh'],
+                values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0)\
             .reset_index()
 
@@ -428,24 +430,26 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         return out_dataframe
 
     elif filter_statement is None:
+
+        # Group and sum tree table
         filtered_df = tree_table \
             .groupby(['PID', group_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 plot_count=('PID', agg_plot_count),
-                tpa=('TR_DENS', sum),
-                ba=('TR_BA', sum)
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
             )
 
         # Add and Calculate QM DBH
-        filtered_df['qm_dbh'] = qm_dbh(filtered_df['ba'], filtered_df['tpa'])
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
         out_dataframe = filtered_df \
             .pivot_table(
                 index='PID',
                 columns=group_column,
-                values=['ba', 'tpa', 'qm_dbh'],
+                values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0) \
             .reset_index()
 
@@ -455,5 +459,91 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         return out_dataframe
 
 
+def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
+    group column supplied resulting in BA, TPA and QM DBH columns for each category in the group column.
+    For example, if mast_type is specified as the group column BA, TPA and QM DBH will be calculated for
+    each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
 
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        group_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be
+                            calculated for each category in this field
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby([level, group_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                stand_dens=('TR_DENS', sum)
+            )
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df \
+            .pivot_table(
+                index=level,
+                columns=group_column,
+                values=['BA', 'TPA', 'QM_DBH'],
+                fill_value=0) \
+            .reset_index()
+
+        # flatten column to multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby([level, 'TR_SIZE'], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                stand_dens=('TR_DENS', sum),
+            )
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Pivot sizes and metrics to columns
+        out_dataframe = filtered_df \
+            .pivot_table(
+                index=level,
+                columns=group_column,
+                values=['BA', 'TPA', 'QM_DBH'],
+                fill_value=0) \
+            .reset_index()
+
+        # flatten column to multi index
+        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+
+        return out_dataframe
 
