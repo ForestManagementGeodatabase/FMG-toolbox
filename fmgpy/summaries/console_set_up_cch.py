@@ -28,4 +28,6 @@ prism = r'C:\LocalProjects\FMG\FMG-Toolbox\test\data\FMG_OracleSchema.gdb\PRISM_
 age_df = pd.DataFrame.spatial.from_featureclass(age)
 fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
 prism_df = pd.DataFrame.spatial.from_featureclass(prism)
+tree_table = fcalc.create_tree_table(prism_df)
+plot_table = fcalc.create_plot_table(fixed_df, age_df)
 ### Console Testing Set Up End
