@@ -183,12 +183,6 @@ def qm_dbh(ba, tpa):
     return qmdbh
 
 
-# Most prevalent ([health, species] by TPA)
-
-# Most prevalent (percent)
-
-# Highest Frequency Species
-
 # Stocking Percent (Total)
 def stocking_pct(avg_tpa, qm_dbh):
     """Calculates stocking percentage for all live trees by polygon for specified hierarchy level.
@@ -208,16 +202,6 @@ def stocking_pct(avg_tpa, qm_dbh):
     percent = avg_tpa * (0.0685724 + 0.0010125 * (0.259 + (0.973 * qm_dbh)) + 0.0023656 + qm_dbh ** 2)
 
     return percent
-
-# Stocking Percent (Hard Mast)
-
-# Species Richness
-
-# Importance Value
-
-# Forest Community (species list, numeric ID)
-
-# Inventory Date (year, range of years)
 
 
 # Percent Cover
@@ -399,6 +383,12 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
     assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
     assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
 
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby('PID', as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count))\
+        .set_index('PID')
+
     # Test for filter statement and run script based on filter or no filter
     if filter_statement is not None:
 
@@ -416,7 +406,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
-        out_dataframe = filtered_df\
+        pivot_df = filtered_df\
             .pivot_table(
                 index='PID',
                 columns=group_column,
@@ -424,10 +414,20 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
                 fill_value=0)\
             .reset_index()
 
-        # flatten column multi index
-        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+        # flatten column multi index and set index for merge
+        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + group_column + "_"): 'PID'}).set_index('PID')
 
-        return out_dataframe
+        # Join results back to full set of PIDs and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=fixpivot_df,
+                   how='left',
+                   on='PID') \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
 
     elif filter_statement is None:
 
@@ -445,7 +445,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
-        out_dataframe = filtered_df \
+        pivot_df = filtered_df \
             .pivot_table(
                 index='PID',
                 columns=group_column,
@@ -453,10 +453,20 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
                 fill_value=0) \
             .reset_index()
 
-        # flatten column multi index
-        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+        # flatten column multi index and set index for merge
+        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + group_column + "_"): 'PID'}).set_index('PID')
 
-        return out_dataframe
+        # Join results back to full set of PIDs and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=fixpivot_df,
+                   how='left',
+                   on='PID') \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
 
 
 def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
@@ -484,17 +494,27 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
     assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
     assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
 
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby(level, as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count)) \
+        .set_index(level)
+
     # Test for filter statement and run script based on filter or no filter
     if filter_statement is not None:
 
-        # Filter, group and sum tree table
+        # Filter, group and sum tree table, add unfiltered plot count field
         filtered_df = tree_table[filter_statement] \
             .groupby([level, group_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
-                plot_count=('PID', agg_plot_count),
                 stand_dens=('TR_DENS', sum)
-            )
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
 
         # Add and calculate TPA, BA, QM_DBH
         baf = 10
@@ -503,7 +523,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
-        out_dataframe = filtered_df \
+        pivot_df = filtered_df \
             .pivot_table(
                 index=level,
                 columns=group_column,
@@ -512,20 +532,34 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
             .reset_index()
 
         # flatten column to multi index
-        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str(level + "_" + group_column + "_"): level}).set_index(level)
 
-        return out_dataframe
+        # Join results back to full set of level polygons and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=fixpivot_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
 
     elif filter_statement is None:
 
         # Group and sum tree table
         filtered_df = tree_table \
-            .groupby([level, 'TR_SIZE'], as_index=False) \
+            .groupby([level, group_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
-                plot_count=('PID', agg_plot_count),
                 stand_dens=('TR_DENS', sum),
-            )
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
 
         # Add and calculate TPA, BA, QM_DBH
         baf = 10
@@ -534,7 +568,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
         # Pivot sizes and metrics to columns
-        out_dataframe = filtered_df \
+        pivot_df = filtered_df \
             .pivot_table(
                 index=level,
                 columns=group_column,
@@ -543,7 +577,17 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
             .reset_index()
 
         # flatten column to multi index
-        out_dataframe.columns = list(map("_".join, out_dataframe.columns))
+        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str(level + "_" + group_column + "_"): level}).set_index(level)
 
-        return out_dataframe
+        # Join results back to full set of level polygons and fill nan with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=fixpivot_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
 
