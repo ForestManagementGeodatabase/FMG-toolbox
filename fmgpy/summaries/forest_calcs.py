@@ -259,6 +259,33 @@ def size_class_map(tr_dia):
         return 'Over Mature'
 
 
+# Assign understory height range categorical variable column
+def und_height_range_map(height):
+    if height < 2:
+        return '<2'
+    if 2 <= height < 5:
+        return '2-5'
+    if 5 <= height < 10:
+        return '5-10'
+    if 10 <= height < 15:
+        return '10-15'
+    if 15 <= height < 20:
+        return '15-20'
+    if 20 <= height < 25:
+        return '20-25'
+    if 25 <= height < 30:
+        return '25-30'
+    if 30 <= height < 35:
+        return '30-35'
+    if 35 <= height < 40:
+        return '35-40'
+    if 40 <= height < 45:
+        return '40-45'
+    if 45 <= height < 50:
+        return '45-50'
+    if height => 50:
+        return '>50'
+
 # Assign vertical composition categorical variable column
 def vert_comp_class_map(tr_cl):
     """Maps a vertical forest composition variable onto the tree canopy class
