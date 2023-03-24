@@ -38,25 +38,6 @@ site_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH
 unit_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH.isin(["D", "DEAD"]), 'VERT_COMP', 'UNIT')
 
 
-# Group and sum tree table
-plotcount_df = tree_table \
-        .groupby('SID', as_index=False) \
-        .agg(plot_count=('PID', fcalc.agg_plot_count)) \
-        .set_index('SID')
+# general descriptive table function runs for all levels
+plot_general_descriptive =
 
-filtered_df = tree_table \
-    .groupby(['SID', 'TR_SP'], as_index=False) \
-    .agg(
-        tree_count=('TR_SP', fcalc.agg_tree_count),
-        stand_dens=('TR_DENS', sum),
-    ) \
-    .set_index('SID') \
-    .merge(right=plotcount_df,
-           how='left',
-           on=level) \
-    .reset_index()
-
-baf = 10
-filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
-filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-filtered_df['QM_DBH'] = fcalc.qm_dbh(filtered_df['BA'], filtered_df['TPA'])
