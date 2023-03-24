@@ -283,8 +283,55 @@ def und_height_range_map(height):
         return '40-45'
     if 45 <= height < 50:
         return '45-50'
-    if height => 50:
+    if height >= 50:
         return '>50'
+
+
+# Create an unfiltered df at specified level, including upstream levels
+def create_level_df(level, plot_table):
+    """ Creates a data frame to be used as a merge base, it aggregates the plot table based
+    on a give level and includes all of the upstream level columns
+
+    Keyword Args:
+        level  --  FMG level, use to group input dataframe
+        plot_table -- dataframe produced by the create_plot_table function
+    """
+
+    if level == 'SID':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first'),
+                UNIT=('UNIT', 'first'),
+                SITE=('SITE', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
+
+    elif level == 'SITE':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first'),
+                UNIT=('UNIT', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
+
+    elif level == 'UNIT':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
 
 # Assign vertical composition categorical variable column
 def vert_comp_class_map(tr_cl):
@@ -618,3 +665,94 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
         return out_df
 
+
+def create_general_description_level(tree_table, plot_table, level):
+    # Create base table
+    base_df = create_level_df(level, tree_table)
+
+    # total num age trees - plot table
+    # total num plots (all, no filter) - plot table
+    # mean overstory closure - plot table
+    # overstory closure standard deviation - plot table
+    # mean overstory height - plot table
+    # overstory height standard deviation - plot table
+    # mean understory cover - plot table
+    # understory cover standard deviation - plot table
+    # mean understory height (number) - plot table
+    # understory height standard deviation - plot table
+    gendesc = plot_table \
+        .groupby([level]) \
+        .agg(
+        NUM_PLOTS=('PID', fcalc.agg_plot_count),
+        NUM_AGE_TR=('AGE_SP', 'count'),
+        MEAN_OV_CLSR=('OV_CLSR', 'mean'),
+        STD_OV_CLSR=('OV_CLSR', 'std'),
+        MEAN_OV_HT=('OV_HT', 'mean'),
+        STD_OV_HT=('OV_HT', 'std'),
+        MEAN_UND_COV=('UND_COV', 'mean'),
+        STD_UND_COV=('UND_COV', 'std'),
+        MEAN_UND_HT=('UND_HT2', 'mean'),
+        STD_UND_HT=('UND_HT2', 'std')
+    ) \
+        .reset_index() \
+        .set_index([level])
+
+    # mean under story height (range value) - plot table
+    gendesc['MEAN_UND_HT_RG'] = gendesc['MEAN_UND_HT'].map(und_height_range_map)
+
+    # BA live trees - tree table
+    ba_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+        .groupby([level]) \
+        .apply(ba)
+    ba_live_df = pd.DataFrame({level: ba_live.index, 'BA_LIVE': ba_live.values}).set_index([level])
+
+    # TPA live trees - tree table
+    tpa_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+        .groupby([level]) \
+        .apply(tpa)
+    tpa_live_df = pd.DataFrame({level: tpa_live.index, 'TPA_LIVE': tpa_live.values}).set_index([level])
+
+    # total num trees (all, no filter) - tree table
+    tr_all = tree_table \
+        .groupby([level]) \
+        .apply(tree_count)
+    tr_all_df = pd.DataFrame({level: tr_all.index, 'NUM_TR': tr_all.values}).set_index([level])
+
+    # total num live trees - tree table
+    tr_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+        .groupby([level]) \
+        .apply(tree_count)
+    tr_live_df = pd.DataFrame({level: tr_live.index, 'NUM_TR_LIVE': tr_live.values}).set_index([level])
+
+    # total num dead trees - tree table
+    tr_dead = tree_table[tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+        .groupby([level]) \
+        .apply(tree_count)
+    tr_dead_df = pd.DataFrame({level: tr_dead.index, 'NUM_TR_DEAD': tr_dead.values}).set_index([level])
+
+    # Average Mean Diameter live trees - tree table
+    # Max DBH live trees - tree table
+    diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+        .groupby([level]) \
+        .agg(
+        AMD=('TR_DIA', 'mean'),
+        MAX_DBH=('TR_DIA', 'max')
+    ) \
+        .reset_index() \
+        .set_index([level])
+
+    # merge component dataframes
+    gendesc_df = base_df \
+        .join([gendesc,
+               ba_live_df,
+               tpa_live_df,
+               tr_all_df,
+               tr_live_df,
+               tr_dead_df,
+               diam_df]) \
+        .reset_index()
+
+    # QM DBH live trees - tree table
+    gendesc_df['QM_DBH_LIVE'] = qm_dbh(gendesc_df['BA_LIVE'], gendesc_df['TPA_LIVE'])
+
+    return gendesc_df
