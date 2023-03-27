@@ -666,6 +666,13 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
         return out_df
 
 
+def date_range(min_year, max_year):
+    if min_year == max_year:
+        return str(min_year)
+    else:
+        return str(min_year) + "-" + str(max_year)
+
+
 def create_general_description_level(tree_table, plot_table, level):
     # Create base table
     base_df = create_level_df(level, tree_table)
@@ -683,7 +690,7 @@ def create_general_description_level(tree_table, plot_table, level):
     gendesc = plot_table \
         .groupby([level]) \
         .agg(
-        NUM_PLOTS=('PID', fcalc.agg_plot_count),
+        NUM_PLOTS=('PID', agg_plot_count),
         NUM_AGE_TR=('AGE_SP', 'count'),
         MEAN_OV_CLSR=('OV_CLSR', 'mean'),
         STD_OV_CLSR=('OV_CLSR', 'std'),
@@ -741,6 +748,19 @@ def create_general_description_level(tree_table, plot_table, level):
         .reset_index() \
         .set_index([level])
 
+    # Collection date
+    date_df = tree_table\
+        .groupby([level], as_index=False) \
+        .agg(
+            min_date=('COL_DATE', 'min'),
+            max_date=('COL_DATE', 'max')
+            )
+    date_df['min_year'] = date_df['min_date'].dt.year
+    date_df['max_year'] = date_df['max_date'].dt.year
+    date_df["COL_YEAR"] = date_df.apply(lambda x: date_range(x["min_year"], x["max_year"]), axis=1)
+
+    date_df = date_df.drop(columns=['min_date', 'max_date', 'min_year', 'max_year']).set_index(level)
+
     # merge component dataframes
     gendesc_df = base_df \
         .join([gendesc,
@@ -749,7 +769,8 @@ def create_general_description_level(tree_table, plot_table, level):
                tr_all_df,
                tr_live_df,
                tr_dead_df,
-               diam_df]) \
+               diam_df,
+               date_df]) \
         .reset_index()
 
     # QM DBH live trees - tree table
