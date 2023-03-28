@@ -355,6 +355,30 @@ def vert_comp_class_map(tr_cl):
         return 'Midstory'
 
 
+# Populate column with list of invasive species codes, given a list of columns
+def inv_sp_list(col_list):
+    """Takes in a list of species columns and returns a list of unique invasive species
+    formatted as a string. To be used in conjunction with .apply(lambda).
+
+    Keyword Args:
+        col_list -- list of dataframe columns that should be searched for invasive species
+                    codes. Columns should contain USDA species codes.
+
+    Details: None"""
+
+    spList = []
+    for col in col_list:
+        if col == 'HUJA':
+            spList.append('HUJA')
+        elif col == 'PHAR3':
+            spList.append('PHAR3')
+        elif col == 'PHAU7':
+            spList.append('PHAU7')
+    spSet = set(spList)
+    spVal = ', '.join(spSet)
+    return spVal
+
+
 # Create tree intermediate table
 def create_tree_table(prism_df):
     """Creates the tree dataframe for use in downstream forest summaries by:
@@ -429,6 +453,39 @@ def create_plot_table(fixed_df, age_df):
     # join age dataframe to fixed dataframe
     plot_table = cleanfixed_df \
         .merge(right=cleanage_df, how='left', left_on='PID', right_on='PID') \
+        .reset_index()
+
+    # Define list of fields used to note invasive species
+    columnlist = ['GRD_SP1', 'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5']
+
+    # Define list of specific invasive species
+    invsp = ['HUJA', 'PHAR3', 'PHAU7']
+
+    # filter dataset to just records with invasive species
+    invsp_filter_df = plot_table[plot_table['GRD_SP1'].isin(invsp) |
+                                 plot_table['GRD_SP2'].isin(invsp) |
+                                 plot_table['GRD_SP3'].isin(invsp) |
+                                 plot_table['NOT_SP1'].isin(invsp) |
+                                 plot_table['NOT_SP2'].isin(invsp) |
+                                 plot_table['NOT_SP3'].isin(invsp) |
+                                 plot_table['NOT_SP4'].isin(invsp) |
+                                 plot_table['NOT_SP5'].isin(invsp)] \
+        .reset_index()
+
+    # add and populate invasive presence column
+    invsp_filter_df['INV_PRESENT'] = 'Yes'
+
+    # add and populate invasive species present column
+    invsp_filter_df['INV_SP'] = invsp_filter_df \
+        .apply(lambda columnlist: inv_sp_list(columnlist), axis=1)
+
+    # Set indices for merge
+    plot_table.set_index('PID')
+    invsp_filter_df.set_index('PID')
+
+    plot_table = plot_table \
+        .merge(right=invsp_filter_df,
+               how='left')\
         .reset_index()
 
     return plot_table
@@ -665,14 +722,15 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
         return out_df
 
-
+# TODO: add function description to date_range
 def date_range(min_year, max_year):
     if min_year == max_year:
         return str(min_year)
     else:
         return str(min_year) + "-" + str(max_year)
 
-
+# TODO: add function description
+# TODO: recast function to handle plot level summaries and calcs
 def create_general_description_level(tree_table, plot_table, level):
     # Create base table
     base_df = create_level_df(level, tree_table)
