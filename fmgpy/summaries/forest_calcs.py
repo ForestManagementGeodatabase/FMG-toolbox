@@ -7,10 +7,10 @@ import math
 import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
-
 arcpy.env.overwriteOutput = True
 
 
+# Set summary level based on user input
 def fmg_level(level):
     """Get the FMG level field
 
@@ -33,18 +33,54 @@ def fmg_level(level):
     return level_field
 
 
-def plot_count(df):
-    """Count the number unique plots
+# Create an unfiltered df at specified level, including upstream levels
+def create_level_df(level, plot_table):
+    """ Creates a data frame to be used as a merge base, it aggregates the plot table based
+    on a given level and includes all the upstream level columns
 
-    :param: df   DataFrame; An FMG "Age", Fixed", or "Prism" plot dataset.
-
-    :return: An integer count of unique plots.
+    Keyword Args:
+        level  --  FMG level, use to group input dataframe
+        plot_table -- dataframe produced by the create_plot_table function
     """
-    plot_num = df.PID.nunique()
 
-    return plot_num
+    if level == 'SID':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first'),
+                UNIT=('UNIT', 'first'),
+                SITE=('SITE', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
+
+    elif level == 'SITE':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first'),
+                UNIT=('UNIT', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
+
+    elif level == 'UNIT':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first')
+                ) \
+            .reset_index() \
+            .set_index(level)
+        return base_df
 
 
+# Plot count to be used with group by - agg
 def agg_plot_count(PID):
     """Counts unique plots, including no tree plots.
 
@@ -57,21 +93,7 @@ def agg_plot_count(PID):
     return float(PID.nunique())
 
 
-def tree_count(df):
-    """Count the number of trees
-
-    :param: df   DataFrame; An FMG "Prism" plot dataset.
-
-    :return: An integer count of trees
-    """
-    # boolean series
-    trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
-
-    # sum number of True instances
-    num_trees = trees.values.sum()
-    return num_trees
-
-
+# Tree count to be used with group by - agg
 def agg_tree_count(tr_sp):
     """Counts trees, excluding no tree records.
 
@@ -96,6 +118,157 @@ def agg_tree_count(tr_sp):
         else:
             trees.append(val)
     return float(len(trees))
+
+
+# Produces a list of invasive species with group by-agg
+# TODO: add function description
+def agg_inv_sp(inv_sp):
+    sp = []
+    # Build list of invasive species codes
+    for val in inv_sp:
+        if val is None:
+            continue
+        else:
+            sp.append(val)
+
+    # Strip nans from list
+    spclean = [x for x in sp if x == x]
+
+    # Reduce list to unique values and return as a string
+    spset = set(spclean)
+    spval = ', '.join(spset)
+    return spval
+
+
+# Produces a count of notes with goup by-agg
+# TODO: add function description
+def agg_count_notes(note_column):
+    notes = []
+    # make a list of valid notes
+    for note in note_column:
+        if note == '':
+            continue
+        if note == ' ':
+            continue
+        if note is None:
+            continue
+        else:
+            notes.append(note)
+
+    # Strip nans from list
+    notes_clean = [x for x in notes if x == x]
+
+    # count items in the list and return the count
+    notecount = len(notes_clean)
+    return notecount
+
+
+# Assign vertical composition categorical variable column
+def vert_comp_class_map(tr_cl):
+    """Maps a vertical forest composition variable onto the tree canopy class
+    as specified by USACE foresters
+
+    Keyword Args:
+        tr_cl -- canopy class (D:Dominant, CD:Co-Dominant, S:Suppressed, I:Intermediate)
+                 for a given tree
+
+    Details: written to function within the pandas .map method
+    """
+
+    if tr_cl == 'D':
+        return 'Canopy'
+    if tr_cl == 'CD':
+        return 'Canopy'
+    if tr_cl == 'S':
+        return 'Midstory'
+    if tr_cl == 'I':
+        return 'Midstory'
+
+
+# Assign size class categorical variable column
+def size_class_map(tr_dia):
+    """Maps a size class categorical variable onto the tree diameter range
+     as specified by USACE foresters
+
+     Keyword Args:
+        tr_dia -- diameter of a given tree
+
+     Details: written to function within the pandas .map method
+     """
+
+    if 1 <= tr_dia <=6:
+        return 'Sappling'
+    if 6 < tr_dia <= 12:
+        return 'Pole'
+    if 12 < tr_dia <= 18:
+        return 'Saw'
+    if 18 < tr_dia <= 24:
+        return 'Mature'
+    if tr_dia > 24:
+        return 'Over Mature'
+
+
+# Assign understory height range categorical variable column
+def und_height_range_map(height):
+    if height < 2:
+        return '<2'
+    if 2 <= height < 5:
+        return '2-5'
+    if 5 <= height < 10:
+        return '5-10'
+    if 10 <= height < 15:
+        return '10-15'
+    if 15 <= height < 20:
+        return '15-20'
+    if 20 <= height < 25:
+        return '20-25'
+    if 25 <= height < 30:
+        return '25-30'
+    if 30 <= height < 35:
+        return '30-35'
+    if 35 <= height < 40:
+        return '35-40'
+    if 40 <= height < 45:
+        return '40-45'
+    if 45 <= height < 50:
+        return '45-50'
+    if height >= 50:
+        return '>50'
+
+
+# Assign tree type categorical variable column
+def tree_type_map(tr_dia):
+    if tr_dia >= 30:
+        return 'Wildlife'
+
+
+# Plot count to be used with group by - apply
+def plot_count(df):
+    """Count the number unique plots
+
+    :param: df   DataFrame; An FMG "Age", Fixed", or "Prism" plot dataset.
+
+    :return: An integer count of unique plots.
+    """
+    plot_num = df.PID.nunique()
+
+    return plot_num
+
+
+# Tree count to be used with group by - apply
+def tree_count(df):
+    """Count the number of trees
+
+    :param: df   DataFrame; An FMG "Prism" plot dataset.
+
+    :return: An integer count of trees
+    """
+    # boolean series
+    trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
+
+    # sum number of True instances
+    num_trees = trees.values.sum()
+    return num_trees
 
 
 # Trees Per Acre (TPA)
@@ -236,126 +409,7 @@ def cover_pct(fixed, level):
     return level_cover_pct
 
 
-# Assign size class categorical variable column
-def size_class_map(tr_dia):
-    """Maps a size class categorical variable onto the tree diameter range
-     as specified by USACE foresters
-
-     Keyword Args:
-        tr_dia -- diameter of a given tree
-
-     Details: written to function within the pandas .map method
-     """
-
-    if 1 <= tr_dia <=6:
-        return 'Sappling'
-    if 6 < tr_dia <= 12:
-        return 'Pole'
-    if 12 < tr_dia <= 18:
-        return 'Saw'
-    if 18 < tr_dia <= 24:
-        return 'Mature'
-    if tr_dia > 24:
-        return 'Over Mature'
-
-
-# Assign understory height range categorical variable column
-def und_height_range_map(height):
-    if height < 2:
-        return '<2'
-    if 2 <= height < 5:
-        return '2-5'
-    if 5 <= height < 10:
-        return '5-10'
-    if 10 <= height < 15:
-        return '10-15'
-    if 15 <= height < 20:
-        return '15-20'
-    if 20 <= height < 25:
-        return '20-25'
-    if 25 <= height < 30:
-        return '25-30'
-    if 30 <= height < 35:
-        return '30-35'
-    if 35 <= height < 40:
-        return '35-40'
-    if 40 <= height < 45:
-        return '40-45'
-    if 45 <= height < 50:
-        return '45-50'
-    if height >= 50:
-        return '>50'
-
-
-# Create an unfiltered df at specified level, including upstream levels
-def create_level_df(level, plot_table):
-    """ Creates a data frame to be used as a merge base, it aggregates the plot table based
-    on a give level and includes all of the upstream level columns
-
-    Keyword Args:
-        level  --  FMG level, use to group input dataframe
-        plot_table -- dataframe produced by the create_plot_table function
-    """
-
-    if level == 'SID':
-        base_df = plot_table \
-            .groupby(level) \
-            .agg(
-                POOL=('POOL', 'first'),
-                COMP=('COMP', 'first'),
-                UNIT=('UNIT', 'first'),
-                SITE=('SITE', 'first')
-                ) \
-            .reset_index() \
-            .set_index(level)
-        return base_df
-
-    elif level == 'SITE':
-        base_df = plot_table \
-            .groupby(level) \
-            .agg(
-                POOL=('POOL', 'first'),
-                COMP=('COMP', 'first'),
-                UNIT=('UNIT', 'first')
-                ) \
-            .reset_index() \
-            .set_index(level)
-        return base_df
-
-    elif level == 'UNIT':
-        base_df = plot_table \
-            .groupby(level) \
-            .agg(
-                POOL=('POOL', 'first'),
-                COMP=('COMP', 'first')
-                ) \
-            .reset_index() \
-            .set_index(level)
-        return base_df
-
-# Assign vertical composition categorical variable column
-def vert_comp_class_map(tr_cl):
-    """Maps a vertical forest composition variable onto the tree canopy class
-    as specified by USACE foresters
-
-    Keyword Args:
-        tr_cl -- canopy class (D:Dominant, CD:Co-Dominant, S:Suppressed, I:Intermediate)
-                 for a given tree
-
-    Details: written to function within the pandas .map method
-    """
-
-    if tr_cl == 'D':
-        return 'Canopy'
-    if tr_cl == 'CD':
-        return 'Canopy'
-    if tr_cl == 'S':
-        return 'Midstory'
-    if tr_cl == 'I':
-        return 'Midstory'
-
-
-# Populate column with list of invasive species codes, given a list of columns
+# Populate column with list of invasive species codes, used with apply - lambda
 def inv_sp_list(col_list):
     """Takes in a list of species columns and returns a list of unique invasive species
     formatted as a string. To be used in conjunction with .apply(lambda).
@@ -408,6 +462,9 @@ def create_tree_table(prism_df):
 
     # Add a vertical composition field (Canopy, Midstory)
     tree_table['VERT_COMP'] = tree_table['TR_CL'].map(vert_comp_class_map)
+
+    # Add a tree type field (currently only wildlife)
+    tree_table['TR_TYPE'] = tree_table['TR_DIA'].map(tree_type_map)
 
     # Define constants for BA & Density calcs, assuming 1 tree, 1 plot
     tree_count = 1
@@ -491,7 +548,8 @@ def create_plot_table(fixed_df, age_df):
     return plot_table
 
 
-def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
+# Generate a number of  TPA, BA, QM DBH metrics for plot summaries
+def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
     """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function pivots on the
     group column supplied resulting in BA, TPA and QM DBH columns for each category in the group column.
     For example, if mast_type is specified as the group column BA, TPA and QM DBH will be calculated for
@@ -499,10 +557,10 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
-        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+        filter_statement -- pandas series: filter statement to be used on the input dataframe, should be a full filter
                             statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
-        group_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
-                            for each category in this field
+        case_column      -- string: column name for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
+                            for each case in this column
 
     Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
     for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
@@ -511,7 +569,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
     """
     # Check input parameters are valid
     assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
-    assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([case_column]).any(), "df must contain column specified as group column param"
     assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
 
     # Create data frame that preserves unfiltered count of plots by level
@@ -525,7 +583,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
 
         # Filter, group and sum tree table
         filtered_df = tree_table[filter_statement] \
-            .groupby(['PID', group_column], as_index=False) \
+            .groupby(['PID', case_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 plot_count=('PID', agg_plot_count),
@@ -540,14 +598,14 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         pivot_df = filtered_df\
             .pivot_table(
                 index='PID',
-                columns=group_column,
+                columns=case_column,
                 values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0)\
             .reset_index()
 
         # flatten column multi index and set index for merge
-        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
-        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + group_column + "_"): 'PID'}).set_index('PID')
+        pivot_df.columns = list(map(str("_" + case_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + case_column + "_"): 'PID'}).set_index('PID')
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
@@ -564,7 +622,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
 
         # Group and sum tree table
         filtered_df = tree_table \
-            .groupby(['PID', group_column], as_index=False) \
+            .groupby(['PID', case_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 plot_count=('PID', agg_plot_count),
@@ -579,14 +637,14 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         pivot_df = filtered_df \
             .pivot_table(
                 index='PID',
-                columns=group_column,
+                columns=case_column,
                 values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0) \
             .reset_index()
 
         # flatten column multi index and set index for merge
-        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
-        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + group_column + "_"): 'PID'}).set_index('PID')
+        pivot_df.columns = list(map(str("_" + case_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str('PID' + "_" + case_column + "_"): 'PID'}).set_index('PID')
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
@@ -600,17 +658,103 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement, group_column):
         return out_df
 
 
-def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
+# Generate a number of  TPA, BA, QM DBH metrics for plot summaries
+def tpa_ba_qmdbh_plot(tree_table, filter_statement):
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level, based on the specified filter
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas series: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby('PID', as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count))\
+        .set_index('PID')
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby(['PID'], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Set index for merge
+        filtered_df.set_index('PID')
+
+        # Join results back to full set of PIDs and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on='PID') \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(['PID'], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Set index for merge
+        filtered_df.set_index('PID')
+
+
+        # Join results back to full set of PIDs and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on='PID') \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
+
+# Generate a number of TPA, BA, QM DBH metrics for level summaries
+def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level):
     """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
-    group column supplied resulting in BA, TPA and QM DBH columns for each category in the group column.
-    For example, if mast_type is specified as the group column BA, TPA and QM DBH will be calculated for
+    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
+    For example, if mast_type is specified as the case column BA, TPA and QM DBH will be calculated for
     each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
         filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
                             statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
-        group_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be
+        case_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be
                             calculated for each category in this field
         level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
 
@@ -622,7 +766,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
     # Check input parameters are valid
     assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
-    assert tree_table.columns.isin([group_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([case_column]).any(), "df must contain column specified as group column param"
     assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
 
     # Create data frame that preserves unfiltered count of plots by level
@@ -636,7 +780,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
         # Filter, group and sum tree table, add unfiltered plot count field
         filtered_df = tree_table[filter_statement] \
-            .groupby([level, group_column], as_index=False) \
+            .groupby([level, case_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 stand_dens=('TR_DENS', sum)
@@ -657,14 +801,14 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
         pivot_df = filtered_df \
             .pivot_table(
                 index=level,
-                columns=group_column,
+                columns=case_column,
                 values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0) \
             .reset_index()
 
         # flatten column to multi index
-        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
-        fixpivot_df = pivot_df.rename(columns={str(level + "_" + group_column + "_"): level}).set_index(level)
+        pivot_df.columns = list(map(str("_" + case_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str(level + "_" + case_column + "_"): level}).set_index(level)
 
         # Join results back to full set of level polygons and fill nans with 0
         out_df = plotcount_df \
@@ -681,7 +825,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
         # Group and sum tree table
         filtered_df = tree_table \
-            .groupby([level, group_column], as_index=False) \
+            .groupby([level, case_column], as_index=False) \
             .agg(
                 tree_count=('TR_SP', agg_tree_count),
                 stand_dens=('TR_DENS', sum),
@@ -702,14 +846,14 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
         pivot_df = filtered_df \
             .pivot_table(
                 index=level,
-                columns=group_column,
+                columns=case_column,
                 values=['BA', 'TPA', 'QM_DBH'],
                 fill_value=0) \
             .reset_index()
 
         # flatten column to multi index
-        pivot_df.columns = list(map(str("_" + group_column + "_").join, pivot_df.columns))
-        fixpivot_df = pivot_df.rename(columns={str(level + "_" + group_column + "_"): level}).set_index(level)
+        pivot_df.columns = list(map(str("_" + case_column + "_").join, pivot_df.columns))
+        fixpivot_df = pivot_df.rename(columns={str(level + "_" + case_column + "_"): level}).set_index(level)
 
         # Join results back to full set of level polygons and fill nan with 0
         out_df = plotcount_df \
@@ -722,6 +866,109 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, group_column, level):
 
         return out_df
 
+
+# Generate a number of TPA, BA, QM DBH metrics for level summaries
+def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
+    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
+    For example, if mast_type is specified as the case column BA, TPA and QM DBH will be calculated for
+    each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby(level, as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count)) \
+        .set_index(level)
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table, add unfiltered plot count field
+        filtered_df = tree_table[filter_statement] \
+            .groupby([level], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                stand_dens=('TR_DENS', sum)
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Set index for merge
+        filtered_df.set_index(level)
+
+        # Join results back to full set of level polygons and fill nans with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby([level], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                stand_dens=('TR_DENS', sum),
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Set index for merge
+        filtered_df.set_index(level)
+
+        # Join results back to full set of level polygons and fill nan with 0
+        out_df = plotcount_df \
+            .drop(['plot_count'], axis=1) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
+
+# Create a field with year or year range, used with apply - lambda
 # TODO: add function description to date_range
 def date_range(min_year, max_year):
     if min_year == max_year:
@@ -729,11 +976,14 @@ def date_range(min_year, max_year):
     else:
         return str(min_year) + "-" + str(max_year)
 
+
+# Create metrics that form the general description summary table
 # TODO: add function description
 # TODO: recast function to handle plot level summaries and calcs
+# TODO: update BA, TPA & QM DBH Calcs with non-case function
 def create_general_description_level(tree_table, plot_table, level):
     # Create base table
-    base_df = create_level_df(level, tree_table)
+    base_df = create_level_df(level, plot_table)
 
     # total num age trees - plot table
     # total num plots (all, no filter) - plot table
@@ -745,6 +995,8 @@ def create_general_description_level(tree_table, plot_table, level):
     # understory cover standard deviation - plot table
     # mean understory height (number) - plot table
     # understory height standard deviation - plot table
+    # invasive species present - plot table
+    # invasive species list - plot table
     gendesc = plot_table \
         .groupby([level]) \
         .agg(
@@ -757,7 +1009,11 @@ def create_general_description_level(tree_table, plot_table, level):
         MEAN_UND_COV=('UND_COV', 'mean'),
         STD_UND_COV=('UND_COV', 'std'),
         MEAN_UND_HT=('UND_HT2', 'mean'),
-        STD_UND_HT=('UND_HT2', 'std')
+        STD_UND_HT=('UND_HT2', 'std'),
+        INV_PRESENT=('INV_PRESENT', 'first'),
+        INV_SP=('INV_SP', agg_inv_sp),
+        NUM_FX_NOTES=('FX_MISC', agg_count_notes),
+        NUM_AGE_NOTES=('AGE_MISC', agg_count_notes)
     ) \
         .reset_index() \
         .set_index([level])
@@ -765,17 +1021,12 @@ def create_general_description_level(tree_table, plot_table, level):
     # mean under story height (range value) - plot table
     gendesc['MEAN_UND_HT_RG'] = gendesc['MEAN_UND_HT'].map(und_height_range_map)
 
-    # BA live trees - tree table
-    ba_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-        .groupby([level]) \
-        .apply(ba)
-    ba_live_df = pd.DataFrame({level: ba_live.index, 'BA_LIVE': ba_live.values}).set_index([level])
-
-    # TPA live trees - tree table
-    tpa_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-        .groupby([level]) \
-        .apply(tpa)
-    tpa_live_df = pd.DataFrame({level: tpa_live.index, 'TPA_LIVE': tpa_live.values}).set_index([level])
+    # TPA & BA for live trees
+    tpa_ba_live = tpa_ba_qmdbh_level(tree_table, ~tree_table.TR_HLTH.isin(["D", "DEAD"]), level)
+    tpa_ba_live_df = tpa_ba_live\
+        .drop(columns=['tree_count', 'stand_dens', 'plot_count']) \
+        .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE', 'QM_DBH': 'QM_DBH_LIVE'}) \
+        .set_index(level)
 
     # total num trees (all, no filter) - tree table
     tr_all = tree_table \
@@ -822,16 +1073,13 @@ def create_general_description_level(tree_table, plot_table, level):
     # merge component dataframes
     gendesc_df = base_df \
         .join([gendesc,
-               ba_live_df,
-               tpa_live_df,
+               tpa_ba_live_df,
                tr_all_df,
                tr_live_df,
                tr_dead_df,
                diam_df,
-               date_df]) \
+               date_df],
+              how='left') \
         .reset_index()
-
-    # QM DBH live trees - tree table
-    gendesc_df['QM_DBH_LIVE'] = qm_dbh(gendesc_df['BA_LIVE'], gendesc_df['TPA_LIVE'])
 
     return gendesc_df
