@@ -30,6 +30,9 @@ arcpy.AddMessage('Age table created')
 # Define list of levels
 levels = ['PID', 'SID', 'SITE', 'UNIT']
 
+# Allow output overwrite during testing
+arcpy.env.overwriteOutput = True
+
 # loop through levels producing an ages summary table for each
 for level in levels:
     arcpy.AddMessage('Work on {0}'.format(level))
@@ -101,7 +104,7 @@ for level in levels:
     arcpy.AddMessage('    dfs merged')
 
     # Export to gdb table
-    table_name = "AGE_Summary_" + level
+    table_name = level + "_Age_Summary"
     table_path = os.path.join(out_gdb, table_name)
     out_df.spatial.to_table(table_path)
     arcpy.AddMessage('    merged df exported to {0}'.format(table_path))
