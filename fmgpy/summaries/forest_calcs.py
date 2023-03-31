@@ -79,6 +79,20 @@ def create_level_df(level, plot_table):
             .set_index(level)
         return base_df
 
+    elif level == 'PID':
+        base_df = plot_table \
+            .groupby(level) \
+            .agg(
+                POOL=('POOL', 'first'),
+                COMP=('COMP', 'first'),
+                UNIT=('UNIT', 'first'),
+                SITE=('SITE', 'first'),
+                SID=('SID', 'first')
+                )\
+            .reset_index()\
+            .set_index(level)
+        return base_df
+
 
 # Plot count to be used with group by - agg
 def agg_plot_count(PID):
@@ -503,7 +517,7 @@ def create_plot_table(fixed_df, age_df):
         .set_index('PID')
 
     # create and clean age plot dataframe
-    cleanage_df = age_df[['PID', 'AGE_SP', 'AGE_DIA', 'AGE_ORIG', 'AGE_GRW', 'MISC']] \
+    cleanage_df = age_df[['PID', 'AGE_SP', 'AGE_DIA', 'AGE_ORIG', 'AGE_GRW', 'MISC', 'MAST_TYPE']] \
         .rename(columns={'MISC': 'AGE_MISC'}) \
         .set_index('PID')
 
