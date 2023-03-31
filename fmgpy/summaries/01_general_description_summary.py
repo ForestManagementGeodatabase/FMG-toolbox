@@ -1,3 +1,4 @@
+# TODO: Modify to handle plot level gen summary
 # Do some imports
 import os
 import sys
@@ -110,8 +111,8 @@ for level in levels:
     diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
         .groupby([level]) \
         .agg(
-            AMD=('TR_DIA', 'mean'),
-            MAX_DBH=('TR_DIA', 'max')
+            AMD_LIVE=('TR_DIA', 'mean'),
+            MAX_DBH_LIVE=('TR_DIA', 'max')
         ) \
         .reset_index() \
         .set_index([level])
@@ -143,10 +144,22 @@ for level in levels:
                date_df],
               how='left')\
         .reset_index()
+
+    # Handle NaN values appropriately
+    out_df = out_df.fillna(value={'INV_PRESENT': 'No',
+                                   'TPA_LIVE': 0,
+                                   'BA_LIVE': 0,
+                                   'QM_DBH_LIVE': 0,
+                                   'NUM_TR': 0,
+                                   'NUM_TR_LIVE': 0,
+                                   'NUM_TR_DEAD': 0,
+                                   'AMD_LIVE': 0,
+                                   'MAX_DBH_LIVE': 0,
+                                   'COL_YEAR': 'NA'})
     arcpy.AddMessage("    All Component DFs Merged")
 
     # Export to gdb table
-    table_name = "General_Summary_" + level
+    table_name = level + "_General_Summary"
     table_path = os.path.join(out_gdb, table_name)
     out_df.spatial.to_table(table_path)
     arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
