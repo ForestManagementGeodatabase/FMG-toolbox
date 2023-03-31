@@ -56,7 +56,7 @@ for level in levels:
     arcpy.AddMessage('    Unfiltered df created')
 
     # Adjust data types & set index
-    unfiltered_metrics = unfiltered_metrics.astype({'AGE_ORIG':'int', 'UND_COV':'int'})
+    unfiltered_metrics = unfiltered_metrics.astype({'AGE_ORIG': 'int', 'UND_COV': 'int'})
     unfiltered_metrics = unfiltered_metrics.set_index(level)
 
     # Calculate filtered metrics
@@ -83,8 +83,8 @@ for level in levels:
 
     # Adjust data types
     hm_age['HARD_MAST_AGE'] = hm_age['HARD_MAST_AGE'].astype(int)
-    sm_age ['SOFT_MAST_AGE'] = sm_age['SOFT_MAST_AGE'].astype(int)
-    lm_age ['LIGHTSEED_MAST_AGE'] = lm_age['LIGHTSEED_MAST_AGE'].astype(int)
+    sm_age['SOFT_MAST_AGE'] = sm_age['SOFT_MAST_AGE'].astype(int)
+    lm_age['LIGHTSEED_MAST_AGE'] = lm_age['LIGHTSEED_MAST_AGE'].astype(int)
 
     # Set indexs
     hm_age = hm_age.set_index(level)
@@ -107,7 +107,3 @@ for level in levels:
     arcpy.AddMessage('    merged df exported to {0}'.format(table_path))
 
 arcpy.AddMessage("Complete")
-
-
-
-
