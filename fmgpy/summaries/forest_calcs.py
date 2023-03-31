@@ -990,8 +990,3 @@ def date_range(min_year, max_year):
     else:
         return str(min_year) + "-" + str(max_year)
 
-
-# Create metrics that form the general description summary table
-# TODO: add function description
-# TODO: recast function to handle plot level summaries and calcs
-# TODO: update BA, TPA & QM DBH Calcs with non-case function
