@@ -510,8 +510,9 @@ def create_plot_table(fixed_df, age_df):
 
     # Create and clean fixed plot dataframe
     cleanfixed_df = fixed_df \
-        .drop(['CREATED_USER', 'CREATED_DATE', 'LAST_EDITED_USER', 'LAST_EDITED_DATE', 'SE_ANNO_CAD_DATA', 'OBJECTID'],
-              axis=1,
+        .drop(columns=['CREATED_USER', 'CREATED_DATE',
+                       'LAST_EDITED_USER', 'LAST_EDITED_DATE',
+                       'SE_ANNO_CAD_DATA', 'OBJECTID'],
               errors='ignore') \
         .rename(columns={'MISC': 'FX_MISC'}) \
         .set_index('PID')
@@ -557,7 +558,8 @@ def create_plot_table(fixed_df, age_df):
     plot_table = plot_table \
         .merge(right=invsp_filter_df,
                how='left')\
-        .reset_index()
+        .reset_index()\
+        .drop(columns=['index', 'level_0'])
 
     return plot_table
 
@@ -623,7 +625,7 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=fixpivot_df,
                    how='left',
                    on='PID') \
@@ -662,7 +664,7 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=fixpivot_df,
                    how='left',
                    on='PID') \
@@ -717,7 +719,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on='PID') \
@@ -747,7 +749,7 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
 
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on='PID') \
@@ -826,7 +828,7 @@ def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level)
 
         # Join results back to full set of level polygons and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=fixpivot_df,
                    how='left',
                    on=level) \
@@ -871,7 +873,7 @@ def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level)
 
         # Join results back to full set of level polygons and fill nan with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=fixpivot_df,
                    how='left',
                    on=level) \
@@ -937,7 +939,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
 
         # Join results back to full set of level polygons and fill nans with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on=level) \
@@ -972,7 +974,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
 
         # Join results back to full set of level polygons and fill nan with 0
         out_df = plotcount_df \
-            .drop(['plot_count'], axis=1) \
+            .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on=level) \

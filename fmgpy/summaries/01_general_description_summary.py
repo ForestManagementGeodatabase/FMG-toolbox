@@ -25,143 +25,241 @@ prism_df = pd.DataFrame.spatial.from_featureclass(prism_fc)
 plot_table = fcalc.create_plot_table(fixed_df=fixed_df, age_df=age_df)
 tree_table = fcalc.create_tree_table(prism_df=prism_df)
 
-# Define list of levels
-levels = ['SID', 'SITE', 'UNIT']
-
 # Allow output overwrite during testing
 arcpy.env.overwriteOutput = True
 
+# Define list of levels
+levels = ['PID', 'SID', 'SITE', 'UNIT']
+
 # loop through levels, producing general description table for each
 for level in levels:
-    arcpy.AddMessage('Work on {0}'.format(level))
+    if level != 'PID':
+        arcpy.AddMessage('Work on {0}'.format(level))
 
-    # Create base table
-    base_df = fcalc.create_level_df(level, plot_table)
-    arcpy.AddMessage("    Base DF Created")
+        # Create base table
+        base_df = fcalc.create_level_df(level, plot_table)
+        arcpy.AddMessage("    Base DF Created")
 
-    # create total num age trees, total num plots, mean overstory closure, overstory closure std, mean overstory height,
-    # overstory height std, mean understory cover, understory cover std, mean understory height, understory height std,
-    # invasive species present, invasive species list -- source: plot table
-    gendesc = plot_table \
-        .groupby([level]) \
-        .agg(
-            NUM_PLOTS=('PID', fcalc.agg_plot_count),
-            NUM_AGE_TR=('AGE_SP', 'count'),
-            MEAN_OV_CLSR=('OV_CLSR', 'mean'),
-            STD_OV_CLSR=('OV_CLSR', 'std'),
-            MEAN_OV_HT=('OV_HT', 'mean'),
-            STD_OV_HT=('OV_HT', 'std'),
-            MEAN_UND_COV=('UND_COV', 'mean'),
-            STD_UND_COV=('UND_COV', 'std'),
-            MEAN_UND_HT=('UND_HT2', 'mean'),
-            STD_UND_HT=('UND_HT2', 'std'),
-            INV_PRESENT=('INV_PRESENT', 'first'),
-            INV_SP=('INV_SP', fcalc.agg_inv_sp),
-            NUM_FX_NOTES=('FX_MISC', fcalc.agg_count_notes),
-            NUM_AGE_NOTES=('AGE_MISC', fcalc.agg_count_notes)
-        ) \
-        .reset_index() \
-        .set_index([level])
+        # create total num age trees, total num plots, mean overstory closure, overstory closure std,
+        # mean overstory height, overstory height std, mean understory cover, understory cover std,
+        # mean understory height, understory height std, invasive species present, invasive species
+        # list -- source: plot table
+        gendesc = plot_table \
+            .groupby([level]) \
+            .agg(
+                NUM_PLOTS=('PID', fcalc.agg_plot_count),
+                NUM_AGE_TR=('AGE_SP', 'count'),
+                MEAN_OV_CLSR=('OV_CLSR', 'mean'),
+                STD_OV_CLSR=('OV_CLSR', 'std'),
+                MEAN_OV_HT=('OV_HT', 'mean'),
+                STD_OV_HT=('OV_HT', 'std'),
+                MEAN_UND_COV=('UND_COV', 'mean'),
+                STD_UND_COV=('UND_COV', 'std'),
+                MEAN_UND_HT=('UND_HT2', 'mean'),
+                STD_UND_HT=('UND_HT2', 'std'),
+                INV_PRESENT=('INV_PRESENT', 'first'),
+                INV_SP=('INV_SP', fcalc.agg_inv_sp),
+                NUM_FX_NOTES=('FX_MISC', fcalc.agg_count_notes),
+                NUM_AGE_NOTES=('AGE_MISC', fcalc.agg_count_notes)
+            ) \
+            .reset_index() \
+            .set_index([level])
 
-    # Add mean under story height category values -- source: plot table
-    gendesc['MEAN_UND_HT_RG'] = gendesc['MEAN_UND_HT'].map(fcalc.und_height_range_map)
-    arcpy.AddMessage("    General DF Created")
+        # Add mean under story height category values -- source: plot table
+        gendesc['MEAN_UND_HT_RG'] = gendesc['MEAN_UND_HT'].map(fcalc.und_height_range_map)
+        arcpy.AddMessage("    General DF Created")
 
-    #  Calculate TPA & BA for live trees
-    tpa_ba_live = fcalc.tpa_ba_qmdbh_level(tree_table=tree_table,
-                                           filter_statement=~tree_table.TR_HLTH.isin(["D", "DEAD"]),
-                                           level=level)
+        #  Calculate TPA & BA for live trees
+        tpa_ba_live = fcalc.tpa_ba_qmdbh_level(tree_table=tree_table,
+                                               filter_statement=~tree_table.TR_HLTH.isin(["D", "DEAD"]),
+                                               level=level)
 
-    # Clean up TPA & BA for live tree dataframe
-    tpa_ba_live_df = tpa_ba_live\
-        .drop(columns=['tree_count', 'stand_dens', 'plot_count']) \
-        .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE', 'QM_DBH': 'QM_DBH_LIVE'}) \
-        .set_index(level)
-    arcpy.AddMessage("    TPA & BA Live Tree DF Created")
+        # Clean up TPA & BA for live tree dataframe
+        tpa_ba_live_df = tpa_ba_live\
+            .drop(columns=['tree_count', 'stand_dens', 'plot_count']) \
+            .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE', 'QM_DBH': 'QM_DBH_LIVE'}) \
+            .set_index(level)
+        arcpy.AddMessage("    TPA & BA Live Tree DF Created")
 
-    # Calculate total num trees (all, no filter) -- source: tree table
-    tr_all = tree_table \
-        .groupby([level]) \
-        .apply(fcalc.tree_count)
+        # Calculate total num trees (all, no filter) -- source: tree table
+        tr_all = tree_table \
+            .groupby([level]) \
+            .apply(fcalc.tree_count)
 
-    # Convert tot num trees series to dataframe
-    tr_all_df = pd.DataFrame({level: tr_all.index, 'NUM_TR': tr_all.values}).set_index([level])
-    arcpy.AddMessage("    Total Tree Count DF Created")
+        # Convert tot num trees series to dataframe
+        tr_all_df = pd.DataFrame({level: tr_all.index, 'NUM_TR': tr_all.values}).set_index([level])
+        arcpy.AddMessage("    Total Tree Count DF Created")
 
-    # Calculate total num live trees -- source: tree table
-    tr_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-        .groupby([level]) \
-        .apply(fcalc.tree_count)
+        # Calculate total num live trees -- source: tree table
+        tr_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby([level]) \
+            .apply(fcalc.tree_count)
 
-    # Convert tot num live trees series to dataframe
-    tr_live_df = pd.DataFrame({level: tr_live.index, 'NUM_TR_LIVE': tr_live.values}).set_index([level])
-    arcpy.AddMessage("    Total Live Tree Count DF Created")
+        # Convert tot num live trees series to dataframe
+        tr_live_df = pd.DataFrame({level: tr_live.index, 'NUM_TR_LIVE': tr_live.values}).set_index([level])
+        arcpy.AddMessage("    Total Live Tree Count DF Created")
 
-    # Calculate total num dead trees -- source: tree table
-    tr_dead = tree_table[tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-        .groupby([level]) \
-        .apply(fcalc.tree_count)
+        # Calculate total num dead trees -- source: tree table
+        tr_dead = tree_table[tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby([level]) \
+            .apply(fcalc.tree_count)
 
-    # Convert total num dead trees series to dataframe
-    tr_dead_df = pd.DataFrame({level: tr_dead.index, 'NUM_TR_DEAD': tr_dead.values}).set_index([level])
-    arcpy.AddMessage("    Total Dead Tree Count DF Created")
+        # Convert total num dead trees series to dataframe
+        tr_dead_df = pd.DataFrame({level: tr_dead.index, 'NUM_TR_DEAD': tr_dead.values}).set_index([level])
+        arcpy.AddMessage("    Total Dead Tree Count DF Created")
 
-    # Average Mean Diameter live trees - tree table
-    # Calculate Max DBH and Mean Diameter live trees -- source: tree table
-    diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
-        .groupby([level]) \
-        .agg(
+        # Average Mean Diameter live trees - tree table
+        # Calculate Max DBH and Mean Diameter live trees -- source: tree table
+        diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby([level]) \
+            .agg(
+                AMD_LIVE=('TR_DIA', 'mean'),
+                MAX_DBH_LIVE=('TR_DIA', 'max')
+            ) \
+            .reset_index() \
+            .set_index([level])
+        arcpy.AddMessage("    AMD and Max DBH for Live Trees DF Created")
+
+        # Calculate collection date
+        date_df = tree_table\
+            .groupby([level], as_index=False) \
+            .agg(
+                min_date=('COL_DATE', 'min'),
+                max_date=('COL_DATE', 'max')
+                )
+        date_df['min_year'] = date_df['min_date'].dt.year
+        date_df['max_year'] = date_df['max_date'].dt.year
+        date_df["COL_YEAR"] = date_df.apply(lambda x: fcalc.date_range(x["min_year"], x["max_year"]), axis=1)
+
+        # Clean up collection date dataframe
+        date_df = date_df.drop(columns=['min_date', 'max_date', 'min_year', 'max_year']).set_index(level)
+        arcpy.AddMessage("    Collection Date DF Created")
+
+        # Merge component dataframes onto the base dataframe
+        out_df = base_df \
+            .join([gendesc,
+                   tpa_ba_live_df,
+                   tr_all_df,
+                   tr_live_df,
+                   tr_dead_df,
+                   diam_df,
+                   date_df],
+                  how='left')\
+            .reset_index()
+
+        # Handle NaN values appropriately
+        out_df = out_df.fillna(value={'INV_PRESENT': 'No',
+                                       'TPA_LIVE': 0,
+                                       'BA_LIVE': 0,
+                                       'QM_DBH_LIVE': 0,
+                                       'NUM_TR': 0,
+                                       'NUM_TR_LIVE': 0,
+                                       'NUM_TR_DEAD': 0,
+                                       'AMD_LIVE': 0,
+                                       'MAX_DBH_LIVE': 0,
+                                       'COL_YEAR': 'NA'}) \
+                        .drop(columns=['index'], errors='ignore')
+        arcpy.AddMessage("    All Component DFs Merged")
+
+        # Export to gdb table
+        table_name = level + "_General_Summary"
+        table_path = os.path.join(out_gdb, table_name)
+        out_df.spatial.to_table(table_path)
+        arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
+
+    elif level == 'PID':
+        # Drop unecessary plot table columns
+        plot_metrics = plot_table.drop(columns=
+                                       ['UND_SP1', 'UND_SP2', 'UND_SP3',
+                                        'GRD_SP1', 'GRD_SP2', 'GRD_SP3',
+                                        'NOT_SP1', 'NOT_SP2', 'NOT_SP3',
+                                        'NOT_SP4', 'NOT_SP5', 'FX_MISC',
+                                        'COL_CREW', 'AGENCY', 'DISTRICT',
+                                        'ITERATION', 'SHAPE'])
+
+        # Create and populate inventory year column
+        plot_metrics['INV_YEAR'] = plot_metrics['COL_DATE'].dt.year
+        plot_metrics = plot_metrics.set_index('PID')
+
+        # Create BA, TPA, QM DBH
+        plot_ba_tpa = fcalc.tpa_ba_qmdbh_plot(tree_table=tree_table,
+                                              filter_statement=~tree_table.TR_HLTH.isin(["D", "DEAD"]))
+
+        # Clean up TPA & BA for live tree dataframe
+        plot_tpa_ba_live_df = plot_ba_tpa\
+            .drop(columns=['tree_count', 'stand_dens', 'plot_count'], errors='ignore') \
+            .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE',
+                             'QM_DBH': 'QM_DBH_LIVE', 'plot_count': 'NUM_PLOT'}) \
+            .set_index('PID')
+        arcpy.AddMessage("    TPA & BA Live Tree DF Created")
+
+        # Calculate total num trees (all, no filter) -- source: tree table
+        plot_tr_all = tree_table \
+            .groupby('PID') \
+            .apply(fcalc.tree_count)
+
+        # Convert tot num trees series to dataframe
+        plot_tr_all_df = pd.DataFrame({'PID': plot_tr_all.index, 'NUM_TR': plot_tr_all.values}).set_index('PID')
+        arcpy.AddMessage("    Total Tree Count DF Created")
+
+        # Calculate total num live trees -- source: tree table
+        plot_tr_live = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby('PID') \
+            .apply(fcalc.tree_count)
+
+        # Convert tot num live trees series to dataframe
+        plot_tr_live_df = pd.DataFrame({'PID': plot_tr_live.index, 'NUM_TR_LIVE': plot_tr_live.values}).set_index('PID')
+        arcpy.AddMessage("    Total Live Tree Count DF Created")
+
+        # Calculate total num dead trees -- source: tree table
+        plot_tr_dead = tree_table[tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby('PID') \
+            .apply(fcalc.tree_count)
+
+        # Convert total num dead trees series to dataframe
+        plot_tr_dead_df = pd.DataFrame({'PID': plot_tr_dead.index, 'NUM_TR_DEAD': plot_tr_dead.values}).set_index('PID')
+        arcpy.AddMessage("    Total Dead Tree Count DF Created")
+
+        # Average Mean Diameter live trees - tree table
+        # Calculate Max DBH and Mean Diameter live trees -- source: tree table
+        plot_diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
+            .groupby('PID') \
+            .agg(
             AMD_LIVE=('TR_DIA', 'mean'),
             MAX_DBH_LIVE=('TR_DIA', 'max')
-        ) \
-        .reset_index() \
-        .set_index([level])
-    arcpy.AddMessage("    AMD and Max DBH for Live Trees DF Created")
+            ) \
+            .reset_index() \
+            .set_index('PID')
+        arcpy.AddMessage("    AMD and Max DBH for Live Trees DF Created")
 
-    # Calculate collection date
-    date_df = tree_table\
-        .groupby([level], as_index=False) \
-        .agg(
-            min_date=('COL_DATE', 'min'),
-            max_date=('COL_DATE', 'max')
-            )
-    date_df['min_year'] = date_df['min_date'].dt.year
-    date_df['max_year'] = date_df['max_date'].dt.year
-    date_df["COL_YEAR"] = date_df.apply(lambda x: fcalc.date_range(x["min_year"], x["max_year"]), axis=1)
+        # Merge component dataframes onto the base dataframe
+        out_df = plot_metrics \
+            .join([plot_tpa_ba_live_df,
+                   plot_tr_all_df,
+                   plot_tr_live_df,
+                   plot_tr_dead_df,
+                   plot_diam_df],
+                  how='left') \
+            .reset_index()
 
-    # Clean up collection date dataframe
-    date_df = date_df.drop(columns=['min_date', 'max_date', 'min_year', 'max_year']).set_index(level)
-    arcpy.AddMessage("    Collection Date DF Created")
+        # Handle NaN values appropriately
+        out_df = out_df.fillna(value={'INV_PRESENT': 'No',
+                                      'TPA_LIVE': 0,
+                                      'BA_LIVE': 0,
+                                      'QM_DBH_LIVE': 0,
+                                      'NUM_TR': 0,
+                                      'NUM_TR_LIVE': 0,
+                                      'NUM_TR_DEAD': 0,
+                                      'AMD_LIVE': 0,
+                                      'MAX_DBH_LIVE': 0,
+                                      'COL_YEAR': 'NA'})\
+                        .drop(columns=['index'], errors='ignore')
+        arcpy.AddMessage("    All Component DFs Merged")
 
-    # Merge component dataframes onto the base dataframe
-    out_df = base_df \
-        .join([gendesc,
-               tpa_ba_live_df,
-               tr_all_df,
-               tr_live_df,
-               tr_dead_df,
-               diam_df,
-               date_df],
-              how='left')\
-        .reset_index()
-
-    # Handle NaN values appropriately
-    out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                   'TPA_LIVE': 0,
-                                   'BA_LIVE': 0,
-                                   'QM_DBH_LIVE': 0,
-                                   'NUM_TR': 0,
-                                   'NUM_TR_LIVE': 0,
-                                   'NUM_TR_DEAD': 0,
-                                   'AMD_LIVE': 0,
-                                   'MAX_DBH_LIVE': 0,
-                                   'COL_YEAR': 'NA'})
-    arcpy.AddMessage("    All Component DFs Merged")
-
-    # Export to gdb table
-    table_name = level + "_General_Summary"
-    table_path = os.path.join(out_gdb, table_name)
-    out_df.spatial.to_table(table_path)
-    arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
+        # Export to gdb table
+        table_name = "PID_General_Summary"
+        table_path = os.path.join(out_gdb, table_name)
+        out_df.spatial.to_table(table_path)
+        arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
 arcpy.AddMessage('Complete')
