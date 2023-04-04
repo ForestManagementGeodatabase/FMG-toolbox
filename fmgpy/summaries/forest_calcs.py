@@ -992,3 +992,101 @@ def date_range(min_year, max_year):
     else:
         return str(min_year) + "-" + str(max_year)
 
+
+# Generate a number of TPA, BA, QM DBH metrics for level summaries
+def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, level):
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
+    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
+    For example, if mast_type is specified as the case column BA, TPA and QM DBH will be calculated for
+    each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be
+                            calculated for each category in this field
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([case_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby(level, as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count)) \
+        .set_index(level)
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table, add unfiltered plot count field
+        filtered_df = tree_table[filter_statement] \
+            .groupby([level, case_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                stand_dens=('TR_DENS', sum)
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons and fill nans with 0
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby([level, case_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                stand_dens=('TR_DENS', sum),
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
+        filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons and fill nan with 0
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .fillna(0) \
+            .reset_index()
+
+        return out_df
+
