@@ -981,7 +981,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
             .fillna(0) \
             .reset_index()
 
-        return out_df
+    return out_df
 
 
 # Create a field with year or year range, used with apply - lambda
@@ -994,6 +994,8 @@ def date_range(min_year, max_year):
 
 
 # Generate a number of TPA, BA, QM DBH metrics for level summaries
+# TODO: determine if function should return all plots or only plots that have valid data, address fill na problem
+# TODO: determine if the issue described above impacts the pivot version of the function
 def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, level):
     """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
     case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
@@ -1051,9 +1053,8 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         out_df = plotcount_df \
             .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
-                   how='left',
+                   how='inner',
                    on=level) \
-            .fillna(0) \
             .reset_index()
 
         return out_df
@@ -1090,3 +1091,119 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
 
         return out_df
 
+
+# Generate health prevalency and prevalency percentage for level summaries
+def health_prev_pct_level(tree_table, filter_statement, level):
+    """Creates a dataframe with most prevalent health and percentage of total that health category comprises
+     for specified level - these metrics are based on TPA for each health category and all trees.
+     The function will accept and apply a filter to determine health prevalency for specific subsets of trees.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Create DF with unfiltered TPA at specified level
+    unfilt_tpa_df = tpa_ba_qmdbh_level(
+        tree_table=tree_table,
+        filter_statement=None,
+        level=level)
+
+    unfilt_tpa_df = unfilt_tpa_df \
+        .drop(
+            columns=['index',
+                     'tree_count',
+                     'stand_dens',
+                     'plot_count',
+                     'BA',
+                     'QM_DBH']) \
+        .rename(columns={'TPA': 'OVERALL_TPA'}) \
+        .set_index('SID')
+
+    # Create DF with filtered TPA
+    health_base_df = tpa_ba_qmdbh_level_by_case_long(
+        tree_table=tree_table,
+        filter_statement=filter_statement,
+        case_column='TR_HLTH',
+        level=level)
+
+    # Create DF with max TPA for each level
+    health_max_df = health_base_df \
+        .groupby(level) \
+        .agg(TPA=('TPA', 'max')) \
+        .reset_index()
+
+    # Join max df back to filtered base df on compound key level, TPA
+    # The resulting dataframe contains health codes by max tpa, with some edge cases
+    health_join_df = health_base_df \
+        .merge(
+            right=health_max_df,
+            how='inner',
+            left_on=[level, 'TPA'],
+            right_on=[level, 'TPA']) \
+        .reset_index()
+
+    # Edge cases are where TPAs may be identical between health ratings within a level
+    # i.e. level 123 has a health rating of H with a TPA of 5 and S with a TPA of 5.
+    # To deal with these cases  we assign a numeric code to each health category, sort the resulting
+    # dataframe by those numeric codes then drop duplicate rows by level, keeping the first if duplicates
+    # are present. This results in a data frame of most prevalent health, wighted toward the healthiest
+    # switching the sort method would result in a data frame of most prevalent health, weighted toward
+    # the least healthy
+
+    # Assign numeric ranking codes to each health category
+    conditions = [(health_join_df['TR_HLTH'] == 'H'),
+                  (health_join_df['TR_HLTH'] == 'S'),
+                  (health_join_df['TR_HLTH'] == 'SD'),
+                  (health_join_df['TR_HLTH'] == 'D'),
+                  (health_join_df['TR_HLTH'] == 'NT')]
+    values = [1, 2, 3, 4, 5]
+    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+
+    # Sort dataframe by numeric ranking codes
+    health_prev_df = health_join_df \
+        .sort_values(
+        by=['SID', 'TR_HLTH_NUM'])
+
+    # Drop duplicate rows, keeping the first row
+    health_prev_df = health_prev_df \
+        .drop_duplicates(
+            subset='SID',
+            keep='first')
+
+    # Rename tpa column and prep for join
+    health_prev_df = health_prev_df \
+        .rename(columns={'TPA': 'HLTH_TPA'}) \
+        .set_index(level)
+
+    # Join overall TPA to health prevalence table to calculate prevalence percentage
+    health_prev_pct_df = health_prev_df \
+        .join(
+            other=unfilt_tpa_df,
+            how='left')
+
+    # Calculate prevalence percentage column
+    health_prev_pct_df['HLTH_PREV_PCT'] = (health_prev_pct_df['HLTH_TPA'] / health_prev_pct_df['OVERALL_TPA']) * 100
+
+    # Clean up dataframe for export
+    health_prev_pct_df = health_prev_pct_df \
+        .drop(columns=['level_0',
+                       'index',
+                       'tree_count',
+                       'stand_dens',
+                       'plot_count',
+                       'BA',
+                       'QM_DBH',
+                       'TR_HLTH_NUM',
+                       'HLTH_TPA',
+                       'OVERALL_TPA']) \
+        .rename(columns={'TR_HLTH': 'HLTH_PREV'}) \
+        .reset_index()
+
+    return health_prev_pct_df
