@@ -37,6 +37,24 @@ stand_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLT
 site_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH.isin(["D", "DEAD"]), 'VERT_COMP', 'SITE')
 unit_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH.isin(["D", "DEAD"]), 'VERT_COMP', 'UNIT')
 
+# Health Prevalence filters - tree table
+tree_table['TR_SIZE'] == 'Sappling'
+tree_table['TR_SIZE'] == 'Pole'
+tree_table['TR_SIZE'] == 'Saw'
+tree_table['TR_SIZE'] == 'Mature'
+tree_table['TR_SIZE'] == 'Over Mature'
+tree_table['TR_TYPR'] == 'Wildlife'
+tree_table['MAST_TYPE'] == 'Hard'
+tree_table['MAST_TYPE'] == 'Soft'
+tree_table['MAST_TYPE'] == 'Lightseed'
+tree_table['VERT_COMP'] == 'Canopy'
+tree_table['VERT_COMP'] == 'Midstory'
+
+TR_SP = [Typical Species]
+TR_SP = [Non Typical Species]
+
+
+
 # Work on prevalency pattern - need for species, health
 # return health code, species code and percent of whole
 

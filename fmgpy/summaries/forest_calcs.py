@@ -1096,7 +1096,7 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
 def health_prev_pct_level(tree_table, filter_statement, level):
     """Creates a dataframe with most prevalent health and percentage of total that health category comprises
      for specified level - these metrics are based on TPA for each health category and all trees.
-     The function will accept and apply a filter to determine health prevalency for specific subsets of trees.
+     The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
