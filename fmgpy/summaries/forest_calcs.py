@@ -1097,7 +1097,8 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
 # Generate health prevalence and prevalence percentage for level summaries
 def health_prev_pct_level(tree_table, filter_statement, level):
     """Creates a dataframe with most prevalent health and percentage of total that health category comprises
-     for specified level - these metrics are based on TPA for each health category and all trees.
+     for specified level - these metrics are based on TPA for each health category and the subset of trees defined
+     by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
 
     Keyword Args:
@@ -1111,10 +1112,11 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
     if no filter is required, None should be passed in as the keyword argument.
     """
-    # Create DF with unfiltered TPA at specified level
+    # Create DF with filtered TPA at specified level, ignoring health categories
+    # TPA from this step will be used to calculate the prevalence percent
     unfilt_tpa_df = tpa_ba_qmdbh_level(
         tree_table=tree_table,
-        filter_statement=None,
+        filter_statement=filter_statement,
         level=level)
 
     unfilt_tpa_df = unfilt_tpa_df \
@@ -1141,7 +1143,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
         .agg(TPA=('TPA', 'max')) \
         .reset_index()
 
-    # Join max df back to filtered base df on compound key: level, TPA
+    # Join max df back to filtered base df on compound key level, TPA
     # The resulting dataframe contains health codes by max tpa, with some edge cases
     health_join_df = health_base_df \
         .merge(
@@ -1155,7 +1157,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     # i.e. level 123 has a health rating of H with a TPA of 5 and S with a TPA of 5.
     # To deal with these cases  we assign a numeric code to each health category, sort the resulting
     # dataframe by those numeric codes then drop duplicate rows by level, keeping the first if duplicates
-    # are present. This results in a data frame of most prevalent health, weighted toward the healthiest
+    # are present. This results in a data frame of most prevalent health, wighted toward the healthiest
     # switching the sort method would result in a data frame of most prevalent health, weighted toward
     # the least healthy
 
@@ -1171,7 +1173,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     # Sort dataframe by numeric ranking codes
     health_prev_df = health_join_df \
         .sort_values(
-        by=['SID', 'TR_HLTH_NUM'])
+            by=['SID', 'TR_HLTH_NUM'])
 
     # Drop duplicate rows, keeping the first row
     health_prev_df = health_prev_df \
