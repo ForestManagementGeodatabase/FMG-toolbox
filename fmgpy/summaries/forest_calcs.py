@@ -211,7 +211,7 @@ def size_class_map(tr_dia):
      """
 
     if 1 <= tr_dia <=6:
-        return 'Sappling'
+        return 'Sapling'
     if 6 < tr_dia <= 12:
         return 'Pole'
     if 12 < tr_dia <= 18:
@@ -1092,7 +1092,7 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         return out_df
 
 
-# Generate health prevalency and prevalency percentage for level summaries
+# Generate health prevalence and prevalence percentage for level summaries
 def health_prev_pct_level(tree_table, filter_statement, level):
     """Creates a dataframe with most prevalent health and percentage of total that health category comprises
      for specified level - these metrics are based on TPA for each health category and all trees.
@@ -1153,7 +1153,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     # i.e. level 123 has a health rating of H with a TPA of 5 and S with a TPA of 5.
     # To deal with these cases  we assign a numeric code to each health category, sort the resulting
     # dataframe by those numeric codes then drop duplicate rows by level, keeping the first if duplicates
-    # are present. This results in a data frame of most prevalent health, wighted toward the healthiest
+    # are present. This results in a data frame of most prevalent health, weighted toward the healthiest
     # switching the sort method would result in a data frame of most prevalent health, weighted toward
     # the least healthy
 

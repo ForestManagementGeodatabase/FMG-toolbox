@@ -38,17 +38,18 @@ site_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH
 unit_vert_dead_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, tree_table.TR_HLTH.isin(["D", "DEAD"]), 'VERT_COMP', 'UNIT')
 
 # Health Prevalence filters - tree table
-tree_table['TR_SIZE'] == 'Sappling'
-tree_table['TR_SIZE'] == 'Pole'
-tree_table['TR_SIZE'] == 'Saw'
-tree_table['TR_SIZE'] == 'Mature'
-tree_table['TR_SIZE'] == 'Over Mature'
-tree_table['TR_TYPR'] == 'Wildlife'
-tree_table['MAST_TYPE'] == 'Hard'
-tree_table['MAST_TYPE'] == 'Soft'
-tree_table['MAST_TYPE'] == 'Lightseed'
-tree_table['VERT_COMP'] == 'Canopy'
-tree_table['VERT_COMP'] == 'Midstory'
+sap_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Sapling', level)
+pole_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Pole', level)
+saw_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Saw', level)
+mat_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Mature', level)
+ovmat_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Over Mature', level)
+wildt_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_TYPE'] == 'Wildlife', level)
+masth_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Hard', level)
+masts_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Soft', level)
+mastl_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Lightseed', level)
+can_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Canopy', level)
+mid_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Midstory', level)
+int_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_CL'] == 'I', level)
 
 TR_SP = [Typical Species]
 TR_SP = [Non Typical Species]
