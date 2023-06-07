@@ -50,6 +50,8 @@ mastl_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['MAST_TYPE']
 can_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Canopy', level)
 mid_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Midstory', level)
 int_prevh_df = fcalc.health_prev_pct_level(tree_table, tree_table['TR_CL'] == 'I', level)
+ovr_prevht_df = fcalc.health_prev_pct_level_pcttest(tree_table, None, level)
+
 
 TR_SP = [Typical Species]
 TR_SP = [Non Typical Species]
@@ -60,9 +62,11 @@ TR_SP = [Non Typical Species]
 # return health code, species code and percent of whole
 # filter format for param: tree_table['TR_SIZE'] == 'Mature'
 
-def health_prev_pct_level(tree_table, filter_statement, level):
+# Generate health prevalence and prevalence percentage for level summaries
+def health_prev_pct_plot(tree_table, filter_statement):
     """Creates a dataframe with most prevalent health and percentage of total that health category comprises
-     for specified level - these metrics are based on TPA for each health category and all trees.
+     for specified level - these metrics are based on TPA for each health category and the subset of trees defined
+     by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
 
     Keyword Args:
@@ -76,33 +80,31 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
     if no filter is required, None should be passed in as the keyword argument.
     """
-    # Create DF with unfiltered TPA at specified level
-    unfilt_tpa_df = tpa_ba_qmdbh_level(
+    # Create DF with filtered TPA at specified level, ignoring health categories
+    # TPA from this step will be used to calculate the prevalence percent
+    unfilt_tpa_df = tpa_ba_qmdbh_plot(
         tree_table=tree_table,
-        filter_statement=None,
-        level=level)
+        filter_statement=filter_statement)
 
     unfilt_tpa_df = unfilt_tpa_df \
         .drop(
             columns=['index',
                      'tree_count',
-                     'stand_dens',
                      'plot_count',
                      'BA',
                      'QM_DBH']) \
         .rename(columns={'TPA': 'OVERALL_TPA'}) \
-        .set_index('SID')
+        .set_index('PID')
 
     # Create DF with filtered TPA
-    health_base_df = tpa_ba_qmdbh_level_by_case_long(
+    health_base_df = tpa_ba_qmdbh_plot_by_case_long(
         tree_table=tree_table,
         filter_statement=filter_statement,
-        case_column='TR_HLTH',
-        level=level)
+        case_column='TR_HLTH')
 
     # Create DF with max TPA for each level
     health_max_df = health_base_df \
-        .groupby(level) \
+        .groupby('PID') \
         .agg(TPA=('TPA', 'max')) \
         .reset_index()
 
@@ -112,8 +114,8 @@ def health_prev_pct_level(tree_table, filter_statement, level):
         .merge(
             right=health_max_df,
             how='inner',
-            left_on=[level, 'TPA'],
-            right_on=[level, 'TPA']) \
+            left_on=['PID', 'TPA'],
+            right_on=['PID', 'TPA']) \
         .reset_index()
 
     # Edge cases are where TPAs may be identical between health ratings within a level
@@ -136,18 +138,18 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     # Sort dataframe by numeric ranking codes
     health_prev_df = health_join_df \
         .sort_values(
-        by=['SID', 'TR_HLTH_NUM'])
+            by=['PID', 'TR_HLTH_NUM'])
 
     # Drop duplicate rows, keeping the first row
     health_prev_df = health_prev_df \
         .drop_duplicates(
-            subset='SID',
+            subset='PID',
             keep='first')
 
     # Rename tpa column and prep for join
     health_prev_df = health_prev_df \
         .rename(columns={'TPA': 'HLTH_TPA'}) \
-        .set_index(level)
+        .set_index('PID')
 
     # Join overall TPA to health prevalence table to calculate prevalence percentage
     health_prev_pct_df = health_prev_df \
@@ -174,5 +176,4 @@ def health_prev_pct_level(tree_table, filter_statement, level):
         .reset_index()
 
     return health_prev_pct_df
-
 

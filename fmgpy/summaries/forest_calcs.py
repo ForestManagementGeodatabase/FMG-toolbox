@@ -746,7 +746,6 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
         # Set index for merge
         filtered_df.set_index('PID')
 
-
         # Join results back to full set of PIDs and fill nans with 0
         out_df = plotcount_df \
             .drop(columns=['plot_count']) \
@@ -1051,7 +1050,7 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
-        # Join results back to full set of level polygons and fill nans with 0
+        # Join results back to full set of level polygons
         out_df = plotcount_df \
             .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
@@ -1128,7 +1127,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
                      'BA',
                      'QM_DBH']) \
         .rename(columns={'TPA': 'OVERALL_TPA'}) \
-        .set_index('SID')
+        .set_index(level)
 
     # Create DF with filtered TPA
     health_base_df = tpa_ba_qmdbh_level_by_case_long(
@@ -1173,12 +1172,12 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     # Sort dataframe by numeric ranking codes
     health_prev_df = health_join_df \
         .sort_values(
-            by=['SID', 'TR_HLTH_NUM'])
+            by=[level, 'TR_HLTH_NUM'])
 
     # Drop duplicate rows, keeping the first row
     health_prev_df = health_prev_df \
         .drop_duplicates(
-            subset='SID',
+            subset=level,
             keep='first')
 
     # Rename tpa column and prep for join
@@ -1201,6 +1200,200 @@ def health_prev_pct_level(tree_table, filter_statement, level):
                        'index',
                        'tree_count',
                        'stand_dens',
+                       'plot_count',
+                       'BA',
+                       'QM_DBH',
+                       'TR_HLTH_NUM',
+                       'HLTH_TPA',
+                       'OVERALL_TPA']) \
+        .rename(columns={'TR_HLTH': 'HLTH_PREV'}) \
+        .reset_index()
+
+    return health_prev_pct_df
+
+
+def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting data frame will be a
+    single instance of a plot/PID and case, with just 3 columns for TPA, BA and QDBH.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas series: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column      -- string: column name for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
+                            for each case in this column
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin([case_column]).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby('PID', as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count))\
+        .set_index('PID')
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby(['PID', case_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(['PID', case_column], as_index=False) \
+            .agg(
+                tree_count=('TR_SP', agg_tree_count),
+                plot_count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        return out_df
+
+
+# Generate health prevalence and prevalence percentage for plot summaries
+def health_prev_pct_plot(tree_table, filter_statement):
+    """Creates a dataframe with most prevalent health and percentage of total that health category comprises
+     for the plot level - these metrics are based on TPA for each health category and the subset of trees defined
+     by the filter statement.
+     The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Create DF with filtered TPA at specified level, ignoring health categories
+    # TPA from this step will be used to calculate the prevalence percent
+    unfilt_tpa_df = tpa_ba_qmdbh_plot(
+        tree_table=tree_table,
+        filter_statement=filter_statement)
+
+    unfilt_tpa_df = unfilt_tpa_df \
+        .drop(
+            columns=['index',
+                     'tree_count',
+                     'plot_count',
+                     'BA',
+                     'QM_DBH']) \
+        .rename(columns={'TPA': 'OVERALL_TPA'}) \
+        .set_index('PID')
+
+    # Create DF with filtered TPA
+    health_base_df = tpa_ba_qmdbh_plot_by_case_long(
+        tree_table=tree_table,
+        filter_statement=filter_statement,
+        case_column='TR_HLTH')
+
+    # Create DF with max TPA for each level
+    health_max_df = health_base_df \
+        .groupby('PID') \
+        .agg(TPA=('TPA', 'max')) \
+        .reset_index()
+
+    # Join max df back to filtered base df on compound key level, TPA
+    # The resulting dataframe contains health codes by max tpa, with some edge cases
+    health_join_df = health_base_df \
+        .merge(
+            right=health_max_df,
+            how='inner',
+            left_on=['PID', 'TPA'],
+            right_on=['PID', 'TPA']) \
+        .reset_index()
+
+    # Edge cases are where TPAs may be identical between health ratings within a level
+    # i.e. level 123 has a health rating of H with a TPA of 5 and S with a TPA of 5.
+    # To deal with these cases  we assign a numeric code to each health category, sort the resulting
+    # dataframe by those numeric codes then drop duplicate rows by level, keeping the first if duplicates
+    # are present. This results in a data frame of most prevalent health, wighted toward the healthiest
+    # switching the sort method would result in a data frame of most prevalent health, weighted toward
+    # the least healthy
+
+    # Assign numeric ranking codes to each health category
+    conditions = [(health_join_df['TR_HLTH'] == 'H'),
+                  (health_join_df['TR_HLTH'] == 'S'),
+                  (health_join_df['TR_HLTH'] == 'SD'),
+                  (health_join_df['TR_HLTH'] == 'D'),
+                  (health_join_df['TR_HLTH'] == 'NT')]
+    values = [1, 2, 3, 4, 5]
+    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+
+    # Sort dataframe by numeric ranking codes
+    health_prev_df = health_join_df \
+        .sort_values(
+            by=['PID', 'TR_HLTH_NUM'])
+
+    # Drop duplicate rows, keeping the first row
+    health_prev_df = health_prev_df \
+        .drop_duplicates(
+            subset='PID',
+            keep='first')
+
+    # Rename tpa column and prep for join
+    health_prev_df = health_prev_df \
+        .rename(columns={'TPA': 'HLTH_TPA'}) \
+        .set_index('PID')
+
+    # Join overall TPA to health prevalence table to calculate prevalence percentage
+    health_prev_pct_df = health_prev_df \
+        .join(
+            other=unfilt_tpa_df,
+            how='left')
+
+    # Calculate prevalence percentage column
+    health_prev_pct_df['HLTH_PREV_PCT'] = (health_prev_pct_df['HLTH_TPA'] / health_prev_pct_df['OVERALL_TPA']) * 100
+
+    # Clean up dataframe for export
+    health_prev_pct_df = health_prev_pct_df \
+        .drop(columns=['level_0',
+                       'index',
+                       'tree_count',
                        'plot_count',
                        'BA',
                        'QM_DBH',
