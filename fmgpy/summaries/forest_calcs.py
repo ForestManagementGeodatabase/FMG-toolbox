@@ -567,7 +567,7 @@ def create_plot_table(fixed_df, age_df):
 # Generate a number of  TPA, BA, QM DBH metrics for plot summaries
 def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
     """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function pivots on the
-    group column supplied resulting in BA, TPA and QM DBH columns for each category in the group column.
+    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
     For example, if mast_type is specified as the group column BA, TPA and QM DBH will be calculated for
     each mast type for each plot - ba_hard, ba_lightseed, ba_soft, etc.
 
@@ -676,7 +676,7 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
 
 # Generate a number of  TPA, BA, QM DBH metrics for plot summaries
 def tpa_ba_qmdbh_plot(tree_table, filter_statement):
-    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level, based on the specified filter
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level, based on the specified filter.
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
@@ -885,10 +885,7 @@ def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level)
 
 # Generate a number of TPA, BA, QM DBH metrics for level summaries
 def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
-    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
-    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
-    For example, if mast_type is specified as the case column BA, TPA and QM DBH will be calculated for
-    each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level based on the provided filter.
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
@@ -985,8 +982,14 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
 
 
 # Create a field with year or year range, used with apply - lambda
-# TODO: add function description to date_range
 def date_range(min_year, max_year):
+    """ Creates a value that is either a single year or year range, based on provided min and max year
+    paramaters
+
+    Keywork Args:
+        min_year  -- minimum year value
+        max_year  -- maximum year value
+    """
     if min_year == max_year:
         return str(min_year)
     else:
@@ -997,16 +1000,15 @@ def date_range(min_year, max_year):
 # TODO: determine if function should return all plots or only plots that have valid data, address fill na problem
 # TODO: determine if the issue described above impacts the pivot version of the function
 def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, level):
-    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function pivots on the
-    case column supplied resulting in BA, TPA and QM DBH columns for each category in the case column.
-    For example, if mast_type is specified as the case column BA, TPA and QM DBH will be calculated for
-    each mast type for each level polygon - ba_hard, ba_lightseed, ba_soft, etc.
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting dataframe will be a single
+    instance of a level and case, with just 3 columns for TPA, BA and QMDBH
 
     Keyword Args:
         tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
         filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
                             statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
-        case_column     -- string: field name for groupby and pivot_table methods, ba, tpa and qm dbh will be
+        case_column      -- string: field name for groupby  method, ba, tpa and qm dbh will be
                             calculated for each category in this field
         level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
 
@@ -1139,7 +1141,7 @@ def health_prev_pct_level(tree_table, filter_statement, level):
         .agg(TPA=('TPA', 'max')) \
         .reset_index()
 
-    # Join max df back to filtered base df on compound key level, TPA
+    # Join max df back to filtered base df on compound key: level, TPA
     # The resulting dataframe contains health codes by max tpa, with some edge cases
     health_join_df = health_base_df \
         .merge(
