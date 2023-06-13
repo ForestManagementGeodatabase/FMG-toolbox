@@ -66,6 +66,25 @@ pl_mid_prevh_df = fcalc.health_prev_pct_plot(tree_table, tree_table['VERT_COMP']
 pl_int_prevh_df = fcalc.health_prev_pct_plot(tree_table, tree_table['TR_CL'] == 'I')
 pl_ovr_prevht_df = fcalc.health_prev_pct_plot(tree_table, None, level)
 
+# Species prevalence filters - tree table
+sap_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Sapling', level)
+pole_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Pole', level)
+saw_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Saw', level)
+mat_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Mature', level)
+ovmat_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_SIZE'] == 'Over Mature', level)
+wildt_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_TYPE'] == 'Wildlife', level)
+hlthdead_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_HLTH'] == 'Dead', level)
+hlthsd_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_HLTH'] == 'Significant Decline', level)
+hlths_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_HLTH'] == 'Stressed', level)
+hlthh_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_HLTH'] == 'Healthy', level)
+masth_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Hard', level)
+masts_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Soft', level)
+mastl_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['MAST_TYPE'] == 'Lightseed', level)
+can_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Canopy', level)
+mid_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['VERT_COMP'] == 'Midstory', level)
+int_prevs_df = fcalc.species_prev_pct_level(tree_table, tree_table['TR_CL'] == 'I', level)
+ovr_prevs_df = fcalc.species_prev_pct_level(tree_table, None, level)
+
 
 TR_SP = [Typical Species]
 TR_SP = [Non Typical Species]
@@ -135,5 +154,56 @@ def species_prev_pct_level(tree_table, filter_statement, level):
             left_on=[level, 'TPA'],
             right_on=[level, 'TPA']) \
         .reset_index()
+
+    # Edge cases are where TPAs may be identical between species within a  level
+    # i.e. level 123 has ASCA2 with a TPA of 5 and BENI with a TPA of 5. To deal
+    # with these cases the data frame will be sorted by level and alphabetically
+    # descending on species code. The first row for each level will be kept and the
+    # other rows dropped. This results in a dataframe weighted toward species codes
+    # that occur at the beginning of the alphabet, functionally this will weight the
+    # results toward ASCA2 (silver maple)
+
+    # Sort dataframe by level and species
+    species_prev_df = species_join_df \
+        .sort_values(
+            by=[level, 'TR_SP'])
+
+    # Drop duplicate rows, keeping the first row
+    species_prev_df = species_prev_df \
+        .drop_duplicates(
+            subset=level,
+            keep='first')
+
+    # Rename tpa column and prep for join
+    species_prev_df = species_prev_df \
+        .rename(columns={'TPA': 'SP_TPA'}) \
+        .set_index(level)
+
+    # Join overall TPA to species prevalance table to calculate prevalence percentage
+    species_prev_pct_df = species_prev_df \
+        .join(
+            other=unfilt_tpa_df,
+            how='left')
+
+    # Calculate prevalence percentage column
+    species_prev_pct_df['SP_PREV_PCT'] = (species_prev_pct_df['SP_TPA'] / species_prev_pct_df['OVERALL_TPA']) * 100
+
+    # Clean up dataframe for export
+    species_prev_pct_df = species_prev_pct_df \
+        .drop(columns=['level_0',
+                       'index',
+                       'tree_count',
+                       'stand_dens',
+                       'plot_count',
+                       'BA',
+                       'QM_DBH',
+                       'OVERALL_TPA',
+                       'SP_TPA']) \
+        .rename(columns={'TR_SP': 'SP_PREV'}) \
+        .reset_index()
+
+    return species_prev_pct_df
+
+
 
 
