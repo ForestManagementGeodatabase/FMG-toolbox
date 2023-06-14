@@ -1339,6 +1339,110 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     return health_prev_pct_df
 
 
+# Generate health prevalence and prevalence percentage for plot summaries
+def species_prev_pct_plot(tree_table, filter_statement):
+    """Creates a dataframe with most prevalent species and percentage of total that species comprises
+     for the plot level - these metrics are based on TPA for each species and the subset of trees defined
+     by the filter statement.
+     The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Create DF with filtered TPA at specified level, ignoring health categories
+    # TPA from this step will be used to calculate the prevalence percent
+    unfilt_tpa_df = tpa_ba_qmdbh_plot(
+        tree_table=tree_table,
+        filter_statement=filter_statement)
+
+    unfilt_tpa_df = unfilt_tpa_df \
+        .drop(
+            columns=['index',
+                     'tree_count',
+                     'plot_count',
+                     'BA',
+                     'QM_DBH']) \
+        .rename(columns={'TPA': 'OVERALL_TPA'}) \
+        .set_index('PID')
+
+    # Create DF with filtered TPA
+    species_base_df = tpa_ba_qmdbh_plot_by_case_long(
+        tree_table=tree_table,
+        filter_statement=filter_statement,
+        case_column='TR_SP')
+
+    # Create DF with max TPA for each level
+    species_max_df = species_base_df \
+        .groupby('PID') \
+        .agg(TPA=('TPA', 'max')) \
+        .reset_index()
+
+    # Join max df back to filtered base df on compound key level, TPA
+    # The resulting dataframe contains health codes by max tpa, with some edge cases
+    species_join_df = species_base_df \
+        .merge(
+            right=species_max_df,
+            how='inner',
+            left_on=['PID', 'TPA'],
+            right_on=['PID', 'TPA']) \
+        .reset_index()
+
+    # Edge cases are where TPAs may be identical between species within a plot
+    # i.e. plot 123 has ASCA2 with a TPA of 5 and BENI with a TPA of 5. To deal
+    # with these cases the data frame will be sorted by plot and alphabetically
+    # descending on species code. The first row for each level will be kept and the
+    # other rows dropped. This results in a dataframe weighted toward species codes
+    # that occur at the beginning of the alphabet, functionally this will weight the
+    # results toward ASCA2 (silver maple)
+
+    # Sort dataframe by numeric ranking codes
+    species_prev_df = species_join_df \
+        .sort_values(
+            by=['PID', 'TR_SP'])
+
+    # Drop duplicate rows, keeping the first row
+    species_prev_df = species_prev_df \
+        .drop_duplicates(
+            subset='PID',
+            keep='first')
+
+    # Rename tpa column and prep for join
+    species_prev_df = species_prev_df \
+        .rename(columns={'TPA': 'SP_TPA'}) \
+        .set_index('PID')
+
+    # Join overall TPA to health prevalence table to calculate prevalence percentage
+    species_prev_pct_df = species_prev_df \
+        .join(
+            other=unfilt_tpa_df,
+            how='left')
+
+    # Calculate prevalence percentage column
+    species_prev_pct_df['SP_PREV_PCT'] = (species_prev_pct_df['SP_TPA'] / species_prev_pct_df['OVERALL_TPA']) * 100
+
+    # Clean up dataframe for export
+    species_prev_pct_df = species_prev_pct_df \
+        .drop(columns=['level_0',
+                       'index',
+                       'tree_count',
+                       'plot_count',
+                       'BA',
+                       'QM_DBH',
+                       'SP_TPA',
+                       'OVERALL_TPA']) \
+        .rename(columns={'TR_SP': 'SP_PREV'}) \
+        .reset_index()
+
+    return species_prev_pct_df
+
+
 # Generate species prevalence and prevalence percentage for level summaries
 def species_prev_pct_level(tree_table, filter_statement, level):
     """Creates a dataframe with most prevalent species and percentage of total that species category comprises
