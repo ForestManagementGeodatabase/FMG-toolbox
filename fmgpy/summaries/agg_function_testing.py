@@ -9,6 +9,8 @@ import sys
 import arcpy
 
 # TPA, BA & QM DBH Function Runs for all levels
+import pandas as pd
+
 plot_size_live_tpabaqm = fcalc.tpa_ba_qmdbh_plot_by_case(tree_table, ~tree_table.TR_HLTH.isin(["D", "DEAD"]), 'TR_SIZE')
 stand_size_live_tpabaqm = fcalc.tpa_ba_qmdbh_level_by_case(tree_table, ~tree_table.TR_HLTH.isin(["D", "DEAD"]), 'TR_SIZE', 'SID')
 site_size_live_tpabaqm = fcalc.tpa_ba_qmdbh_level(tree_table, ~tree_table.TR_HLTH.isin(["D", "DEAD"]), 'TR_SIZE', 'SITE')
@@ -91,7 +93,7 @@ pl_saw_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_SIZE'] 
 pl_mat_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_SIZE'] == 'Mature')
 pl_ovmat_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_SIZE'] == 'Over Mature')
 pl_wildt_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_TYPE'] == 'Wildlife')
-pl_hlthdead_prevs_df = fcalc.species_prev_pct_plotl(tree_table, tree_table['TR_HLTH'] == 'D')
+pl_hlthdead_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_HLTH'] == 'D')
 pl_hlthsd_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_HLTH'] == 'SD')
 pl_hlths_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_HLTH'] == 'S')
 pl_hlthh_prevs_df = fcalc.species_prev_pct_plot(tree_table, tree_table['TR_HLTH'] == 'H')
@@ -112,108 +114,135 @@ TR_SP = [Non Typical Species]
 # return health code, species code and percent of whole
 # filter format for param: tree_table['TR_SIZE'] == 'Mature'
 
-# Generate health prevalence and prevalence percentage for plot summaries
-def species_prev_pct_plot(tree_table, filter_statement):
-    """Creates a dataframe with most prevalent species and percentage of total that species comprises
-     for the plot level - these metrics are based on TPA for each species and the subset of trees defined
-     by the filter statement.
-     The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
+# Determine top 5 overstory species at level, using TPA
+# Create OV SPECIES table with top 5 species and associated
+#
+# Create table with TPA for each unique species per given level
+species_df = fcalc.tpa_ba_qmdbh_level_by_case_long(tree_table=tree_table,
+                                                   filter_statement=None,
+                                                   case_column='TR_SP',
+                                                   level='SID')
 
-    Keyword Args:
-        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
-        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
-                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+# Remove rows with a tree species of None or NoTree
+species_df = species_df[species_df.TR_SP != "NONE"]
 
-    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
-    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
-    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
-    if no filter is required, None should be passed in as the keyword argument.
-    """
-    # Create DF with filtered TPA at specified level, ignoring health categories
-    # TPA from this step will be used to calculate the prevalence percent
-    unfilt_tpa_df = fcalc.tpa_ba_qmdbh_plot(
-        tree_table=tree_table,
-        filter_statement=filter_statement)
+# Sort species_df by level and TPA
+species_df = species_df.sort_values(by=['SID', 'TPA'], ascending=False)
 
-    unfilt_tpa_df = unfilt_tpa_df \
-        .drop(
-            columns=['index',
-                     'tree_count',
-                     'plot_count',
-                     'BA',
-                     'QM_DBH']) \
-        .rename(columns={'TPA': 'OVERALL_TPA'}) \
-        .set_index('PID')
+# Rank each species within a single level group, based on sort
+species_df['SP_RANK'] = species_df.groupby(['SID']).cumcount().add(1)
 
-    # Create DF with filtered TPA
-    species_base_df = fcalc.tpa_ba_qmdbh_plot_by_case_long(
-        tree_table=tree_table,
-        filter_statement=filter_statement,
-        case_column='TR_SP')
+# Filter on keep flag field where the value is less than or equal to 5
+species_df = species_df[species_df.SP_RANK <= 5]
 
-    # Create DF with max TPA for each level
-    species_max_df = species_base_df \
-        .groupby('PID') \
-        .agg(TPA=('TPA', 'max')) \
-        .reset_index()
+# Assign categorical variable for species rank to assist in pivot column naming
+species_df['OV_SP_RANK'] = species_df['SP_RANK'].map(fcalc.overstory_sp_map)
 
-    # Join max df back to filtered base df on compound key level, TPA
-    # The resulting dataframe contains health codes by max tpa, with some edge cases
-    species_join_df = species_base_df \
-        .merge(
-            right=species_max_df,
-            how='inner',
-            left_on=['PID', 'TPA'],
-            right_on=['PID', 'TPA']) \
-        .reset_index()
+# Pivot variables based on sp rank field
+species_pivot_df2 = species_df.pivot(index='SID', columns='OV_SP_RANK', values=['TR_SP', 'BA', 'TPA', 'QM_DBH'])
 
-    # Edge cases are where TPAs may be identical between species within a plot
-    # i.e. plot 123 has ASCA2 with a TPA of 5 and BENI with a TPA of 5. To deal
-    # with these cases the data frame will be sorted by plot and alphabetically
-    # descending on species code. The first row for each level will be kept and the
-    # other rows dropped. This results in a dataframe weighted toward species codes
-    # that occur at the beginning of the alphabet, functionally this will weight the
-    # results toward ASCA2 (silver maple)
+# flatten multi index and rename columns
+species_pivot_df2.columns = ['_'.join(col) for col in species_pivot_df2.columns.values]
 
-    # Sort dataframe by numeric ranking codes
-    species_prev_df = species_join_df \
-        .sort_values(
-            by=['PID', 'TR_SP'])
+# reset index
+species_pivot_df2 = species_pivot_df2.reset_index()
 
-    # Drop duplicate rows, keeping the first row
-    species_prev_df = species_prev_df \
-        .drop_duplicates(
-            subset='PID',
-            keep='first')
+# Rename columns
+OV_SPECIES = species_pivot_df2 \
+    .rename(columns={
+            'TR_SP_OV_SP1': 'OV_SP1',
+            'BA_OV_SP1': 'OV_SP1_BA',
+            'TPA_OV_SP1': 'OV_SP1_TPA',
+            'QM_DBH_OV_SP1': 'OV_SP1_QMDBH',
+            'TR_SP_OV_SP2': 'OV_SP2',
+            'BA_OV_SP2': 'OV_SP2_BA',
+            'TPA_OV_SP2': 'OV_SP2_TPA',
+            'QM_DBH_OV_SP2': 'OV_SP2_QMDBH',
+            'TR_SP_OV_SP3': 'OV_SP3',
+            'BA_OV_SP3': 'OV_SP3_BA',
+            'TPA_OV_SP3': 'OV_SP3_TPA',
+            'QM_DBH_OV_SP3': 'OV_SP3_QMDBH',
+            'TR_SP_OV_SP4': 'OV_SP4',
+            'BA_OV_SP4': 'OV_SP4_BA',
+            'TPA_OV_SP4': 'OV_SP4_TPA',
+            'QM_DBH_OV_SP4': 'OV_SP4_QMDBH',
+            'TR_SP_OV_SP5': 'OV_SP5',
+            'BA_OV_SP5': 'OV_SP5_BA',
+            'TPA_OV_SP5': 'OV_SP5_TPA',
+            'QM_DBH_OV_SP5': 'OV_SP5_QMDBH'})
 
-    # Rename tpa column and prep for join
-    species_prev_df = species_prev_df \
-        .rename(columns={'TPA': 'SP_TPA'}) \
-        .set_index('PID')
 
-    # Join overall TPA to health prevalence table to calculate prevalence percentage
-    species_prev_pct_df = species_prev_df \
-        .join(
-            other=unfilt_tpa_df,
-            how='left')
+## Health Prevalency Testing
+# 1. Iterate through individual levels (i.e. a single stand)
+# Assume use of OV_SPECIES table as iterator
+# Need to convert SID and OV_SP1 to list of lists to iterate with
+# need to decompose result from each run of health pref to list and add to master list
+# convert the list of lists to a data frame
+# need to join the resulting dataframe back to OV_SPECIES table and rename the columns to reflect ov sp 1
 
-    # Calculate prevalence percentage column
-    species_prev_pct_df['SP_PREV_PCT'] = (species_prev_pct_df['SP_TPA'] / species_prev_pct_df['OVERALL_TPA']) * 100
+# Create iterator dict for sp 1-5
+species_columns = ['OV_SP1', 'OV_SP2', 'OV_SP3', 'OV_SP4', 'OV_SP5']
+iterator_lists = []
+for sp in species_columns:
+    # filter out nan values
+    OV_SPECIES_FLT = OV_SPECIES.dropna(subset=[sp])
 
-    # Clean up dataframe for export
-    species_prev_pct_df = species_prev_pct_df \
-        .drop(columns=['level_0',
-                       'index',
-                       'tree_count',
-                       'plot_count',
-                       'BA',
-                       'QM_DBH',
-                       'SP_TPA',
-                       'OVERALL_TPA']) \
-        .rename(columns={'TR_SP': 'SP_PREV'}) \
-        .reset_index()
+    # Convert filtered df to a list of lists
+    iterator = OV_SPECIES_FLT[['SID', sp]].values.tolist()
 
-    return species_prev_pct_df
+    # Append list to the iterator list
+    iterator_lists.append(iterator)
+
+# Convert iterator list to dict so lists can be accessed by species rank
+iterator_dict = dict(zip(species_columns, iterator_lists))
+
+# iterate through the dict doing a bunch of stuff
+for key, value in iterator_dict.items():
+
+    # create column naming variable from key
+    sp_number = key
+
+    # Create empty list to hold results of loop
+    health_prev_list = []
+
+    # Iterate through value list
+    for item in value:
+
+        # filter tree table to a single stand
+        tree_table_sm = tree_table.loc[tree_table['SID'] == item[0]]
+
+        # Run health prev level function with single stand associated species
+        health_prev_test = fcalc.health_prev_pct_level(tree_table=tree_table_sm,
+                                                       filter_statement=tree_table_sm['TR_SP'] == item[1],
+                                                       level='SID')
+
+        # Convert dataframe to list
+        shortlist = health_prev_test.values.tolist()
+
+        # Add the list to the global list
+        health_prev_list.append(shortlist[0])
+
+    # convert loop result list to dataframe
+    health_prev_ovsp = pd.DataFrame(health_prev_list, columns=['SID', key+'_HLTH_PREV', key+'_HLTH_PREV_PCT'])
+
+    # Join dataframe to OV_SPECIES dataframe
+    OV_SPECIES = OV_SPECIES.set_index('SID').join(health_prev_ovsp.set_index('SID'), how='left')
+    OV_SPECIES = OV_SPECIES.reset_index()
+
+# Re order columns
+OV_SPECIES = OV_SPECIES.reindex(['SID',
+                                        'OV_SP1', 'OV_SP1_BA','OV_SP1_TPA','OV_SP1_QMDBH','OV_SP1_HLTH_PREV','OV_SP1_HLTH_PREV_PCT',
+                                        'OV_SP2','OV_SP2_BA','OV_SP2_TPA','OV_SP2_QMDBH','OV_SP2_HLTH_PREV','OV_SP2_HLTH_PREV_PCT',
+                                        'OV_SP3','OV_SP3_BA','OV_SP3_TPA','OV_SP3_QMDBH','OV_SP3_HLTH_PREV','OV_SP3_HLTH_PREV_PCT',
+                                        'OV_SP4','OV_SP4_BA','OV_SP4_TPA','OV_SP4_QMDBH','OV_SP4_HLTH_PREV','OV_SP4_HLTH_PREV_PCT',
+                                        'OV_SP5','OV_SP5_BA','OV_SP5_TPA','OV_SP5_QMDBH','OV_SP5_HLTH_PREV','OV_SP5_HLTH_PREV_PCT'],
+                                       axis="columns")
+
+
+
+
+
+
 
 
 

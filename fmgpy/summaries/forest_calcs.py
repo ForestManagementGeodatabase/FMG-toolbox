@@ -324,6 +324,19 @@ def tree_type_map(tr_dia):
         return 'Wildlife'
 
 
+def overstory_sp_map(sp_rank):
+    if sp_rank == 1:
+        return 'OV_SP1'
+    if sp_rank == 2:
+        return 'OV_SP2'
+    if sp_rank == 3:
+        return 'OV_SP3'
+    if sp_rank == 4:
+        return 'OV_SP4'
+    if sp_rank == 5:
+        return 'OV_SP5'
+
+
 # Quadratic Mean Diameter at Breast Height (QM DBH)
 def qm_dbh(ba, tpa):
     """Calculates quadratic mean at diameter breast height. Returns one value.
