@@ -1567,6 +1567,8 @@ def species_prev_pct_level(tree_table, filter_statement, level):
 
 
 # Determine top 5 overstory species and generate associated statistics
+# TODO: Preserve TPA for Dom Species Health
+# TODO: Calculate Dead TPA for each overstory species (see recon report)
 def top5_ov_species_level(tree_table, level):
     """ Creates a dataframe with the top 5 overstory species and associated statistics (BA, TPA, QM DBH, Dom. Health
     and percent composition) for each of the top 5 species
