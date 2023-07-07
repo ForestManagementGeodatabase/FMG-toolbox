@@ -108,18 +108,10 @@ pl_ovr_prevs_df = fcalc.species_prev_pct_plot(tree_table, None)
 TR_SP = [Typical Species]
 TR_SP = [Non Typical Species]
 
-
-
-# Work on prevalency pattern - need for species, health
-# return health code, species code and percent of whole
-# filter format for param: tree_table['TR_SIZE'] == 'Mature'
-
-# Determine top 5 overstory species at level, using TPA
-# Create OV SPECIES table with top 5 species and associated
-
-def top5_ov_species_level(tree_table, level):
-    """ Creates a dataframe with the top 5 overstory species and associated statistics (BA, TPA, QM DBH, Dom. Health
-    and percent composition) for each of the top 5 species
+# Determine top 5 overstory species and generate associated statistics
+def top5_ov_species_plot(tree_table):
+    """ Creates a dataframe with the top 5 overstory species and associated statistics (BA, TPA, QM DBH, Dom. Health,
+    Dom. Health % Composition, Dom. Health TPA, and Dead TPA) for each of the top 5 species
 
     Keyword Args:
           tree_table -- dataframe: input tree_table, produced by create_tree_table function
@@ -128,28 +120,27 @@ def top5_ov_species_level(tree_table, level):
     Details: None
     """
     # Create table with TPA for each unique species per given level
-    species_df = fcalc.tpa_ba_qmdbh_level_by_case_long(tree_table=tree_table,
+    species_df = tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
                                                  filter_statement=None,
-                                                 case_column='TR_SP',
-                                                 level=level)
+                                                 case_column='TR_SP')
 
     # Remove rows with a tree species of None or NoTree
     species_df = species_df[species_df.TR_SP != "NONE"]
 
-    # Sort species_df by level and TPA
-    species_df = species_df.sort_values(by=[level, 'TPA'], ascending=False)
+    # Sort species_df by plot and TPA
+    species_df = species_df.sort_values(by=['PID', 'TPA'], ascending=False)
 
-    # Rank each species within a single level group, based on sort
-    species_df['SP_RANK'] = species_df.groupby([level]).cumcount().add(1)
+    # Rank each species within a single plot group, based on sort
+    species_df['SP_RANK'] = species_df.groupby(['PID']).cumcount().add(1)
 
     # Filter on keep flag field where the value is less than or equal to 5
     species_df = species_df[species_df.SP_RANK <= 5]
 
     # Assign categorical variable for species rank to assist in pivot column naming
-    species_df['OV_SP_RANK'] = species_df['SP_RANK'].map(fcalc.overstory_sp_map)
+    species_df['OV_SP_RANK'] = species_df['SP_RANK'].map(overstory_sp_map)
 
     # Pivot variables based on sp rank field
-    species_pivot_df2 = species_df.pivot(index=level, columns='OV_SP_RANK', values=['TR_SP', 'BA', 'TPA', 'QM_DBH'])
+    species_pivot_df2 = species_df.pivot(index='PID', columns='OV_SP_RANK', values=['TR_SP', 'BA', 'TPA', 'QM_DBH'])
 
     # flatten multi index and rename columns
     species_pivot_df2.columns = ['_'.join(col) for col in species_pivot_df2.columns.values]
@@ -181,15 +172,6 @@ def top5_ov_species_level(tree_table, level):
                 'TPA_OV_SP5': 'OV_SP5_TPA',
                 'QM_DBH_OV_SP5': 'OV_SP5_QMDBH'})
 
-
-    ## Health Prevalency Testing
-    # 1. Iterate through individual levels (i.e. a single stand)
-    # Assume use of OV_SPECIES table as iterator
-    # Need to convert SID and OV_SP1 to list of lists to iterate with
-    # need to decompose result from each run of health pref to list and add to master list
-    # convert the list of lists to a data frame
-    # need to join the resulting dataframe back to OV_SPECIES table and rename the columns to reflect ov sp 1
-
     # Create iterator dict for sp 1-5
     species_columns = ['OV_SP1', 'OV_SP2', 'OV_SP3', 'OV_SP4', 'OV_SP5']
     iterator_lists = []
@@ -198,7 +180,7 @@ def top5_ov_species_level(tree_table, level):
         ov_species_filtered = ov_species.dropna(subset=[sp])
 
         # Convert filtered df to a list of lists
-        iterator = ov_species_filtered[[level, sp]].values.tolist()
+        iterator = ov_species_filtered[['PID', sp]].values.tolist()
 
         # Append list to the iterator list
         iterator_lists.append(iterator)
@@ -209,64 +191,54 @@ def top5_ov_species_level(tree_table, level):
     # iterate through the dict doing a bunch of stuff
     for key, value in iterator_dict.items():
 
-        # create column naming variable from key
-        sp_number = key
-
         # Create empty list to hold results of loop
         health_prev_list = []
 
         # Iterate through value list
         for item in value:
-            # Need to add 2 TPA calcs
-            # First with tr_sp and tr_hlth=dom health filter
-            # Second with tr_sp and tr_hlth=dead filter
 
             # filter tree table to a single stand
-            tree_table_level = tree_table.loc[tree_table[level] == item[0]]
+            tree_table_plot = tree_table.loc[tree_table['PID'] == item[0]]
 
-            # Run health prev level function with single stand associated species
-            health_prev_level = fcalc.health_prev_pct_level(tree_table=tree_table_level,
-                                                      filter_statement=tree_table_level['TR_SP'] == item[1],
-                                                      level=level)
+            # Run health prev plot function with single stand associated species
+            health_prev_plot = health_prev_pct_plot(tree_table=tree_table_plot,
+                                                      filter_statement=tree_table_plot['TR_SP'] == item[1])
 
-            # Convert dataframe to list - contains level, dom health, % comp
-            health_prev_level_list = health_prev_level.values.tolist()[0]
+            # Convert dataframe to list - contains pid, dom health, % comp
+            health_prev_plot_list = health_prev_plot.values.tolist()[0]
 
             # Filter tree table to just dom health trees
-            tree_table_dom_hlth = tree_table_level[(tree_table_level['TR_HLTH'] == health_prev_level_list[1]) &
-                                                   (tree_table_level['TR_SP'] == item[1])]
+            tree_table_dom_hlth = tree_table_plot[(tree_table_plot['TR_HLTH'] == health_prev_plot_list[1]) &
+                                                   (tree_table_plot['TR_SP'] == item[1])]
 
             # Calculate TPA for just dom health trees
-            dom_hlth_tpa = fcalc.tpa_ba_qmdbh_level(tree_table = tree_table_dom_hlth,
-                                                    filter_statement = None,
-                                                    level = level)
+            dom_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_dom_hlth,
+                                              filter_statement=None)
 
             # Convert dom health tpa dataframe to list and insert into dom health list
             if len(dom_hlth_tpa.index) == 0:
-                health_prev_level_list.insert(3, 0)
+                health_prev_plot_list.insert(3, 0)
             else:
                 dom_hlth_tpa_list = dom_hlth_tpa.values.tolist()[0]
-                health_prev_level_list.insert(3, dom_hlth_tpa_list[5])
-
+                health_prev_plot_list.insert(3, dom_hlth_tpa_list[5])
 
             # Filter tree table to just dead trees
-            tree_table_dead = tree_table_level[(tree_table_level['TR_HLTH'] == 'D') &
-                                               (tree_table_level['TR_SP'] == item[1])]
+            tree_table_dead = tree_table_plot[(tree_table_plot['TR_HLTH'] == 'D') &
+                                               (tree_table_plot['TR_SP'] == item[1])]
 
             # Calcualte TPA for just dead trees
-            dead_hlth_tpa = fcalc.tpa_ba_qmdbh_level(tree_table = tree_table_dead,
-                                                     filter_statement = None,
-                                                     level = level)
+            dead_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_dead,
+                                               filter_statement=None)
 
             # Convert dead health tpa dataframe to list
             if len(dead_hlth_tpa.index) == 0:
-                health_prev_level_list.insert(4, 0)
+                health_prev_plot_list.insert(4, 0)
             else:
                 dead_hlth_tpa_list = dead_hlth_tpa.values.tolist()[0]
-                health_prev_level_list.insert(4, dead_hlth_tpa_list[5])
+                health_prev_plot_list.insert(4, dead_hlth_tpa_list[5])
 
             # Add health prev list to loop result list
-            health_prev_list.append(health_prev_level_list)
+            health_prev_list.append(health_prev_plot_list)
 
         # convert loop result list to dataframe
         health_prev_ovsp = pd.DataFrame(health_prev_list, columns=[level,
@@ -276,34 +248,23 @@ def top5_ov_species_level(tree_table, level):
                                                                    key+ '_D_TPA'])
 
         # Join dataframe to OV_SPECIES dataframe
-        ov_species = ov_species.set_index(level).join(health_prev_ovsp.set_index(level), how='left')
+        ov_species = ov_species.set_index('PID').join(health_prev_ovsp.set_index('PID'), how='left')
         ov_species = ov_species.reset_index()
 
     # Re order columns
     ov_species = ov_species.reindex([level,
-                                     'OV_SP1', 'OV_SP1_BA','OV_SP1_TPA','OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_PREV','OV_SP1_HLTH_PREV_PCT', 'OV_SP1_HLTH_PREV_TPA', 'OV_SP1_D_TPA',
-                                     'OV_SP2','OV_SP2_BA','OV_SP2_TPA','OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_PREV','OV_SP2_HLTH_PREV_PCT', 'OV_SP2_HLTH_PREV_TPA', 'OV_SP2_D_TPA',
-                                     'OV_SP3','OV_SP3_BA','OV_SP3_TPA','OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_PREV','OV_SP3_HLTH_PREV_PCT', 'OV_SP3_HLTH_PREV_TPA', 'OV_SP3_D_TPA',
-                                     'OV_SP4','OV_SP4_BA','OV_SP4_TPA','OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_PREV','OV_SP4_HLTH_PREV_PCT', 'OV_SP4_HLTH_PREV_TPA', 'OV_SP4_D_TPA',
-                                     'OV_SP5','OV_SP5_BA','OV_SP5_TPA','OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_PREV','OV_SP5_HLTH_PREV_PCT', 'OV_SP5_HLTH_PREV_TPA', 'OV_SP5_D_TPA'],
+                                     'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
+                                     'OV_SP1_HLTH_PREV', 'OV_SP1_HLTH_PREV_PCT', 'OV_SP1_HLTH_PREV_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
+                                     'OV_SP2_HLTH_PREV', 'OV_SP2_HLTH_PREV_PCT', 'OV_SP2_HLTH_PREV_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP3','OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
+                                     'OV_SP3_HLTH_PREV', 'OV_SP3_HLTH_PREV_PCT', 'OV_SP3_HLTH_PREV_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
+                                     'OV_SP4_HLTH_PREV', 'OV_SP4_HLTH_PREV_PCT', 'OV_SP4_HLTH_PREV_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
+                                     'OV_SP5_HLTH_PREV', 'OV_SP5_HLTH_PREV_PCT', 'OV_SP5_HLTH_PREV_TPA',
+                                     'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
-
-
-
-
-
-
-
-
-
-
-
-
 

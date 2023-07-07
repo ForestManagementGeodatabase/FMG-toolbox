@@ -1,4 +1,3 @@
-# TODO: Modify to handle plot level gen summary
 # Do some imports
 import os
 import sys
