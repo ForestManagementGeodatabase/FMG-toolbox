@@ -43,7 +43,6 @@ for level in levels:
             .rename(columns={'SP_PREV': 'DEAD_DOM_SP', 'SP_PREV_PCT': 'DEAD_DOM_SP_PCMP'}) \
             .set_index(level)
 
-
         # Create Species Dom where Health = SD
         sp_dom_sd_df = fcalc.species_prev_pct_level(tree_table=tree_table,
                                                     filter_statement=tree_table['TR_HLTH'] == 'SD',
@@ -64,6 +63,40 @@ for level in levels:
         sp_dom_h_df = fcalc.species_prev_pct_level(tree_table=tree_table,
                                                    filter_statement=tree_table['TR_HLTH'] == 'H',
                                                    level=level)
+        sp_dom_h_df = sp_dom_h_df\
+            .rename(columns={'SP_PREV': 'HLTH_DOM_SP', 'SP_PREV_PCT': 'HLTH_DOM_SP_PCMP'})\
+            .reset_index(level)
+
+        # Create overall dominant health
+        dom_health_df = fcalc.health_prev_pct_level(tree_table=tree_table,
+                                                    filter_statement=None,
+                                                    level=level)
+
+        dom_health_df = dom_health_df\
+            .rename(columns={'HEALTH_PREV': 'DOM_HLTH', 'HLTH_PREV_PCT': 'DOM_HLTH_PCMP'})\
+            .reset_index(level)
+
+        # Create overall dominant species
+        dom_species_df = fcalc.species_prev_pct_level(tree_table=tree_table,
+                                                      filter_statement=None,
+                                                      level=level)
+
+        dom_species_df = dom_species_df\
+            .rename(columns={'SP_PREV': 'DOM_SP', 'SP_PREV_PCT': 'DOM_SP_PCMP'})\
+            .reset_index(level)
+
+        # Large Dead Tree TPA
+        lg_dead_tr_raw_df = fcalc.tpa_ba_qmdbh_level(tree_table=tree_table_dead,
+                                                     filter_statement=
+                                                     (tree_table['TR_HLTH'] == 'D') &
+                                                     (tree_table['TR_DIA'] > 20),
+                                                     level=level)
+
+        lg_dead_tr_df = lg_dead_tr_raw_df.filter(itemm=['SID', 'TPA'])
+
+        lg_dead_tr_df = lg_dead_tr_df.rename(columns={'TPA': 'LG_D_TPA'}).reset_index(level)
+
+
 
 
 

@@ -123,6 +123,12 @@ def agg_tree_count(tr_sp):
             continue
         elif val == 'NONE':
             continue
+        elif val == 'NO TREE':
+            continue
+        elif val == 'NO TREES':
+            continue
+        elif val == 'NOTREE':
+            continue
         elif val == '':
             continue
         elif val == ' ':
@@ -1650,9 +1656,6 @@ def top5_ov_species_level(tree_table, level):
     # iterate through the dict doing a bunch of stuff
     for key, value in iterator_dict.items():
 
-        # create column naming variable from key
-        sp_number = key
-
         # Create empty list to hold results of loop
         health_prev_list = []
 
@@ -1670,13 +1673,10 @@ def top5_ov_species_level(tree_table, level):
             # Convert dataframe to list - contains level, dom health, % comp
             health_prev_level_list = health_prev_level.values.tolist()[0]
 
-            # Filter tree table to just dom health trees
-            tree_table_dom_hlth = tree_table_level[(tree_table_level['TR_HLTH'] == health_prev_level_list[1]) &
-                                                   (tree_table_level['TR_SP'] == item[1])]
-
             # Calculate TPA for just dom health trees
-            dom_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_dom_hlth,
-                                              filter_statement=None,
+            dom_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_level,
+                                              filter_statement=(tree_table_level['TR_HLTH'] == health_prev_level_list[1])
+                                                                & (tree_table_level['TR_SP'] == item[1]),
                                               level=level)
 
             # Convert dom health tpa dataframe to list and insert into dom health list
@@ -1686,13 +1686,10 @@ def top5_ov_species_level(tree_table, level):
                 dom_hlth_tpa_list = dom_hlth_tpa.values.tolist()[0]
                 health_prev_level_list.insert(3, dom_hlth_tpa_list[5])
 
-            # Filter tree table to just dead trees
-            tree_table_dead = tree_table_level[(tree_table_level['TR_HLTH'] == 'D') &
-                                               (tree_table_level['TR_SP'] == item[1])]
-
             # Calcualte TPA for just dead trees
-            dead_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_dead,
-                                               filter_statement=None,
+            dead_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_level,
+                                               filter_statement=(tree_table_level['TR_HLTH'] == 'D')
+                                                                 & (tree_table_level['TR_SP'] == item[1]),
                                                level=level)
 
             # Convert dead health tpa dataframe to list
@@ -1833,13 +1830,11 @@ def top5_ov_species_plot(tree_table):
             # Convert dataframe to list - contains pid, dom health, % comp
             health_prev_plot_list = health_prev_plot.values.tolist()[0]
 
-            # Filter tree table to just dom health trees
-            tree_table_dom_hlth = tree_table_plot[(tree_table_plot['TR_HLTH'] == health_prev_plot_list[1]) &
-                                                   (tree_table_plot['TR_SP'] == item[1])]
-
             # Calculate TPA for just dom health trees
-            dom_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_dom_hlth,
-                                            filter_statement=None)
+            dom_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_plot,
+                                             filter_statement=
+                                             (tree_table_plot['TR_HLTH'] == health_prev_plot_list[1]) &
+                                             (tree_table_plot['TR_SP'] == item[1]))
 
             # Convert dom health tpa dataframe to list and insert into dom health list
             if len(dom_hlth_tpa.index) == 0:
@@ -1848,13 +1843,11 @@ def top5_ov_species_plot(tree_table):
                 dom_hlth_tpa_list = dom_hlth_tpa.values.tolist()[0]
                 health_prev_plot_list.insert(3, dom_hlth_tpa_list[5])
 
-            # Filter tree table to just dead trees
-            tree_table_dead = tree_table_plot[(tree_table_plot['TR_HLTH'] == 'D') &
-                                               (tree_table_plot['TR_SP'] == item[1])]
-
             # Calcualte TPA for just dead trees
-            dead_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_dead,
-                                              filter_statement=None)
+            dead_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_plot,
+                                              filter_statement=
+                                              (tree_table_plot['TR_HLTH'] == 'D') &
+                                              (tree_table_plot['TR_SP'] == item[1]))
 
             # Convert dead health tpa dataframe to list
             if len(dead_hlth_tpa.index) == 0:
