@@ -438,7 +438,7 @@ def create_tree_table(prism_df):
          errors='ignore')
 
     # Set TR_DIA to 0 if TR_SP is NoTree or None
-    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree"]), 'TR_DIA'] = 0
+    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree", "NOTREE"]), 'TR_DIA'] = 0
 
     # Add a tree size class field (Sap, Pole, Saw, Mature, Over Mature)
     tree_table['TR_SIZE'] = tree_table['TR_DIA'].map(size_class_map)
@@ -457,10 +457,18 @@ def create_tree_table(prism_df):
 
     # Add and Calculate BA column, then set BA to 0 where no tree
     tree_table['TR_BA'] = (tree_count * baf) / plot_count
-    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree"]), 'TR_BA'] = 0
+    tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree", "NOTREE"]), 'TR_BA'] = 0
 
     # Add and calculate density column (TPA)
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
+
+    # Add SP_TYPE Column
+    crosswalk_df = pd.read_csv('fmgpy/reference_resources/MAST_SP_TYP_Crosswalk.csv')\
+        .filter(items=['TR_SP','TYP_FOR_MVR'])
+
+    tree_table = tree_table\
+        .merge(right=crosswalk_df, how='left', on='TR_SP')\
+        .rename(columns={'TYP_FOR_MVR': 'SP_TYPE'})
 
     return tree_table
 
