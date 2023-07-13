@@ -30,7 +30,7 @@ arcpy.env.overwriteOutput = True
 # Define list of levels
 levels = ['PID', 'SID', 'SITE', 'UNIT']
 
-# loop through levels, producing general description table for each
+# loop through levels, producing healthy summary table for each
 for level in levels:
     if level != 'PID':
         arcpy.AddMessage('Work on {0}'.format(level))
