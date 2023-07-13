@@ -79,6 +79,22 @@ def create_level_df(level, plot_table):
             .set_index(level)
         return base_df
 
+    elif level == 'COMP':
+        base_df = plot_table\
+            .groupby(level)\
+            .agg(
+                POOL=('POOL', 'first'))\
+            .reset_index()\
+            .set_index(level)
+        return base_df
+
+    elif level == 'POOL':
+        base_df = plot_table\
+            .groupby(level)\
+            .reset_index()\
+            .set_index(level)
+        return base_df
+
     elif level == 'PID':
         base_df = plot_table \
             .groupby(level) \
@@ -92,6 +108,41 @@ def create_level_df(level, plot_table):
             .reset_index()\
             .set_index(level)
         return base_df
+
+
+# Create ordered list of columns for output gdb tables
+def fmg_column_reindex_list(level, col_csv):
+    """ Creates a list of hierarchy and statistic columns in a specific order
+    used when thematic output tables are created.
+
+    Keyword Args:
+        level -- FMG hierarchy level, string
+        col_csv -- relative path to a column definition csv in fmgpy/reference_resources
+
+    Details: None
+    """
+
+    # Create list of upstream levels based on current level
+    levels_list = []
+    if level == 'SID':
+        levels_list = ['POOL', 'COMP', 'UNIT', 'SITE', 'SID']
+    elif level == 'SITE':
+        levels_list = ['POOL', 'COMP', 'UNIT', 'SITE']
+    elif level == 'UNIT':
+        levels_list = ['POOL', 'COMP', 'UNIT']
+    elif level == 'COMP':
+        levels_list = ['POOL', 'COMP']
+    elif level == 'POOL':
+        levels_list = ['POOL']
+
+    # Import the column definition csv
+    col_list_df = pd.read_csv(col_csv)
+
+    # Covert column definition df to list
+    col_list = col_list_df['COL_NAME'].values.tolist()
+    reindex_cols = levels_list + col_list
+
+    return reindex_cols
 
 
 # Plot count: use with group by - agg
@@ -463,7 +514,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('fmgpy/reference_resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP','TYP_FOR_MVR'])
 
     tree_table = tree_table\
