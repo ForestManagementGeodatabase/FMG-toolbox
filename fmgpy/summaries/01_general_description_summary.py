@@ -46,26 +46,26 @@ for level in levels:
         gendesc = plot_table \
             .groupby([level]) \
             .agg(
-                NUM_PLOTS=('PID', fcalc.agg_plot_count),
-                NUM_AGE_TR=('AGE_SP', 'count'),
-                MEAN_OV_CLSR=('OV_CLSR', 'mean'),
-                STD_OV_CLSR=('OV_CLSR', 'std'),
-                MEAN_OV_HT=('OV_HT', 'mean'),
-                STD_OV_HT=('OV_HT', 'std'),
-                MEAN_UND_COV=('UND_COV', 'mean'),
-                STD_UND_COV=('UND_COV', 'std'),
-                MEAN_UND_HT=('UND_HT2', 'mean'),
-                STD_UND_HT=('UND_HT2', 'std'),
+                PLOT_CT=('PID', fcalc.agg_plot_count),
+                TR_AGE_CT=('AGE_SP', 'count'),
+                OV_CLSR_MEAN=('OV_CLSR', 'mean'),
+                OV_CLSR_STD=('OV_CLSR', 'std'),
+                OV_HT_MEAN=('OV_HT', 'mean'),
+                OV_HT_STD=('OV_HT', 'std'),
+                UND_COV_MEAN=('UND_COV', 'mean'),
+                UND_COV_STD=('UND_COV', 'std'),
+                UND_HT_MEAN=('UND_HT2', 'mean'),
+                UND_HT_STD=('UND_HT2', 'std'),
                 INV_PRESENT=('INV_PRESENT', 'first'),
                 INV_SP=('INV_SP', fcalc.agg_inv_sp),
-                NUM_FX_NOTES=('FX_MISC', fcalc.agg_count_notes),
+                NUM_FIX_NOTES=('FX_MISC', fcalc.agg_count_notes),
                 NUM_AGE_NOTES=('AGE_MISC', fcalc.agg_count_notes)
             ) \
             .reset_index() \
             .set_index([level])
 
         # Add mean under story height category values -- source: plot table
-        gendesc['MEAN_UND_HT_RG'] = gendesc['MEAN_UND_HT'].map(fcalc.und_height_range_map)
+        gendesc['UND_HT_RG'] = gendesc['UND_HT_MEAN'].map(fcalc.und_height_range_map)
         arcpy.AddMessage("    General DF Created")
 
         #  Calculate TPA & BA for live trees
@@ -76,7 +76,7 @@ for level in levels:
         # Clean up TPA & BA for live tree dataframe
         tpa_ba_live_df = tpa_ba_live\
             .drop(columns=['tree_count', 'stand_dens', 'plot_count']) \
-            .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE', 'QM_DBH': 'QM_DBH_LIVE'}) \
+            .rename(columns={'TPA': 'LIVE_TPA', 'BA': 'LIVE_BA', 'QM_DBH': 'LIVE_QMDBH'}) \
             .set_index(level)
         arcpy.AddMessage("    TPA & BA Live Tree DF Created")
 
@@ -86,7 +86,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert tot num trees series to dataframe
-        tr_all_df = pd.DataFrame({level: tr_all.index, 'NUM_TR': tr_all.values}).set_index([level])
+        tr_all_df = pd.DataFrame({level: tr_all.index, 'TR_CT': tr_all.values}).set_index([level])
         arcpy.AddMessage("    Total Tree Count DF Created")
 
         # Calculate total num live trees -- source: tree table
@@ -95,7 +95,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert tot num live trees series to dataframe
-        tr_live_df = pd.DataFrame({level: tr_live.index, 'NUM_TR_LIVE': tr_live.values}).set_index([level])
+        tr_live_df = pd.DataFrame({level: tr_live.index, 'TR_LV_CT': tr_live.values}).set_index([level])
         arcpy.AddMessage("    Total Live Tree Count DF Created")
 
         # Calculate total num dead trees -- source: tree table
@@ -104,7 +104,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert total num dead trees series to dataframe
-        tr_dead_df = pd.DataFrame({level: tr_dead.index, 'NUM_TR_DEAD': tr_dead.values}).set_index([level])
+        tr_dead_df = pd.DataFrame({level: tr_dead.index, 'TR_D_CT': tr_dead.values}).set_index([level])
         arcpy.AddMessage("    Total Dead Tree Count DF Created")
 
         # Average Mean Diameter live trees - tree table
@@ -112,8 +112,8 @@ for level in levels:
         diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
             .groupby([level]) \
             .agg(
-                AMD_LIVE=('TR_DIA', 'mean'),
-                MAX_DBH_LIVE=('TR_DIA', 'max')
+                LIVE_AMD=('TR_DIA', 'mean'),
+                LIVE_MAX_DBH=('TR_DIA', 'max')
             ) \
             .reset_index() \
             .set_index([level])
@@ -128,7 +128,7 @@ for level in levels:
                 )
         date_df['min_year'] = date_df['min_date'].dt.year
         date_df['max_year'] = date_df['max_date'].dt.year
-        date_df["COL_YEAR"] = date_df.apply(lambda x: fcalc.date_range(x["min_year"], x["max_year"]), axis=1)
+        date_df["INVT_YEAR"] = date_df.apply(lambda x: fcalc.date_range(x["min_year"], x["max_year"]), axis=1)
 
         # Clean up collection date dataframe
         date_df = date_df.drop(columns=['min_date', 'max_date', 'min_year', 'max_year']).set_index(level)
@@ -136,29 +136,36 @@ for level in levels:
 
         # Merge component dataframes onto the base dataframe
         out_df = base_df \
-            .join([gendesc,
-                   tpa_ba_live_df,
-                   tr_all_df,
-                   tr_live_df,
-                   tr_dead_df,
-                   diam_df,
-                   date_df],
+            .join(other=[gendesc,
+                         tpa_ba_live_df,
+                         tr_all_df,
+                         tr_live_df,
+                         tr_dead_df,
+                         diam_df,
+                         date_df],
                   how='left')\
             .reset_index()
 
         # Handle NaN values appropriately
         out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                       'TPA_LIVE': 0,
-                                       'BA_LIVE': 0,
-                                       'QM_DBH_LIVE': 0,
-                                       'NUM_TR': 0,
-                                       'NUM_TR_LIVE': 0,
-                                       'NUM_TR_DEAD': 0,
-                                       'AMD_LIVE': 0,
-                                       'MAX_DBH_LIVE': 0,
-                                       'COL_YEAR': 'NA'}) \
+                                       'LIVE_TPA': 0,
+                                       'LIVE_BA': 0,
+                                       'LIVE_QMDBH': 0,
+                                       'TR_CT': 0,
+                                       'TR_LV_CT': 0,
+                                       'TR_D_CT': 0,
+                                       'LIVE_AMD': 0,
+                                       'LIVE_MAX_DBH': 0,
+                                       'INVT_YEAR': 'NA'}) \
                         .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
+
+        # Reindex output dataframe
+        general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
+                                                             col_csv='resources/general_summary_cols.csv')
+        out_df = out_df.reindex(labels=general_reindex_cols,
+                                axis='columns')
+        arcpy.AddMessage("    Columns reordered")
 
         # Export to gdb table
         table_name = level + "_General_Summary"
@@ -167,6 +174,7 @@ for level in levels:
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
+        arcpy.AddMessage('Work on {0}'.format(level))
         # Drop unecessary plot table columns
         plot_metrics = plot_table.drop(columns=
                                        ['UND_SP1', 'UND_SP2', 'UND_SP3',
@@ -177,7 +185,7 @@ for level in levels:
                                         'ITERATION', 'SHAPE'])
 
         # Create and populate inventory year column
-        plot_metrics['INV_YEAR'] = plot_metrics['COL_DATE'].dt.year
+        plot_metrics['INVT_YEAR'] = plot_metrics['COL_DATE'].dt.year
         plot_metrics = plot_metrics.set_index('PID')
 
         # Create BA, TPA, QM DBH
@@ -187,8 +195,8 @@ for level in levels:
         # Clean up TPA & BA for live tree dataframe
         plot_tpa_ba_live_df = plot_ba_tpa\
             .drop(columns=['tree_count', 'stand_dens', 'plot_count'], errors='ignore') \
-            .rename(columns={'TPA': 'TPA_LIVE', 'BA': 'BA_LIVE',
-                             'QM_DBH': 'QM_DBH_LIVE', 'plot_count': 'NUM_PLOT'}) \
+            .rename(columns={'TPA': 'LIVE_TPA', 'BA': 'LIVE_BA',
+                             'QM_DBH': 'LIVE_QMDBH', 'plot_count': 'PLOT_CT'}) \
             .set_index('PID')
         arcpy.AddMessage("    TPA & BA Live Tree DF Created")
 
@@ -198,7 +206,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert tot num trees series to dataframe
-        plot_tr_all_df = pd.DataFrame({'PID': plot_tr_all.index, 'NUM_TR': plot_tr_all.values}).set_index('PID')
+        plot_tr_all_df = pd.DataFrame({'PID': plot_tr_all.index, 'TR_CT': plot_tr_all.values}).set_index('PID')
         arcpy.AddMessage("    Total Tree Count DF Created")
 
         # Calculate total num live trees -- source: tree table
@@ -207,7 +215,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert tot num live trees series to dataframe
-        plot_tr_live_df = pd.DataFrame({'PID': plot_tr_live.index, 'NUM_TR_LIVE': plot_tr_live.values}).set_index('PID')
+        plot_tr_live_df = pd.DataFrame({'PID': plot_tr_live.index, 'TR_LV_CT': plot_tr_live.values}).set_index('PID')
         arcpy.AddMessage("    Total Live Tree Count DF Created")
 
         # Calculate total num dead trees -- source: tree table
@@ -216,7 +224,7 @@ for level in levels:
             .apply(fcalc.tree_count)
 
         # Convert total num dead trees series to dataframe
-        plot_tr_dead_df = pd.DataFrame({'PID': plot_tr_dead.index, 'NUM_TR_DEAD': plot_tr_dead.values}).set_index('PID')
+        plot_tr_dead_df = pd.DataFrame({'PID': plot_tr_dead.index, 'TR_D_CT': plot_tr_dead.values}).set_index('PID')
         arcpy.AddMessage("    Total Dead Tree Count DF Created")
 
         # Average Mean Diameter live trees - tree table
@@ -224,8 +232,8 @@ for level in levels:
         plot_diam_df = tree_table[~tree_table.TR_HLTH.isin(["D", "DEAD"])] \
             .groupby('PID') \
             .agg(
-            AMD_LIVE=('TR_DIA', 'mean'),
-            MAX_DBH_LIVE=('TR_DIA', 'max')
+            LIVE_AMD=('TR_DIA', 'mean'),
+            LIVE_MAX_DBH=('TR_DIA', 'max')
             ) \
             .reset_index() \
             .set_index('PID')
@@ -243,17 +251,24 @@ for level in levels:
 
         # Handle NaN values appropriately
         out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                      'TPA_LIVE': 0,
-                                      'BA_LIVE': 0,
-                                      'QM_DBH_LIVE': 0,
-                                      'NUM_TR': 0,
-                                      'NUM_TR_LIVE': 0,
-                                      'NUM_TR_DEAD': 0,
-                                      'AMD_LIVE': 0,
-                                      'MAX_DBH_LIVE': 0,
-                                      'COL_YEAR': 'NA'})\
+                                      'LIVE_TPA': 0,
+                                      'LIVE_BA': 0,
+                                      'LIVE_QMDBH': 0,
+                                      'TR_CT': 0,
+                                      'TR_LV_CT': 0,
+                                      'TR_D_CT': 0,
+                                      'LIVE_AMD': 0,
+                                      'LIVE_MAX_DBH': 0,
+                                      'INVT_YEAR': 'NA'})\
                         .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
+
+        # reindex output dataframe
+        general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
+                                                             col_csv='resources/general_summary_cols.csv')
+        out_df = out_df.reindex(labels=general_reindex_cols,
+                                axis='columns')
+        arcpy.AddMessage("    Columns reordered")
 
         # Export to gdb table
         table_name = "PID_General_Summary"
