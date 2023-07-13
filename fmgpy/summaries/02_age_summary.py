@@ -51,45 +51,45 @@ for level in levels:
         .groupby([level])\
         .agg(
             AGE_ORIG=('AGE_ORIG', 'mean'),
-            AGE_DIA=('AGE_DIA', 'mean'),
+            AGE_DBH=('AGE_DIA', 'mean'),
             AGE_GRW=('AGE_GRW', 'mean'),
-            UND_COV=('UND_COV', 'mean')
+            AGE_UND_COV=('UND_COV', 'mean')
             )\
         .reset_index()
     arcpy.AddMessage('    Unfiltered df created')
 
     # Adjust data types & set index
-    unfiltered_metrics = unfiltered_metrics.astype({'AGE_ORIG': 'int', 'UND_COV': 'int'})
+    unfiltered_metrics = unfiltered_metrics.astype({'AGE_ORIG': 'int', 'AGE_UND_COV': 'int'})
     unfiltered_metrics = unfiltered_metrics.set_index(level)
 
     # Calculate filtered metrics
     # Avg Age Hard Mast
     hm_age = age_plots[age_plots.MAST_TYPE.isin(["H", "Hard"])]\
         .groupby([level])\
-        .agg(HARD_MAST_AGE=('AGE_ORIG', 'mean'))\
+        .agg(HM_ORIG=('AGE_ORIG', 'mean'))\
         .reset_index()
     arcpy.AddMessage('    Hard mast df created')
 
     # Avg Age Soft Mast
     sm_age = age_plots[age_plots.MAST_TYPE.isin(["S", "Soft"])]\
         .groupby([level]) \
-        .agg(SOFT_MAST_AGE=('AGE_ORIG', 'mean')) \
+        .agg(SM_ORIG=('AGE_ORIG', 'mean')) \
         .reset_index()
     arcpy.AddMessage('    Soft Mast df created')
 
     # Avg Age Lightseed
     lm_age = age_plots[age_plots.MAST_TYPE.isin(["L", "Lightseed"])]\
         .groupby([level]) \
-        .agg(LIGHTSEED_MAST_AGE=('AGE_ORIG', 'mean'))\
+        .agg(LM_ORIG=('AGE_ORIG', 'mean'))\
         .reset_index()
     arcpy.AddMessage('    Lightseed df created')
 
     # Adjust data types
-    hm_age['HARD_MAST_AGE'] = hm_age['HARD_MAST_AGE'].astype(int)
-    sm_age['SOFT_MAST_AGE'] = sm_age['SOFT_MAST_AGE'].astype(int)
-    lm_age['LIGHTSEED_MAST_AGE'] = lm_age['LIGHTSEED_MAST_AGE'].astype(int)
+    hm_age['HM_ORIG'] = hm_age['HM_ORIG'].astype(int)
+    sm_age['SM_ORIG'] = sm_age['SM_ORIG'].astype(int)
+    lm_age['LM_ORIG'] = lm_age['LM_ORIG'].astype(int)
 
-    # Set indexs
+    # Set indexes
     hm_age = hm_age.set_index(level)
     sm_age = sm_age.set_index(level)
     lm_age = lm_age.set_index(level)
@@ -102,6 +102,19 @@ for level in levels:
                lm_age])\
         .reset_index()
     arcpy.AddMessage('    dfs merged')
+
+    # Reindex output dataframe
+    age_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
+                                                     col_csv="resources/age_summary_cols.csv")
+    out_df = out_df.reindex(labels=age_reindex_cols,
+                            axis='columns')
+    arcpy.AddMessage("    Columns reordered")
+
+    # Handle Nan values
+    out_df = out_df.fillna(value={'AGE_DBH': 0,
+                                  'AGE_GRW': 0,
+                                  'AGE_UND_COV': 0})
+    arcpy.AddMessage("    No data/nan values set")
 
     # Export to gdb table
     table_name = level + "_Age_Summary"
