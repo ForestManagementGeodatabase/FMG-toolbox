@@ -49,56 +49,56 @@ for level in levels:
         arcpy.AddMessage("    TPA, BA, QMDBH by health class created")
 
         # Create Health Dom where Mast = Hard
-        hm_dom_hlth_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                     filter_statement=tree_table['MAST_TYPE'] == 'Hard',
-                                                     level=level)
+        hm_dom_hlth_df = fcalc.health_dom_level(tree_table=tree_table,
+                                                filter_statement=tree_table['MAST_TYPE'] == 'Hard',
+                                                level=level)
         hm_dom_hlth_df = hm_dom_hlth_df\
-            .rename(columns={'HLTH_PREV': 'HM_DOM_HLTH', 'HLTH_PREV_PCT': 'HM_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCT': 'HM_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant health created")
 
         # Create Species Dom where Mast = Hard
-        hm_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Hard',
-                                                    level=level)
+        hm_dom_sp_df = fcalc.species_dom_level(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Hard',
+                                               level=level)
         hm_dom_sp_df = hm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'HM_DOM_SP', 'SP_PREV_PCT': 'HM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'HM_DOM_SP', 'SP_DOM_PCMP': 'HM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant species created")
 
         # Create Health Dom where Mast = Soft
-        sm_dom_hlth_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                     filter_statement=tree_table['MAST_TYPE'] == 'Soft',
-                                                     level=level)
+        sm_dom_hlth_df = fcalc.health_dom_level(tree_table=tree_table,
+                                                filter_statement=tree_table['MAST_TYPE'] == 'Soft',
+                                                level=level)
         sm_dom_hlth_df = sm_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'SM_DOM_HLTH', 'HLTH_PREV_PCT': 'SM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCT': 'SM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant health created")
 
         # Create Species Dom where Mast = Soft
-        sm_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Soft',
-                                                    level=level)
+        sm_dom_sp_df = fcalc.species_dom_level(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Soft',
+                                               level=level)
         sm_dom_sp_df = sm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'SM_DOM_SP', 'SP_PREV_PCT': 'SM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'SM_DOM_SP', 'SP_DOM_PCMP': 'SM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant species created")
 
         # Create Health Dom where Mast = Lightseed
-        lm_dom_hlth_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                     filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
-                                                     level=level)
+        lm_dom_hlth_df = fcalc.health_dom_level(tree_table=tree_table,
+                                                filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
+                                                level=level)
         lm_dom_hlth_df = lm_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'LM_DOM_HLTH', 'HLTH_PREV_PCT': 'LM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCT': 'LM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant health created")
 
         # Create Species Dom where Mast = Lightseed
-        lm_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
-                                                    level=level)
+        lm_dom_sp_df = fcalc.species_dom_level(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
+                                               level=level)
         lm_dom_sp_df = lm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'LM_DOM_SP', 'SP_PREV_PCT': 'LM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'LM_DOM_SP', 'SP_DOM_PCMP': 'LM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant species created")
 
@@ -181,50 +181,50 @@ for level in levels:
         arcpy.AddMessage("    TPA, BA, QMDBH by health class created")
 
         # Create Health Dom where Mast = Hard
-        hm_dom_hlth_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Hard')
+        hm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Hard')
         hm_dom_hlth_df = hm_dom_hlth_df\
-            .rename(columns={'HLTH_PREV': 'HM_DOM_HLTH', 'HLTH_PREV_PCT': 'HM_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCT': 'HM_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant health created")
 
         # Create Species Dom where Mast = Hard
-        hm_dom_sp_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                   filter_statement=tree_table['MAST_TYPE'] == 'Hard')
+        hm_dom_sp_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                              filter_statement=tree_table['MAST_TYPE'] == 'Hard')
         hm_dom_sp_df = hm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'HM_DOM_SP', 'SP_PREV_PCT': 'HM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'HM_DOM_SP', 'SP_DOM_PCMP': 'HM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant species created")
 
         # Create Health Dom where Mast = Soft
-        sm_dom_hlth_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Soft')
+        sm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Soft')
         sm_dom_hlth_df = sm_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'SM_DOM_HLTH', 'HLTH_PREV_PCT': 'SM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCT': 'SM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant health created")
 
         # Create Species Dom where Mast = Soft
-        sm_dom_sp_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                   filter_statement=tree_table['MAST_TYPE'] == 'Soft')
+        sm_dom_sp_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                              filter_statement=tree_table['MAST_TYPE'] == 'Soft')
         sm_dom_sp_df = sm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'SM_DOM_SP', 'SP_PREV_PCT': 'SM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'SM_DOM_SP', 'SP_DOM_PCMP': 'SM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant species created")
 
         # Create Health Dom where Mast = Lightseed
-        lm_dom_hlth_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                    filter_statement=tree_table['MAST_TYPE'] == 'Lightseed')
+        lm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                               filter_statement=tree_table['MAST_TYPE'] == 'Lightseed')
         lm_dom_hlth_df = lm_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'LM_DOM_HLTH', 'HLTH_PREV_PCT': 'LM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCT': 'LM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant health created")
 
         # Create Species Dom where Mast = Lightseed
-        lm_dom_sp_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                   filter_statement=tree_table['MAST_TYPE'] == 'Lightseed')
+        lm_dom_sp_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                              filter_statement=tree_table['MAST_TYPE'] == 'Lightseed')
         lm_dom_sp_df = lm_dom_sp_df\
-            .rename(columns={'SP_PREV': 'LM_DOM_SP', 'SP_PREV_PCT': 'LM_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'LM_DOM_SP', 'SP_DOM_PCMP': 'LM_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant species created")
 

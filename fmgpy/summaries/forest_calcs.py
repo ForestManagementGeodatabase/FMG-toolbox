@@ -514,7 +514,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -1184,9 +1184,9 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         return out_df
 
 
-# Generate health prevalence and prevalence percentage for plot summaries
-def health_prev_pct_plot(tree_table, filter_statement):
-    """Creates a dataframe with most prevalent health and percentage of total that health category comprises
+# Generate dominate health and percent composition for plot summaries
+def health_dom_plot(tree_table, filter_statement):
+    """Creates a dataframe with most dominant health and percentage of total that health category comprises
      for the plot level - these metrics are based on TPA for each health category and the subset of trees defined
      by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
@@ -1257,32 +1257,32 @@ def health_prev_pct_plot(tree_table, filter_statement):
     health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
 
     # Sort dataframe by numeric ranking codes
-    health_prev_df = health_join_df \
+    health_dom_df = health_join_df \
         .sort_values(
             by=['PID', 'TR_HLTH_NUM'])
 
     # Drop duplicate rows, keeping the first row
-    health_prev_df = health_prev_df \
+    health_dom_df = health_dom_df \
         .drop_duplicates(
             subset='PID',
             keep='first')
 
     # Rename tpa column and prep for join
-    health_prev_df = health_prev_df \
+    health_dom_df = health_dom_df \
         .rename(columns={'TPA': 'HLTH_TPA'}) \
         .set_index('PID')
 
     # Join overall TPA to health prevalence table to calculate prevalence percentage
-    health_prev_pct_df = health_prev_df \
+    health_dom_pct_df = health_dom_df \
         .join(
             other=unfilt_tpa_df,
             how='left')
 
     # Calculate prevalence percentage column
-    health_prev_pct_df['HLTH_PREV_PCT'] = (health_prev_pct_df['HLTH_TPA'] / health_prev_pct_df['OVERALL_TPA']) * 100
+    health_dom_pct_df['HLTH_DOM_PCT'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
-    health_prev_pct_df = health_prev_pct_df \
+    health_dom_pct_df = health_dom_pct_df \
         .drop(columns=['level_0',
                        'index',
                        'tree_count',
@@ -1292,15 +1292,15 @@ def health_prev_pct_plot(tree_table, filter_statement):
                        'TR_HLTH_NUM',
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
-        .rename(columns={'TR_HLTH': 'HLTH_PREV'}) \
+        .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
         .reset_index()
 
-    return health_prev_pct_df
+    return health_dom_pct_df
 
 
-# Generate health prevalence and prevalence percentage for level summaries
-def health_prev_pct_level(tree_table, filter_statement, level):
-    """Creates a dataframe with most prevalent health and percentage of total that health category comprises
+# Generate dominate health and percent composition for level summaries
+def health_dom_level(tree_table, filter_statement, level):
+    """Creates a dataframe with dominant health and percentage of total that health category comprises
      for specified level - these metrics are based on TPA for each health category and the subset of trees defined
      by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
@@ -1375,32 +1375,32 @@ def health_prev_pct_level(tree_table, filter_statement, level):
     health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
 
     # Sort dataframe by numeric ranking codes
-    health_prev_df = health_join_df \
+    health_dom_df = health_join_df \
         .sort_values(
             by=[level, 'TR_HLTH_NUM'])
 
     # Drop duplicate rows, keeping the first row
-    health_prev_df = health_prev_df \
+    health_dom_df = health_dom_df \
         .drop_duplicates(
             subset=level,
             keep='first')
 
     # Rename tpa column and prep for join
-    health_prev_df = health_prev_df \
+    health_dom_df = health_dom_df \
         .rename(columns={'TPA': 'HLTH_TPA'}) \
         .set_index(level)
 
     # Join overall TPA to health prevalence table to calculate prevalence percentage
-    health_prev_pct_df = health_prev_df \
+    health_dom_pct_df = health_dom_df \
         .join(
             other=unfilt_tpa_df,
             how='left')
 
     # Calculate prevalence percentage column
-    health_prev_pct_df['HLTH_PREV_PCT'] = (health_prev_pct_df['HLTH_TPA'] / health_prev_pct_df['OVERALL_TPA']) * 100
+    health_dom_pct_df['HLTH_DOM_PCT'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
-    health_prev_pct_df = health_prev_pct_df \
+    health_dom_pct_df = health_dom_pct_df \
         .drop(columns=['level_0',
                        'index',
                        'tree_count',
@@ -1411,15 +1411,15 @@ def health_prev_pct_level(tree_table, filter_statement, level):
                        'TR_HLTH_NUM',
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
-        .rename(columns={'TR_HLTH': 'HLTH_PREV'}) \
+        .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
         .reset_index()
 
-    return health_prev_pct_df
+    return health_dom_pct_df
 
 
-# Generate health prevalence and prevalence percentage for plot summaries
-def species_prev_pct_plot(tree_table, filter_statement):
-    """Creates a dataframe with most prevalent species and percentage of total that species comprises
+# Generate dominant health percent composition for plot summaries
+def species_dom_plot(tree_table, filter_statement):
+    """Creates a dataframe with dominant species and percentage of total that species comprises
      for the plot level - these metrics are based on TPA for each species and the subset of trees defined
      by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
@@ -1435,7 +1435,7 @@ def species_prev_pct_plot(tree_table, filter_statement):
     if no filter is required, None should be passed in as the keyword argument.
     """
     # Create DF with filtered TPA at specified level, ignoring health categories
-    # TPA from this step will be used to calculate the prevalence percent
+    # TPA from this step will be used to calculate the percent composition
     unfilt_tpa_df = tpa_ba_qmdbh_plot(
         tree_table=tree_table,
         filter_statement=filter_statement)
@@ -1481,32 +1481,32 @@ def species_prev_pct_plot(tree_table, filter_statement):
     # results toward ASCA2 (silver maple)
 
     # Sort dataframe by numeric ranking codes
-    species_prev_df = species_join_df \
+    species_dom_df = species_join_df \
         .sort_values(
             by=['PID', 'TR_SP'])
 
     # Drop duplicate rows, keeping the first row
-    species_prev_df = species_prev_df \
+    species_dom_df = species_dom_df \
         .drop_duplicates(
             subset='PID',
             keep='first')
 
     # Rename tpa column and prep for join
-    species_prev_df = species_prev_df \
+    species_dom_df = species_dom_df \
         .rename(columns={'TPA': 'SP_TPA'}) \
         .set_index('PID')
 
-    # Join overall TPA to health prevalence table to calculate prevalence percentage
-    species_prev_pct_df = species_prev_df \
+    # Join overall TPA to dominant health table to calculate percent composition
+    species_dom_pct_df = species_dom_df \
         .join(
             other=unfilt_tpa_df,
             how='left')
 
-    # Calculate prevalence percentage column
-    species_prev_pct_df['SP_PREV_PCT'] = (species_prev_pct_df['SP_TPA'] / species_prev_pct_df['OVERALL_TPA']) * 100
+    # Calculate percent composition column
+    species_dom_pct_df['SP_DOM_PCMP'] = (species_dom_pct_df['SP_TPA'] / species_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
-    species_prev_pct_df = species_prev_pct_df \
+    species_dom_pct_df = species_dom_pct_df \
         .drop(columns=['level_0',
                        'index',
                        'tree_count',
@@ -1515,15 +1515,15 @@ def species_prev_pct_plot(tree_table, filter_statement):
                        'QM_DBH',
                        'SP_TPA',
                        'OVERALL_TPA']) \
-        .rename(columns={'TR_SP': 'SP_PREV'}) \
+        .rename(columns={'TR_SP': 'SP_DOM'}) \
         .reset_index()
 
-    return species_prev_pct_df
+    return species_dom_pct_df
 
 
-# Generate species prevalence and prevalence percentage for level summaries
-def species_prev_pct_level(tree_table, filter_statement, level):
-    """Creates a dataframe with most prevalent species and percentage of total that species category comprises
+# Generate dominant species percent composition for level summaries
+def species_dom_level(tree_table, filter_statement, level):
+    """Creates a dataframe with dominant species and percentage of total that species category comprises
      for specified level - these metrics are based on TPA for each species and the subset of trees defined
      by the filter statement.
      The function will accept and apply a filter to determine health prevalence for specific subsets of trees.
@@ -1541,7 +1541,7 @@ def species_prev_pct_level(tree_table, filter_statement, level):
     """
 
     # Create DF with filtered TPA at specified level, ignoring species
-    # TPA from this step will be used to calculate the prevalence percent
+    # TPA from this step will be used to calculate the dominance percent composition
     unfilt_tpa_df = tpa_ba_qmdbh_level(
         tree_table=tree_table,
         filter_statement=filter_statement,
@@ -1590,32 +1590,32 @@ def species_prev_pct_level(tree_table, filter_statement, level):
     # results toward ASCA2 (silver maple)
 
     # Sort dataframe by level and species
-    species_prev_df = species_join_df \
+    species_dom_df = species_join_df \
         .sort_values(
             by=[level, 'TR_SP'])
 
     # Drop duplicate rows, keeping the first row
-    species_prev_df = species_prev_df \
+    species_dom_df = species_dom_df \
         .drop_duplicates(
             subset=level,
             keep='first')
 
     # Rename tpa column and prep for join
-    species_prev_df = species_prev_df \
+    species_dom_df = species_dom_df \
         .rename(columns={'TPA': 'SP_TPA'}) \
         .set_index(level)
 
-    # Join overall TPA to species prevalance table to calculate prevalence percentage
-    species_prev_pct_df = species_prev_df \
+    # Join overall TPA to species dominance table to calculate percent composition
+    species_dom_pct_df = species_dom_df \
         .join(
             other=unfilt_tpa_df,
             how='left')
 
-    # Calculate prevalence percentage column
-    species_prev_pct_df['SP_PREV_PCT'] = (species_prev_pct_df['SP_TPA'] / species_prev_pct_df['OVERALL_TPA']) * 100
+    # Calculate percent composition column
+    species_dom_pct_df['SP_DOM_PCMP'] = (species_dom_pct_df['SP_TPA'] / species_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
-    species_prev_pct_df = species_prev_pct_df \
+    species_dom_pct_df = species_dom_pct_df \
         .drop(columns=['level_0',
                        'index',
                        'tree_count',
@@ -1625,10 +1625,10 @@ def species_prev_pct_level(tree_table, filter_statement, level):
                        'QM_DBH',
                        'OVERALL_TPA',
                        'SP_TPA']) \
-        .rename(columns={'TR_SP': 'SP_PREV'}) \
+        .rename(columns={'TR_SP': 'SP_DOM'}) \
         .reset_index()
 
-    return species_prev_pct_df
+    return species_dom_pct_df
 
 
 # Determine top 5 overstory species and generate associated statistics for level summaries
@@ -1716,7 +1716,7 @@ def top5_ov_species_level(tree_table, level):
     for key, value in iterator_dict.items():
 
         # Create empty list to hold results of loop
-        health_prev_list = []
+        health_dom_list = []
 
         # Iterate through value list
         for item in value:
@@ -1725,66 +1725,66 @@ def top5_ov_species_level(tree_table, level):
             tree_table_level = tree_table.loc[tree_table[level] == item[0]]
 
             # Run health prev level function with single stand associated species
-            health_prev_level = health_prev_pct_level(tree_table=tree_table_level,
-                                                      filter_statement=tree_table_level['TR_SP'] == item[1],
-                                                      level=level)
+            health_dom_level_df = health_dom_level(tree_table=tree_table_level,
+                                                   filter_statement=tree_table_level['TR_SP'] == item[1],
+                                                   level=level)
 
             # Convert dataframe to list - contains level, dom health, % comp
-            health_prev_level_list = health_prev_level.values.tolist()[0]
+            health_dom_level_list = health_dom_level_df.values.tolist()[0]
 
             # Calculate TPA for just dom health trees
             dom_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_level,
-                                              filter_statement=(tree_table_level['TR_HLTH'] == health_prev_level_list[1])
-                                                                & (tree_table_level['TR_SP'] == item[1]),
+                                              filter_statement=
+                                              (tree_table_level['TR_HLTH'] == health_dom_level_list[1]) &
+                                              (tree_table_level['TR_SP'] == item[1]),
                                               level=level)
 
             # Convert dom health tpa dataframe to list and insert into dom health list
             if len(dom_hlth_tpa.index) == 0:
-                health_prev_level_list.insert(3, 0)
+                health_dom_level_list.insert(3, 0)
             else:
                 dom_hlth_tpa_list = dom_hlth_tpa.values.tolist()[0]
-                health_prev_level_list.insert(3, dom_hlth_tpa_list[5])
+                health_dom_level_list.insert(3, dom_hlth_tpa_list[5])
 
             # Calcualte TPA for just dead trees
             dead_hlth_tpa = tpa_ba_qmdbh_level(tree_table=tree_table_level,
-                                               filter_statement=(tree_table_level['TR_HLTH'] == 'D')
-                                                                 & (tree_table_level['TR_SP'] == item[1]),
+                                               filter_statement=(tree_table_level['TR_HLTH'] == 'D') &
+                                                                (tree_table_level['TR_SP'] == item[1]),
                                                level=level)
 
             # Convert dead health tpa dataframe to list
             if len(dead_hlth_tpa.index) == 0:
-                health_prev_level_list.insert(4, 0)
+                health_dom_level_list.insert(4, 0)
             else:
                 dead_hlth_tpa_list = dead_hlth_tpa.values.tolist()[0]
-                health_prev_level_list.insert(4, dead_hlth_tpa_list[5])
+                health_dom_level_list.insert(4, dead_hlth_tpa_list[5])
 
             # Add health prev list to loop result list
-            health_prev_list.append(health_prev_level_list)
+            health_dom_list.append(health_dom_level_list)
 
         # convert loop result list to dataframe
-        health_prev_ovsp = pd.DataFrame(health_prev_list, columns=[level,
-                                                                   key+'_HLTH_PREV',
-                                                                   key+'_HLTH_PREV_PCT',
-                                                                   key+ '_HLTH_PREV_TPA',
-                                                                   key+ '_D_TPA'])
+        health_dom_ovsp = pd.DataFrame(health_dom_list, columns=[level,
+                                                                 key+'_HLTH_DOM',
+                                                                 key+'_HLTH_DOM_PCMP',
+                                                                 key+'_HLTH_DOM_TPA',
+                                                                 key+'_D_TPA'])
 
         # Join dataframe to OV_SPECIES dataframe
-        ov_species = ov_species.set_index(level).join(health_prev_ovsp.set_index(level), how='left')
+        ov_species = ov_species.set_index(level).join(health_dom_ovsp.set_index(level), how='left')
         ov_species = ov_species.reset_index()
 
     # Re order columns
     ov_species = ov_species.reindex([level,
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_PREV', 'OV_SP1_HLTH_PREV_PCT', 'OV_SP1_HLTH_PREV_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_PREV', 'OV_SP2_HLTH_PREV_PCT', 'OV_SP2_HLTH_PREV_TPA', 'OV_SP2_D_TPA',
-                                     'OV_SP3','OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_PREV', 'OV_SP3_HLTH_PREV_PCT', 'OV_SP3_HLTH_PREV_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
+                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_PREV', 'OV_SP4_HLTH_PREV_PCT', 'OV_SP4_HLTH_PREV_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_PREV', 'OV_SP5_HLTH_PREV_PCT', 'OV_SP5_HLTH_PREV_TPA',
-                                     'OV_SP5_D_TPA'],
+                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
@@ -1874,7 +1874,7 @@ def top5_ov_species_plot(tree_table):
     for key, value in iterator_dict.items():
 
         # Create empty list to hold results of loop
-        health_prev_list = []
+        health_dom_list = []
 
         # Iterate through value list
         for item in value:
@@ -1883,24 +1883,24 @@ def top5_ov_species_plot(tree_table):
             tree_table_plot = tree_table.loc[tree_table['PID'] == item[0]]
 
             # Run health prev plot function with single stand associated species
-            health_prev_plot = health_prev_pct_plot(tree_table=tree_table_plot,
-                                                    filter_statement=tree_table_plot['TR_SP'] == item[1])
+            health_dom_plot_df = health_dom_plot(tree_table=tree_table_plot,
+                                                 filter_statement=tree_table_plot['TR_SP'] == item[1])
 
             # Convert dataframe to list - contains pid, dom health, % comp
-            health_prev_plot_list = health_prev_plot.values.tolist()[0]
+            health_dom_plot_list = health_dom_plot_df.values.tolist()[0]
 
             # Calculate TPA for just dom health trees
             dom_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_plot,
                                              filter_statement=
-                                             (tree_table_plot['TR_HLTH'] == health_prev_plot_list[1]) &
+                                             (tree_table_plot['TR_HLTH'] == health_dom_plot_list[1]) &
                                              (tree_table_plot['TR_SP'] == item[1]))
 
             # Convert dom health tpa dataframe to list and insert into dom health list
             if len(dom_hlth_tpa.index) == 0:
-                health_prev_plot_list.insert(3, 0)
+                health_dom_plot_list.insert(3, 0)
             else:
                 dom_hlth_tpa_list = dom_hlth_tpa.values.tolist()[0]
-                health_prev_plot_list.insert(3, dom_hlth_tpa_list[5])
+                health_dom_plot_list.insert(3, dom_hlth_tpa_list[5])
 
             # Calcualte TPA for just dead trees
             dead_hlth_tpa = tpa_ba_qmdbh_plot(tree_table=tree_table_plot,
@@ -1910,38 +1910,37 @@ def top5_ov_species_plot(tree_table):
 
             # Convert dead health tpa dataframe to list
             if len(dead_hlth_tpa.index) == 0:
-                health_prev_plot_list.insert(4, 0)
+                health_dom_plot_list.insert(4, 0)
             else:
                 dead_hlth_tpa_list = dead_hlth_tpa.values.tolist()[0]
-                health_prev_plot_list.insert(4, dead_hlth_tpa_list[5])
+                health_dom_plot_list.insert(4, dead_hlth_tpa_list[5])
 
             # Add health prev list to loop result list
-            health_prev_list.append(health_prev_plot_list)
+            health_dom_list.append(health_dom_plot_list)
 
         # convert loop result list to dataframe
-        health_prev_ovsp = pd.DataFrame(health_prev_list, columns=['PID',
-                                                                   key+'_HLTH_PREV',
-                                                                   key+'_HLTH_PREV_PCT',
-                                                                   key+ '_HLTH_PREV_TPA',
-                                                                   key+ '_D_TPA'])
+        health_dom_ovsp = pd.DataFrame(health_dom_list, columns=['PID',
+                                                                 key+'_HLTH_DOM',
+                                                                 key+'_HLTH_DOM_PCMP',
+                                                                 key+ '_HLTH_DOM_TPA',
+                                                                 key+ '_D_TPA'])
 
         # Join dataframe to OV_SPECIES dataframe
-        ov_species = ov_species.set_index('PID').join(health_prev_ovsp.set_index('PID'), how='left')
+        ov_species = ov_species.set_index('PID').join(health_dom_ovsp.set_index('PID'), how='left')
         ov_species = ov_species.reset_index()
 
     # Re order columns
     ov_species = ov_species.reindex(['PID',
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_PREV', 'OV_SP1_HLTH_PREV_PCT', 'OV_SP1_HLTH_PREV_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_PREV', 'OV_SP2_HLTH_PREV_PCT', 'OV_SP2_HLTH_PREV_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
                                      'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_PREV', 'OV_SP3_HLTH_PREV_PCT', 'OV_SP3_HLTH_PREV_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_PREV', 'OV_SP4_HLTH_PREV_PCT', 'OV_SP4_HLTH_PREV_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_PREV', 'OV_SP5_HLTH_PREV_PCT', 'OV_SP5_HLTH_PREV_TPA',
-                                     'OV_SP5_D_TPA'],
+                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species

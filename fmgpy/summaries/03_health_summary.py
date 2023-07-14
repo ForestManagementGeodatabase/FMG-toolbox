@@ -48,58 +48,56 @@ for level in levels:
         arcpy.AddMessage("    TPA, BA, QMDBH by health class created")
 
         # Create Species Dom where Health = D
-        sp_dom_d_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                   filter_statement=tree_table['TR_HLTH'] == 'D',
-                                                   level=level)
+        sp_dom_d_df = fcalc.species_dom_level(tree_table=tree_table,
+                                              filter_statement=tree_table['TR_HLTH'] == 'D',
+                                              level=level)
         sp_dom_d_df = sp_dom_d_df\
-            .rename(columns={'SP_PREV': 'DEAD_DOM_SP', 'SP_PREV_PCT': 'DEAD_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'DEAD_DOM_SP', 'SP_DOM_PCMP': 'DEAD_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dominant dead species created")
 
         # Create Species Dom where Health = SD
-        sp_dom_sd_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                    filter_statement=tree_table['TR_HLTH'] == 'SD',
-                                                    level=level)
+        sp_dom_sd_df = fcalc.species_dom_level(tree_table=tree_table,
+                                               filter_statement=tree_table['TR_HLTH'] == 'SD',
+                                               level=level)
         sp_dom_sd_df = sp_dom_sd_df\
-            .rename(columns={'SP_PREV': 'SD_DOM_SP', 'SP_PREV_PCT': 'SD_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'SD_DOM_SP', 'SP_DOM_PCMP': 'SD_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Dominant sig dec species created")
 
         # Create Species Dom where Health = S
-        sp_dom_s_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                   filter_statement=tree_table['TR_HLTH'] == 'S',
-                                                   level=level)
+        sp_dom_s_df = fcalc.species_dom_level(tree_table=tree_table,
+                                              filter_statement=tree_table['TR_HLTH'] == 'S',
+                                              level=level)
         sp_dom_s_df = sp_dom_s_df\
-            .rename(columns={'SP_PREV': 'STR_DOM_SP', 'SP_PREV_PCT': 'STR_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'STR_DOM_SP', 'SP_DOM_PCMP': 'STR_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Dominant stressed species created")
 
         # Create Species Dom where Health = H
-        sp_dom_h_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                   filter_statement=tree_table['TR_HLTH'] == 'H',
-                                                   level=level)
+        sp_dom_h_df = fcalc.species_dom_level(tree_table=tree_table,
+                                              filter_statement=tree_table['TR_HLTH'] == 'H',
+                                              level=level)
         sp_dom_h_df = sp_dom_h_df\
-            .rename(columns={'SP_PREV': 'HLTH_DOM_SP', 'SP_PREV_PCT': 'HLTH_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'HLTH_DOM_SP', 'SP_DOM_PCMP': 'HLTH_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Dominant healthy species created")
 
         # Create overall dominant health
-        dom_health_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                    filter_statement=None,
-                                                    level=level)
+        dom_health_df = fcalc.health_dom_level(tree_table=tree_table,
+                                               filter_statement=None,
+                                               level=level)
 
-        dom_health_df = dom_health_df\
-            .rename(columns={'HLTH_PREV': 'DOM_HLTH', 'HLTH_PREV_PCT': 'DOM_HLTH_PCMP'})\
-            .set_index(level)
+        dom_health_df = dom_health_df.set_index(level)
         arcpy.AddMessage("    Dominant health created")
 
         # Create overall dominant species
-        dom_species_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                      filter_statement=None,
-                                                      level=level)
+        dom_species_df = fcalc.species_dom_level(tree_table=tree_table,
+                                                 filter_statement=None,
+                                                 level=level)
 
         dom_species_df = dom_species_df\
-            .rename(columns={'SP_PREV': 'DOM_SP', 'SP_PREV_PCT': 'DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'DOM_SP', 'SP_DOM_PCMP': 'DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Dominant species created")
 
@@ -116,38 +114,38 @@ for level in levels:
         arcpy.AddMessage("    Lg dead tree TPA created")
 
         # Create Typical species dominant health
-        typ_dom_hlth_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                      filter_statement=tree_table['SP_TYPE'] == 'Common',
-                                                      level=level)
+        typ_dom_hlth_df = fcalc.health_dom_level(tree_table=tree_table,
+                                                 filter_statement=tree_table['SP_TYPE'] == 'Common',
+                                                 level=level)
         typ_dom_hlth_df = typ_dom_hlth_df\
-            .rename(columns={'HLTH_PREV': 'TYP_SP_DOM_HLTH', 'HLTH_PREV_PCT': 'TYP_SP_DOM_HLTH_PCMP'})\
+            .rename(columns={'DOM_HLTH': 'TYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'TYP_SP_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom health created")
 
         # Create Typical Species dominant species
-        typ_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                     filter_statement=tree_table['SP_TYPE'] == 'Common',
-                                                     level=level)
+        typ_dom_sp_df = fcalc.species_dom_level(tree_table=tree_table,
+                                                filter_statement=tree_table['SP_TYPE'] == 'Common',
+                                                level=level)
         typ_dom_sp_df = typ_dom_sp_df\
-            .rename(columns={'SP_PREV': 'TYP_DOM_SP', 'SP_PREV_PCT': 'TYP_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'TYP_DOM_SP', 'SP_DOM_PCMP': 'TYP_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom species created")
 
         # Create Non-Typical species dominant health
-        ntyp_dom_hlth_df = fcalc.health_prev_pct_level(tree_table=tree_table,
-                                                       filter_statement=tree_table['SP_TYPE'] == 'Uncommon',
-                                                       level=level)
+        ntyp_dom_hlth_df = fcalc.health_dom_level(tree_table=tree_table,
+                                                  filter_statement=tree_table['SP_TYPE'] == 'Uncommon',
+                                                  level=level)
         ntyp_dom_hlth_df = ntyp_dom_hlth_df\
-            .rename(columns={'HLTH_PREV': 'NTYP_SP_DOM_HLTH', 'HLTH_PREV_PCT': 'NTYP_SP_DOM_HLTH_PCMP'})\
+            .rename(columns={'DOM_HLTH': 'NTYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom health created")
 
         # Create Non-Typical species dominant species
-        ntyp_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                      filter_statement=tree_table['SP_TYPE'] == 'Uncommon',
-                                                      level=level)
+        ntyp_dom_sp_df = fcalc.species_dom_level(tree_table=tree_table,
+                                                 filter_statement=tree_table['SP_TYPE'] == 'Uncommon',
+                                                 level=level)
         ntyp_dom_sp_df = ntyp_dom_sp_df\
-            .rename(columns={'SP_PREV': 'NTYP_DOM_SP', 'SP_PREV_PCT': 'NTYP_DOM_SP_PCMP'})\
+            .rename(columns={'SP_DOM': 'NTYP_DOM_SP', 'SP_DOM_PCMP': 'NTYP_DOM_SP_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom species created")
 
@@ -250,50 +248,48 @@ for level in levels:
         arcpy.AddMessage("    TPA, BA, QMDBH by health class created")
 
         # Create Species Dom where Health = D
-        sp_dom_d_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                  filter_statement=tree_table['TR_HLTH'] == 'D')
+        sp_dom_d_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                             filter_statement=tree_table['TR_HLTH'] == 'D')
         sp_dom_d_df = sp_dom_d_df \
-            .rename(columns={'SP_PREV': 'DEAD_DOM_SP', 'SP_PREV_PCT': 'DEAD_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'DEAD_DOM_SP', 'SP_DOM_PCMP': 'DEAD_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dom dead species created")
 
         # Create Species Dom where Health = SD
-        sp_dom_sd_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                   filter_statement=tree_table['TR_HLTH'] == 'SD')
+        sp_dom_sd_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                              filter_statement=tree_table['TR_HLTH'] == 'SD')
         sp_dom_sd_df = sp_dom_sd_df \
-            .rename(columns={'SP_PREV': 'SD_DOM_SP', 'SP_PREV_PCT': 'SD_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'SD_DOM_SP', 'SP_DOM_PCMP': 'SD_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dom sig dec species created")
 
         # Create Species Dom where Health = S
-        sp_dom_s_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                  filter_statement=tree_table['TR_HLTH'] == 'S')
+        sp_dom_s_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                             filter_statement=tree_table['TR_HLTH'] == 'S')
         sp_dom_s_df = sp_dom_s_df \
-            .rename(columns={'SP_PREV': 'STR_DOM_SP', 'SP_PREV_PCT': 'STR_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'STR_DOM_SP', 'SP_DOM_PCMP': 'STR_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dom stressed species created")
 
         # Create Species Dom where Health = H
-        sp_dom_h_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                  filter_statement=tree_table['TR_HLTH'] == 'H')
+        sp_dom_h_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                             filter_statement=tree_table['TR_HLTH'] == 'H')
         sp_dom_h_df = sp_dom_h_df \
-            .rename(columns={'SP_PREV': 'HLTH_DOM_SP', 'SP_PREV_PCT': 'HLTH_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'HLTH_DOM_SP', 'SP_DOM_PCMP': 'HLTH_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dom healthy species created")
 
         # Create overall dominant health
-        dom_health_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                   filter_statement=None)
-        dom_health_df = dom_health_df \
-            .rename(columns={'HLTH_PREV': 'DOM_HLTH', 'HLTH_PREV_PCT': 'DOM_HLTH_PCMP'}) \
-            .set_index(level)
+        dom_health_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                              filter_statement=None)
+        dom_health_df = dom_health_df.set_index(level)
         arcpy.AddMessage("    Dominant health created")
 
         # Create overall dominant species
-        dom_species_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                     filter_statement=None)
+        dom_species_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                                filter_statement=None)
         dom_species_df = dom_species_df \
-            .rename(columns={'SP_PREV': 'DOM_SP', 'SP_PREV_PCT': 'DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'DOM_SP', 'SP_DOM_PCMP': 'DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Dominant species created")
 
@@ -309,34 +305,34 @@ for level in levels:
         arcpy.AddMessage("    Lg dead tree TPA created")
 
         # Create Typical species dominant health
-        typ_dom_hlth_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                     filter_statement=tree_table['SP_TYPE'] == 'Common')
+        typ_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                                filter_statement=tree_table['SP_TYPE'] == 'Common')
         typ_dom_hlth_df = typ_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'TYP_SP_DOM_HLTH', 'HLTH_PREV_PCT': 'TYP_SP_DOM_HLTH_PCMP'}) \
+            .rename(columns={'DOM_HLTH': 'TYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'TYP_SP_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom health created")
 
         # Create Typical Species dominant species
-        typ_dom_sp_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                    filter_statement=tree_table['SP_TYPE'] == 'Common')
+        typ_dom_sp_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                               filter_statement=tree_table['SP_TYPE'] == 'Common')
         typ_dom_sp_df = typ_dom_sp_df \
-            .rename(columns={'SP_PREV': 'TYP_DOM_SP', 'SP_PREV_PCT': 'TYP_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'TYP_DOM_SP', 'SP_DOM_PCMP': 'TYP_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom species created")
 
         # Create Non-Typical species dominant health
-        ntyp_dom_hlth_df = fcalc.health_prev_pct_plot(tree_table=tree_table,
-                                                      filter_statement=tree_table['SP_TYPE'] == 'Uncommon')
+        ntyp_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
+                                                 filter_statement=tree_table['SP_TYPE'] == 'Uncommon')
         ntyp_dom_hlth_df = ntyp_dom_hlth_df \
-            .rename(columns={'HLTH_PREV': 'NTYP_SP_DOM_HLTH', 'HLTH_PREV_PCT': 'NTYP_SP_DOM_HLTH_PCMP'}) \
+            .rename(columns={'DOM_HLTH': 'NTYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom health created")
 
         # Create Non-Typical species dominant species
-        ntyp_dom_sp_df = fcalc.species_prev_pct_plot(tree_table=tree_table,
-                                                     filter_statement=tree_table['SP_TYPE'] == 'Uncommon')
+        ntyp_dom_sp_df = fcalc.species_dom_plot(tree_table=tree_table,
+                                                filter_statement=tree_table['SP_TYPE'] == 'Uncommon')
         ntyp_dom_sp_df = ntyp_dom_sp_df \
-            .rename(columns={'SP_PREV': 'NTYP_DOM_SP', 'SP_PREV_PCT': 'NTYP_DOM_SP_PCMP'}) \
+            .rename(columns={'SP_DOM': 'NTYP_DOM_SP', 'SP_DOM_PCMP': 'NTYP_DOM_SP_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom species created")
 
