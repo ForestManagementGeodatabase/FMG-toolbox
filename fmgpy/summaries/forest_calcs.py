@@ -515,7 +515,7 @@ def create_tree_table(prism_df):
 
     # Add SP_TYPE Column
     crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
-        .filter(items=['TR_SP','TYP_FOR_MVR'])
+        .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
         .merge(right=crosswalk_df, how='left', on='TR_SP')\

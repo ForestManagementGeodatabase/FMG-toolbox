@@ -41,7 +41,8 @@ for level in levels:
 
         # Create TPA, BA, QMDBH for each mast class
         tpa_ba_qmdbh_base_df = fcalc.tpa_ba_qmdbh_level_by_case(tree_table=tree_table,
-                                                                filter_statement=~tree_table.TR_HLTH.isin(["D", "DEAD"]),
+                                                                filter_statement=
+                                                                ~tree_table.TR_HLTH.isin(["D", "DEAD"]),
                                                                 case_column='MAST_TYPE',
                                                                 level=level)
         tpa_ba_qmdbh_base_df = tpa_ba_qmdbh_base_df.set_index(level)
@@ -93,9 +94,9 @@ for level in levels:
         arcpy.AddMessage("    Lightseed mast dominant health created")
 
         # Create Species Dom where Mast = Lightseed
-        lm_dom_sp_df =fcalc.species_prev_pct_level(tree_table=tree_table,
-                                                   filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
-                                                   level=level)
+        lm_dom_sp_df = fcalc.species_prev_pct_level(tree_table=tree_table,
+                                                    filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
+                                                    level=level)
         lm_dom_sp_df = lm_dom_sp_df\
             .rename(columns={'SP_PREV': 'LM_DOM_SP', 'SP_PREV_PCT': 'LM_DOM_SP_PCMP'})\
             .set_index(level)
@@ -103,7 +104,8 @@ for level in levels:
 
         # Merge Component Dataframes onto base df
         mast_summary_df = base_df\
-            .join(other=[hm_dom_hlth_df,
+            .join(other=[tpa_ba_qmdbh_base_df,
+                         hm_dom_hlth_df,
                          hm_dom_sp_df,
                          sm_dom_hlth_df,
                          sm_dom_sp_df,
@@ -136,26 +138,26 @@ for level in levels:
 
         # Handle NAN values for output
         mast_summary_df = mast_summary_df.fillna(value={'HM_TPA': 0,
-                                                         'HM_BA': 0,
-                                                         'HM_QMDBH': 0,
-                                                         'HM_DOM_HLTH': 'NONE',
-                                                         'HM_DOM_HLTH_PCMP': 0,
-                                                         'HM_DOM_SP': 'NONE',
-                                                         'HM_DOM_SP_PCMP': 0,
-                                                         'SM_TPA': 0,
-                                                         'SM_BA': 0,
-                                                         'SM_QMDBH': 0,
-                                                         'SM_DOM_HLTH': 'NONE',
-                                                         'SM_DOM_HLTH_PCMP': 0,
-                                                         'SM_DOM_SP': 'NONE',
-                                                         'SM_DOM_SP_PCMP': 0,
-                                                         'LM_TPA': 0,
-                                                         'LM_BA': 0,
-                                                         'LM_QMDBH': 0,
-                                                         'LM_DOM_HLTH': 'NONE',
-                                                         'LM_DOM_HLTH_PCMP': 0,
-                                                         'LM_DOM_SP': 'NONE',
-                                                         'LM_DOM_SP_PCMP': 0})
+                                                        'HM_BA': 0,
+                                                        'HM_QMDBH': 0,
+                                                        'HM_DOM_HLTH': 'NONE',
+                                                        'HM_DOM_HLTH_PCMP': 0,
+                                                        'HM_DOM_SP': 'NONE',
+                                                        'HM_DOM_SP_PCMP': 0,
+                                                        'SM_TPA': 0,
+                                                        'SM_BA': 0,
+                                                        'SM_QMDBH': 0,
+                                                        'SM_DOM_HLTH': 'NONE',
+                                                        'SM_DOM_HLTH_PCMP': 0,
+                                                        'SM_DOM_SP': 'NONE',
+                                                        'SM_DOM_SP_PCMP': 0,
+                                                        'LM_TPA': 0,
+                                                        'LM_BA': 0,
+                                                        'LM_QMDBH': 0,
+                                                        'LM_DOM_HLTH': 'NONE',
+                                                        'LM_DOM_HLTH_PCMP': 0,
+                                                        'LM_DOM_SP': 'NONE',
+                                                        'LM_DOM_SP_PCMP': 0})
         arcpy.AddMessage("    No data/nan values set")
 
         # Export to GDB Table
@@ -228,7 +230,8 @@ for level in levels:
 
         # Merge Component Dataframes onto base df
         mast_summary_df = base_df\
-            .join(other=[hm_dom_hlth_df,
+            .join(other=[tpa_ba_qmdbh_base_df,
+                         hm_dom_hlth_df,
                          hm_dom_sp_df,
                          sm_dom_hlth_df,
                          sm_dom_sp_df,
@@ -261,26 +264,26 @@ for level in levels:
 
         # Handle NAN values for output
         mast_summary_df = mast_summary_df.fillna(value={'HM_TPA': 0,
-                                                         'HM_BA': 0,
-                                                         'HM_QMDBH': 0,
-                                                         'HM_DOM_HLTH': 'NONE',
-                                                         'HM_DOM_HLTH_PCMP': 0,
-                                                         'HM_DOM_SP': 'NONE',
-                                                         'HM_DOM_SP_PCMP': 0,
-                                                         'SM_TPA': 0,
-                                                         'SM_BA': 0,
-                                                         'SM_QMDBH': 0,
-                                                         'SM_DOM_HLTH': 'NONE',
-                                                         'SM_DOM_HLTH_PCMP': 0,
-                                                         'SM_DOM_SP': 'NONE',
-                                                         'SM_DOM_SP_PCMP': 0,
-                                                         'LM_TPA': 0,
-                                                         'LM_BA': 0,
-                                                         'LM_QMDBH': 0,
-                                                         'LM_DOM_HLTH': 'NONE',
-                                                         'LM_DOM_HLTH_PCMP': 0,
-                                                         'LM_DOM_SP': 'NONE',
-                                                         'LM_DOM_SP_PCMP': 0})
+                                                        'HM_BA': 0,
+                                                        'HM_QMDBH': 0,
+                                                        'HM_DOM_HLTH': 'NONE',
+                                                        'HM_DOM_HLTH_PCMP': 0,
+                                                        'HM_DOM_SP': 'NONE',
+                                                        'HM_DOM_SP_PCMP': 0,
+                                                        'SM_TPA': 0,
+                                                        'SM_BA': 0,
+                                                        'SM_QMDBH': 0,
+                                                        'SM_DOM_HLTH': 'NONE',
+                                                        'SM_DOM_HLTH_PCMP': 0,
+                                                        'SM_DOM_SP': 'NONE',
+                                                        'SM_DOM_SP_PCMP': 0,
+                                                        'LM_TPA': 0,
+                                                        'LM_BA': 0,
+                                                        'LM_QMDBH': 0,
+                                                        'LM_DOM_HLTH': 'NONE',
+                                                        'LM_DOM_HLTH_PCMP': 0,
+                                                        'LM_DOM_SP': 'NONE',
+                                                        'LM_DOM_SP_PCMP': 0})
         arcpy.AddMessage("    No data/nan values set")
 
         # Export to GDB Table
