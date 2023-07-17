@@ -28,7 +28,7 @@ tree_table = fcalc.create_tree_table(prism_df=prism_df)
 arcpy.env.overwriteOutput = True
 
 # Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT']
+levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 # loop through levels, producing general description table for each
 for level in levels:
@@ -148,16 +148,16 @@ for level in levels:
 
         # Handle NaN values appropriately
         out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                       'LIVE_TPA': 0,
-                                       'LIVE_BA': 0,
-                                       'LIVE_QMDBH': 0,
-                                       'TR_CT': 0,
-                                       'TR_LV_CT': 0,
-                                       'TR_D_CT': 0,
-                                       'LIVE_AMD': 0,
-                                       'LIVE_MAX_DBH': 0,
-                                       'INVT_YEAR': 'NA'}) \
-                        .drop(columns=['index'], errors='ignore')
+                                      'LIVE_TPA': 0,
+                                      'LIVE_BA': 0,
+                                      'LIVE_QMDBH': 0,
+                                      'TR_CT': 0,
+                                      'TR_LV_CT': 0,
+                                      'TR_D_CT': 0,
+                                      'LIVE_AMD': 0,
+                                      'LIVE_MAX_DBH': 0,
+                                      'INVT_YEAR': 'NA'}) \
+                       .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
 
         # Reindex output dataframe
@@ -260,7 +260,7 @@ for level in levels:
                                       'LIVE_AMD': 0,
                                       'LIVE_MAX_DBH': 0,
                                       'INVT_YEAR': 'NA'})\
-                        .drop(columns=['index'], errors='ignore')
+                       .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
 
         # reindex output dataframe

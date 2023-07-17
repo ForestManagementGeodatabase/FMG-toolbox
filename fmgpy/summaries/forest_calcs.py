@@ -91,6 +91,7 @@ def create_level_df(level, plot_table):
     elif level == 'POOL':
         base_df = plot_table\
             .groupby(level)\
+            .agg(PLT_CT=('PID', 'count'))\
             .reset_index()\
             .set_index(level)
         return base_df
@@ -514,7 +515,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\

@@ -28,7 +28,7 @@ tree_table = fcalc.create_tree_table(prism_df=prism_df)
 arcpy.env.overwriteOutput = True
 
 # Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT']
+levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 # Loop through levels, producing mast summary table for each
 for level in levels:

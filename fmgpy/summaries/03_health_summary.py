@@ -28,7 +28,7 @@ tree_table = fcalc.create_tree_table(prism_df=prism_df)
 arcpy.env.overwriteOutput = True
 
 # Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT']
+levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 # loop through levels, producing healthy summary table for each
 for level in levels:
@@ -421,15 +421,3 @@ for level in levels:
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
 arcpy.AddMessage('Complete')
-
-
-
-
-
-
-
-
-
-
-
-

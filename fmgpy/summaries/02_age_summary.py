@@ -28,7 +28,7 @@ age_plots = plot_table.query("AGE_ORIG==AGE_ORIG")
 arcpy.AddMessage('Age table created')
 
 # Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT']
+levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 # Allow output overwrite during testing
 arcpy.env.overwriteOutput = True
