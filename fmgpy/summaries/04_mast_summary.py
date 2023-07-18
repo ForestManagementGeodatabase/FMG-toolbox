@@ -53,7 +53,7 @@ for level in levels:
                                                 filter_statement=tree_table['MAST_TYPE'] == 'Hard',
                                                 level=level)
         hm_dom_hlth_df = hm_dom_hlth_df\
-            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCT': 'HM_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCMP': 'HM_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant health created")
 
@@ -71,7 +71,7 @@ for level in levels:
                                                 filter_statement=tree_table['MAST_TYPE'] == 'Soft',
                                                 level=level)
         sm_dom_hlth_df = sm_dom_hlth_df \
-            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCT': 'SM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCMP': 'SM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant health created")
 
@@ -89,7 +89,7 @@ for level in levels:
                                                 filter_statement=tree_table['MAST_TYPE'] == 'Lightseed',
                                                 level=level)
         lm_dom_hlth_df = lm_dom_hlth_df \
-            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCT': 'LM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCMP': 'LM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant health created")
 
@@ -184,7 +184,7 @@ for level in levels:
         hm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
                                                filter_statement=tree_table['MAST_TYPE'] == 'Hard')
         hm_dom_hlth_df = hm_dom_hlth_df\
-            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCT': 'HM_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'HM_DOM_HLTH', 'HLTH_DOM_PCMP': 'HM_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Hard mast dominant health created")
 
@@ -200,7 +200,7 @@ for level in levels:
         sm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
                                                filter_statement=tree_table['MAST_TYPE'] == 'Soft')
         sm_dom_hlth_df = sm_dom_hlth_df \
-            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCT': 'SM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'SM_DOM_HLTH', 'HLTH_DOM_PCMP': 'SM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Soft mast dominant health created")
 
@@ -216,7 +216,7 @@ for level in levels:
         lm_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
                                                filter_statement=tree_table['MAST_TYPE'] == 'Lightseed')
         lm_dom_hlth_df = lm_dom_hlth_df \
-            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCT': 'LM_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'LM_DOM_HLTH', 'HLTH_DOM_PCMP': 'LM_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Lightseed mast dominant health created")
 
