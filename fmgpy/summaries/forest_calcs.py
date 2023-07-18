@@ -125,7 +125,9 @@ def fmg_column_reindex_list(level, col_csv):
 
     # Create list of upstream levels based on current level
     levels_list = []
-    if level == 'SID':
+    if level == 'PID':
+        levels_list = ['POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID']
+    elif level == 'SID':
         levels_list = ['POOL', 'COMP', 'UNIT', 'SITE', 'SID']
     elif level == 'SITE':
         levels_list = ['POOL', 'COMP', 'UNIT', 'SITE']
@@ -1280,7 +1282,7 @@ def health_dom_plot(tree_table, filter_statement):
             how='left')
 
     # Calculate prevalence percentage column
-    health_dom_pct_df['HLTH_DOM_PCT'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
+    health_dom_pct_df['HLTH_DOM_PCMP'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
     health_dom_pct_df = health_dom_pct_df \
@@ -1398,7 +1400,7 @@ def health_dom_level(tree_table, filter_statement, level):
             how='left')
 
     # Calculate prevalence percentage column
-    health_dom_pct_df['HLTH_DOM_PCT'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
+    health_dom_pct_df['HLTH_DOM_PCMP'] = (health_dom_pct_df['HLTH_TPA'] / health_dom_pct_df['OVERALL_TPA']) * 100
 
     # Clean up dataframe for export
     health_dom_pct_df = health_dom_pct_df \
