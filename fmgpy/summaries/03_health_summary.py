@@ -87,8 +87,9 @@ for level in levels:
         dom_health_df = fcalc.health_dom_level(tree_table=tree_table,
                                                filter_statement=None,
                                                level=level)
-
-        dom_health_df = dom_health_df.set_index(level)
+        dom_health_df = dom_health_df\
+            .rename(columns={'HLTH_DOM': 'DOM_HLTH', 'HLTH_DOM_PCMP': 'DOM_HLTH_PCMP'})\
+            .set_index(level)
         arcpy.AddMessage("    Dominant health created")
 
         # Create overall dominant species
@@ -118,7 +119,7 @@ for level in levels:
                                                  filter_statement=tree_table['SP_TYPE'] == 'Common',
                                                  level=level)
         typ_dom_hlth_df = typ_dom_hlth_df\
-            .rename(columns={'DOM_HLTH': 'TYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'TYP_SP_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'TYP_SP_DOM_HLTH', 'HLTH_DOM_PCMP': 'TYP_SP_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom health created")
 
@@ -136,7 +137,7 @@ for level in levels:
                                                   filter_statement=tree_table['SP_TYPE'] == 'Uncommon',
                                                   level=level)
         ntyp_dom_hlth_df = ntyp_dom_hlth_df\
-            .rename(columns={'DOM_HLTH': 'NTYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'NTYP_SP_DOM_HLTH', 'HLTH_DOM_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom health created")
 
@@ -282,7 +283,9 @@ for level in levels:
         # Create overall dominant health
         dom_health_df = fcalc.health_dom_plot(tree_table=tree_table,
                                               filter_statement=None)
-        dom_health_df = dom_health_df.set_index(level)
+        dom_health_df = dom_health_df\
+            .rename(columns={'HLTH_DOM': 'DOM_HLTH', 'HLTH_DOM_PCMP': 'DOM_HLTH_PCMP'})\
+            .set_index(level)
         arcpy.AddMessage("    Dominant health created")
 
         # Create overall dominant species
@@ -308,7 +311,7 @@ for level in levels:
         typ_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
                                                 filter_statement=tree_table['SP_TYPE'] == 'Common')
         typ_dom_hlth_df = typ_dom_hlth_df \
-            .rename(columns={'DOM_HLTH': 'TYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'TYP_SP_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'TYP_SP_DOM_HLTH', 'HLTH_DOM_PCMP': 'TYP_SP_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Typ Sp Dom health created")
 
@@ -324,7 +327,7 @@ for level in levels:
         ntyp_dom_hlth_df = fcalc.health_dom_plot(tree_table=tree_table,
                                                  filter_statement=tree_table['SP_TYPE'] == 'Uncommon')
         ntyp_dom_hlth_df = ntyp_dom_hlth_df \
-            .rename(columns={'DOM_HLTH': 'NTYP_SP_DOM_HLTH', 'DOM_HLTH_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'}) \
+            .rename(columns={'HLTH_DOM': 'NTYP_SP_DOM_HLTH', 'HLTH_DOM_PCMP': 'NTYP_SP_DOM_HLTH_PCMP'}) \
             .set_index(level)
         arcpy.AddMessage("    Non-Typ Sp Dom health created")
 
