@@ -1,8 +1,8 @@
-COL_NAME,ALIAS,VALUE_NAN
-AGE_ORIG,Mean Origin Year,
-AGE_DBH,Mean Age Tree DBH,0
-AGE_GRW,Mean Age Tree Growth Rate,0
-AGE_UND_COV,Mean Understory Cover,0
-HM_ORIG,Hard Mast Mean Origin Year,
-SM_ORIG,Soft Mast Mean Origin Year,
-LM_ORIG,Lightseed Mast Mean Origin Year,
+COL_NAME,ALIAS,VALUE_NAN,REQ_NAN_FILL
+AGE_ORIG,Mean Origin Year,,No
+AGE_DBH,Mean Age Tree DBH,0,Yes
+AGE_GRW,Mean Age Tree Growth Rate,0,Yes
+AGE_UND_COV,Mean Understory Cover,0,Yes
+HM_ORIG,Hard Mast Mean Origin Year,,No
+SM_ORIG,Soft Mast Mean Origin Year,,No
+LM_ORIG,Lightseed Mast Mean Origin Year,,No

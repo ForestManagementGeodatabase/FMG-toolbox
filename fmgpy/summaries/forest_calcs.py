@@ -118,7 +118,7 @@ def fmg_column_reindex_list(level, col_csv):
 
     Keyword Args:
         level -- FMG hierarchy level, string
-        col_csv -- relative path to a column definition csv in fmgpy/reference_resources
+        col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
 
     Details: None
     """
@@ -146,6 +146,34 @@ def fmg_column_reindex_list(level, col_csv):
     reindex_cols = levels_list + col_list
 
     return reindex_cols
+
+
+# Create dictionary of nan fill values for output gdb tables
+def fmg_nan_fill(col_csv):
+    """ Creates a dictionary with key value pairs of field name and nan fill value.
+    Used to clean up the data frame prior to export to ArcGIS GDB table
+
+    Keyword Args:
+          col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
+
+    Details: None
+    """
+
+    # import the column definition csv
+    col_list_df = pd.read_csv(col_csv)
+
+    # Filter to just fields that require nan filling
+    col_list_df_filt = col_list_df[col_list_df['REQ_NAN_FILL'] == 'Yes']
+
+    # Create value lists for COL_NAME and VALUE_NAN
+    col_list = col_list_df_filt['COL_NAME'].values.tolist()
+    val_list = [int(x) if len(x) == 1 else x for x in col_list_df_filt['VALUE_NAN'].values.tolist()]
+
+    # Zip lists into dict
+    nan_fill_dict = dict(zip(col_list, val_list))
+
+    return nan_fill_dict
+
 
 
 # Plot count: use with group by - agg

@@ -1,34 +1,34 @@
-COL_NAME,ALIAS,VALUE_NAN
-DEAD_TPA,Dead TPA,0
-DEAD_BA,Dead BA,0
-DEAD_QMDBH,Dead QM DBH,0
-DEAD_DOM_SP,Dead Dominant Species,NONE
-DEAD_DOM_SP_PCMP,Dead Dominant Species % Composition,0
-SD_TPA,Significant Decline TPA,0
-SD_BA,Significant Decline BA,0
-SD_QMDBH,Significant Decline QM DBH,0
-SD_DOM_SP,Significant Decline Dominant Species,NONE
-SD_DOM_SP_PCMP,Significant Decline Dominant Species % Composition,0
-STR_TPA,Stressed TPA,0
-STR_BA,Stressed BA,0
-STR_QMDBH,Stressed QM DBH,0
-STR_DOM_SP,Stressed Dominant Species,NONE
-STR_DOM_SP_PCMP,Stressed Dominant Species % Composition,0
-HLTH_TPA,Healthy TPA,0
-HLTH_BA,Healthy BA,0
-HLTH_QMDBH,Healthy QM DBH,0
-HLTH_DOM_SP,Healthy Dominant Species,NONE
-HLTH_DOM_SP_PCMP,Healthy Dominant Species % Composition,0
-LG_D_TPA,"Large Snag/Dead TPA (>20"" Dia.)",0
-DOM_HLTH,Dominant Health Class,NONE
-DOM_HLTH_PCMP,Dominant Health Class % Composition,0
-DOM_SP,Dominant Species,NONE
-DOM_SP_PCMP,Dominant Species % Composition,0
-TYP_SP_DOM_HLTH,Typical Species Dominant Health Class,NONE
-TYP_SP_DOM_HLTH_PCMP,Typical Species Dominant Health Class % Composition,0
-TYP_DOM_SP,Typical Dominant Species,NONE
-TYP_DOM_SP_PCMP,Typical Dominant Species % Composition,0
-NTYP_SP_DOM_HLTH,Non-Typical Species Dominant Health Class,NONE
-NTYP_SP_DOM_HLTH_PCMP,Non-Typical Species Dominant Health Class % Composition,0
-NTYP_DOM_SP,Non-Typical Dominant Species,NONE
-NTYP_DOM_SP_PCMP,Non-Typical Dominant Species % Composition,0
+COL_NAME,ALIAS,VALUE_NAN,REQ_NAN_FILL
+DEAD_TPA,Dead TPA,0,Yes
+DEAD_BA,Dead BA,0,Yes
+DEAD_QMDBH,Dead QM DBH,0,Yes
+DEAD_DOM_SP,Dead Dominant Species,NONE,Yes
+DEAD_DOM_SP_PCMP,Dead Dominant Species % Composition,0,Yes
+SD_TPA,Significant Decline TPA,0,Yes
+SD_BA,Significant Decline BA,0,Yes
+SD_QMDBH,Significant Decline QM DBH,0,Yes
+SD_DOM_SP,Significant Decline Dominant Species,NONE,Yes
+SD_DOM_SP_PCMP,Significant Decline Dominant Species % Composition,0,Yes
+STR_TPA,Stressed TPA,0,Yes
+STR_BA,Stressed BA,0,Yes
+STR_QMDBH,Stressed QM DBH,0,Yes
+STR_DOM_SP,Stressed Dominant Species,NONE,Yes
+STR_DOM_SP_PCMP,Stressed Dominant Species % Composition,0,Yes
+HLTH_TPA,Healthy TPA,0,Yes
+HLTH_BA,Healthy BA,0,Yes
+HLTH_QMDBH,Healthy QM DBH,0,Yes
+HLTH_DOM_SP,Healthy Dominant Species,NONE,Yes
+HLTH_DOM_SP_PCMP,Healthy Dominant Species % Composition,0,Yes
+LG_D_TPA,"Large Snag/Dead TPA (>20"" Dia.)",0,Yes
+DOM_HLTH,Dominant Health Class,NONE,Yes
+DOM_HLTH_PCMP,Dominant Health Class % Composition,0,Yes
+DOM_SP,Dominant Species,NONE,Yes
+DOM_SP_PCMP,Dominant Species % Composition,0,Yes
+TYP_SP_DOM_HLTH,Typical Species Dominant Health Class,NONE,Yes
+TYP_SP_DOM_HLTH_PCMP,Typical Species Dominant Health Class % Composition,0,Yes
+TYP_DOM_SP,Typical Dominant Species,NONE,Yes
+TYP_DOM_SP_PCMP,Typical Dominant Species % Composition,0,Yes
+NTYP_SP_DOM_HLTH,Non-Typical Species Dominant Health Class,NONE,Yes
+NTYP_SP_DOM_HLTH_PCMP,Non-Typical Species Dominant Health Class % Composition,0,Yes
+NTYP_DOM_SP,Non-Typical Dominant Species,NONE,Yes
+NTYP_DOM_SP_PCMP,Non-Typical Dominant Species % Composition,0,Yes

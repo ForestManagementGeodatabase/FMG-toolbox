@@ -1,22 +1,22 @@
-COL_NAME,ALIAS,VALUE_NAN
-HM_TPA,Hard Mast TPA,0
-HM_BA,Hard Mast BA,0
-HM_QMDBH,Hard Mast QM DBH,0
-HM_DOM_HLTH,Hard Mast Dominant Health Class,NONE
-HM_DOM_HLTH_PCMP,Hard Mast Dominant Health Class % Composition,0
-HM_DOM_SP,Hard Mast Dominant Species,NONE
-HM_DOM_SP_PCMP,Hard Mast Dominant Species % Composition,0
-SM_TPA,Soft Mast TPA,0
-SM_BA,Soft Mast BA,0
-SM_QMDBH,Soft Mast QM DBH,0
-SM_DOM_HLTH,Soft Mast Dominant Health Class,NONE
-SM_DOM_HLTH_PCMP,Soft Mast Dominant Health Class % Composition,0
-SM_DOM_SP,Soft Mast Dominant Species,NONE
-SM_DOM_SP_PCMP,Soft Mast Dominant Species % Composition,0
-LM_TPA,Lightseed Mast TPA,0
-LM_BA,Lightseed Mast BA,0
-LM_QMDBH,Lightseed Mast QM DBH,0
-LM_DOM_HLTH,Lightseed Mast Dominant Health Class,NONE
-LM_DOM_HLTH_PCMP,Lightseed Mast Dominant Health Class % Composition,0
-LM_DOM_SP,Lightseed Mast Dominant Species,NONE
-LM_DOM_SP_PCMP,Lightseed Mast Dominant Species % Composition,0
+COL_NAME,ALIAS,VALUE_NAN,REQ_NAN_FILL
+HM_TPA,Hard Mast TPA,0,Yes
+HM_BA,Hard Mast BA,0,Yes
+HM_QMDBH,Hard Mast QM DBH,0,Yes
+HM_DOM_HLTH,Hard Mast Dominant Health Class,NONE,Yes
+HM_DOM_HLTH_PCMP,Hard Mast Dominant Health Class % Composition,0,Yes
+HM_DOM_SP,Hard Mast Dominant Species,NONE,Yes
+HM_DOM_SP_PCMP,Hard Mast Dominant Species % Composition,0,Yes
+SM_TPA,Soft Mast TPA,0,Yes
+SM_BA,Soft Mast BA,0,Yes
+SM_QMDBH,Soft Mast QM DBH,0,Yes
+SM_DOM_HLTH,Soft Mast Dominant Health Class,NONE,Yes
+SM_DOM_HLTH_PCMP,Soft Mast Dominant Health Class % Composition,0,Yes
+SM_DOM_SP,Soft Mast Dominant Species,NONE,Yes
+SM_DOM_SP_PCMP,Soft Mast Dominant Species % Composition,0,Yes
+LM_TPA,Lightseed Mast TPA,0,Yes
+LM_BA,Lightseed Mast BA,0,Yes
+LM_QMDBH,Lightseed Mast QM DBH,0,Yes
+LM_DOM_HLTH,Lightseed Mast Dominant Health Class,NONE,Yes
+LM_DOM_HLTH_PCMP,Lightseed Mast Dominant Health Class % Composition,0,Yes
+LM_DOM_SP,Lightseed Mast Dominant Species,NONE,Yes
+LM_DOM_SP_PCMP,Lightseed Mast Dominant Species % Composition,0,Yes
