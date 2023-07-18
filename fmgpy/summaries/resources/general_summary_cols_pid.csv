@@ -1,0 +1,25 @@
+COL_NAME,ALIAS,VALUE_NAN
+AREA_AC,Area (Acres),0
+INVT_YEAR,Inventory Year or Years,NA
+TR_CT,Total Number of Trees,0
+TR_LV_CT,Total Number of Live Trees,0
+TR_D_CT,Total Number of Dead Trees,0
+LIVE_BA,BA for Live Trees,0
+LIVE_TPA,TPA for Live Trees,0
+LIVE_QMDBH,QMDBH For Live Trees,0
+LIVE_AMD,Average Diameter for Live Trees,0
+LIVE_MAX_DBH,Max DBH for Live Trees,0
+INV_PRESENT,Invasive Species Present,No
+INV_SP,List of Invasive Species Identified,NONE
+OV_CLSR,Overstory Closure,0
+OV_HT,Overstory Height,0
+UND_COV,Understory Cover,0
+UND_HT_MEAN,Understory Height Mean,0
+UND_HT_RG,Understory Height Range,None
+AGE_SP,Aged Tree Species,None
+AGE_DIA,Aged Tree Diameter,
+AGE_ORIG,Aged Tree Year of Origin,
+AGE_GRW,Aged Tree Growth,
+AGE_MAST_TYPE,Aged Tree Mast Type,
+AGE_NOTE,Number of Notes from Age Plots,0
+FIXED_NOTE,Number of Notes from Fixed Plots,0

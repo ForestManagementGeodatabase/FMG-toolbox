@@ -156,7 +156,8 @@ for level in levels:
                                       'TR_D_CT': 0,
                                       'LIVE_AMD': 0,
                                       'LIVE_MAX_DBH': 0,
-                                      'INVT_YEAR': 'NA'}) \
+                                      'INVT_YEAR': 'NA',
+                                      'INV_SP': 'NONE'}) \
                        .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
 
@@ -180,9 +181,16 @@ for level in levels:
                                        ['UND_SP1', 'UND_SP2', 'UND_SP3',
                                         'GRD_SP1', 'GRD_SP2', 'GRD_SP3',
                                         'NOT_SP1', 'NOT_SP2', 'NOT_SP3',
-                                        'NOT_SP4', 'NOT_SP5', 'FX_MISC',
+                                        'NOT_SP4', 'NOT_SP5',
                                         'COL_CREW', 'AGENCY', 'DISTRICT',
                                         'ITERATION', 'SHAPE'])
+
+        # Rename Columns
+        plot_metrics = plot_metrics.rename(columns={'AGE_MISC': 'AGE_NOTE',
+                                                    'FX_MISC': 'FIXED_NOTE',
+                                                    'UND_HT': 'UND_HT_RG',
+                                                    'UND_HT2': 'UND_HT_MEAN',
+                                                    'MAST_TYPE': 'AGE_MAST_TYPE'})
 
         # Create and populate inventory year column
         plot_metrics['INVT_YEAR'] = plot_metrics['COL_DATE'].dt.year
@@ -259,13 +267,15 @@ for level in levels:
                                       'TR_D_CT': 0,
                                       'LIVE_AMD': 0,
                                       'LIVE_MAX_DBH': 0,
-                                      'INVT_YEAR': 'NA'})\
+                                      'INVT_YEAR': 'NA',
+                                      'INV_SP': 'NONE',
+                                      'AGE_SP': 'NONE'})\
                        .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
 
         # reindex output dataframe
         general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                             col_csv='resources/general_summary_cols.csv')
+                                                             col_csv='resources/general_summary_cols_pid.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
