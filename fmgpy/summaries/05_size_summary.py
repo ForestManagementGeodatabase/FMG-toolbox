@@ -96,7 +96,7 @@ for level in levels:
                                               filter_statement=tree_table['TR_SIZE'] == 'Sapling',
                                               level=level)
         sap_dom_hlth = sap_dom_hlth\
-            .rename(columns={'DOM_HLTH': 'SAP_DOM_HLTH', 'DOM_HLTH_PCMP': 'SAP_DOM_HLTH_PCMP'})\
+            .rename(columns={'HLTH_DOM': 'SAP_DOM_HLTH', 'HLTH_DOM_PCMP': 'SAP_DOM_HLTH_PCMP'})\
             .set_index(level)
         arcpy.AddMessage("    Sapling dominant health created")
 
