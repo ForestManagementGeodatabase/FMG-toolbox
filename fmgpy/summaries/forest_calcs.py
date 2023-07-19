@@ -167,13 +167,12 @@ def fmg_nan_fill(col_csv):
 
     # Create value lists for COL_NAME and VALUE_NAN
     col_list = col_list_df_filt['COL_NAME'].values.tolist()
-    val_list = [int(x) if len(x) == 1 else x for x in col_list_df_filt['VALUE_NAN'].values.tolist()]
+    val_list = [float(x) if len(x) == 1 else x for x in col_list_df_filt['VALUE_NAN'].values.tolist()]
 
     # Zip lists into dict
     nan_fill_dict = dict(zip(col_list, val_list))
 
     return nan_fill_dict
-
 
 
 # Plot count: use with group by - agg

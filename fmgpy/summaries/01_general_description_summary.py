@@ -145,21 +145,14 @@ for level in levels:
                          date_df],
                   how='left')\
             .reset_index()
+        arcpy.AddMessage("    All Component DFs Merged")
 
         # Handle NaN values appropriately
-        out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                      'LIVE_TPA': 0,
-                                      'LIVE_BA': 0,
-                                      'LIVE_QMDBH': 0,
-                                      'TR_CT': 0,
-                                      'TR_LV_CT': 0,
-                                      'TR_D_CT': 0,
-                                      'LIVE_AMD': 0,
-                                      'LIVE_MAX_DBH': 0,
-                                      'INVT_YEAR': 'NA',
-                                      'INV_SP': 'NONE'}) \
+        nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols.csv')
+
+        out_df = out_df.fillna(value=nan_fill_dict) \
                        .drop(columns=['index'], errors='ignore')
-        arcpy.AddMessage("    All Component DFs Merged")
+        arcpy.AddMessage("    NAN values filled")
 
         # Reindex output dataframe
         general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
@@ -258,18 +251,9 @@ for level in levels:
             .reset_index()
 
         # Handle NaN values appropriately
-        out_df = out_df.fillna(value={'INV_PRESENT': 'No',
-                                      'LIVE_TPA': 0,
-                                      'LIVE_BA': 0,
-                                      'LIVE_QMDBH': 0,
-                                      'TR_CT': 0,
-                                      'TR_LV_CT': 0,
-                                      'TR_D_CT': 0,
-                                      'LIVE_AMD': 0,
-                                      'LIVE_MAX_DBH': 0,
-                                      'INVT_YEAR': 'NA',
-                                      'INV_SP': 'NONE',
-                                      'AGE_SP': 'NONE'})\
+        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols_pid.csv')
+
+        out_df = out_df.fillna(value=nan_fill_dict_pid)\
                        .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    All Component DFs Merged")
 

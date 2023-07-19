@@ -21,5 +21,5 @@ AGE_DIA,Aged Tree Diameter,,No
 AGE_ORIG,Aged Tree Year of Origin,,No
 AGE_GRW,Aged Tree Growth,,No
 AGE_MAST_TYPE,Aged Tree Mast Type,,No
-AGE_NOTE,Number of Notes from Age Plots,0,Yes
-FIXED_NOTE,Number of Notes from Fixed Plots,0,Yes
+AGE_NOTE,Number of Notes from Age Plots,,No
+FIXED_NOTE,Number of Notes from Fixed Plots,,No
