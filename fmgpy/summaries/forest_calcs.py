@@ -304,17 +304,17 @@ def inv_sp_list(col_list):
 
     Details: None"""
 
-    spList = []
+    sp_list = []
     for col in col_list:
         if col == 'HUJA':
-            spList.append('HUJA')
+            sp_list.append('HUJA')
         elif col == 'PHAR3':
-            spList.append('PHAR3')
+            sp_list.append('PHAR3')
         elif col == 'PHAU7':
-            spList.append('PHAU7')
-    spSet = set(spList)
-    spVal = ', '.join(spSet)
-    return spVal
+            sp_list.append('PHAU7')
+    sp_set = set(sp_list)
+    sp_val = ', '.join(sp_set)
+    return sp_val
 
 
 # Create a column with year or year range: use with apply - lambda

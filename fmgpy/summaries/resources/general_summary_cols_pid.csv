@@ -17,9 +17,9 @@ UND_COV,Understory Cover,0,Yes
 UND_HT_MEAN,Understory Height Mean,0,Yes
 UND_HT_RG,Understory Height Range,,No
 AGE_SP,Aged Tree Species,NONE,Yes
-AGE_DIA,Aged Tree Diameter,,No
+AGE_DIA,Aged Tree Diameter,0,Yes
 AGE_ORIG,Aged Tree Year of Origin,,No
-AGE_GRW,Aged Tree Growth,,No
+AGE_GRW,Aged Tree Growth,0,Yes
 AGE_MAST_TYPE,Aged Tree Mast Type,,No
-AGE_NOTE,Number of Notes from Age Plots,,No
-FIXED_NOTE,Number of Notes from Fixed Plots,,No
+AGE_NOTE,Note from Age Plots,,No
+FIXED_NOTE,Note from Fixed Plots,,No

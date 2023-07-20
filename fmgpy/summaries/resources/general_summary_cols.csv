@@ -14,13 +14,13 @@ LIVE_MAX_DBH,Max DBH for Live Trees,0,Yes
 INV_PRESENT,Invasive Species Present,No,Yes
 INV_SP,List of Invasive Species Identified,NONE,Yes
 OV_CLSR_MEAN,Overstory Closure,0,Yes
-OV_CLSR_STD,Overstory Closure Standard Deviation,,No
+OV_CLSR_STD,Overstory Closure Standard Deviation,0,Yes
 OV_HT_MEAN,Overstory Height,0,Yes
-OV_HT_STD,Overstory Height Standard Deviation,,No
+OV_HT_STD,Overstory Height Standard Deviation,0,Yes
 UND_COV_MEAN,Understory Cover,0,Yes
-UND_COV_STD,Understory Cover Standard Deviation,,No
+UND_COV_STD,Understory Cover Standard Deviation,0,Yes
 UND_HT_MEAN,Understory Height Mean,0,Yes
 UND_HT_RG,Understory Height Range,,No
-UND_HT_STD,Understory Height Standard Deviation,,No
+UND_HT_STD,Understory Height Standard Deviation,0,Yes
 NUM_FIX_NOTES,Number of Notes from Fixed Plots,0,Yes
 NUM_AGE_NOTES,Number of Notes from Age Plots,0,Yes
