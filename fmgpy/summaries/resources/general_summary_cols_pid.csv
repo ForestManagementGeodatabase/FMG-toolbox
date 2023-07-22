@@ -20,6 +20,6 @@ AGE_SP,Aged Tree Species,NONE,Yes
 AGE_DIA,Aged Tree Diameter,0,Yes
 AGE_ORIG,Aged Tree Year of Origin,,No
 AGE_GRW,Aged Tree Growth,0,Yes
-AGE_MAST_TYPE,Aged Tree Mast Type,,No
+AGE_MAST_TYPE,Aged Tree Mast Type,None,Yes
 AGE_NOTE,Note from Age Plots,,No
 FIXED_NOTE,Note from Fixed Plots,,No
