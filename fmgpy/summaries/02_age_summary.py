@@ -111,9 +111,8 @@ for level in levels:
     arcpy.AddMessage("    Columns reordered")
 
     # Handle Nan values
-    out_df = out_df.fillna(value={'AGE_DBH': 0,
-                                  'AGE_GRW': 0,
-                                  'AGE_UND_COV': 0})
+    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/age_summary_cols.csv')
+    out_df = out_df.fillna(value=nan_fill_dict)
     arcpy.AddMessage("    No data/nan values set")
 
     # Export to gdb table

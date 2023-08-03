@@ -155,10 +155,12 @@ for level in levels:
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NaN values appropriately
-        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols.csv')
+        nan_fill_dict_level = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols.csv')
 
-        out_df = out_df.fillna(value=nan_fill_dict_pid) \
-            .drop(columns=['index'], errors='ignore')
+        out_df = out_df\
+            .fillna(value=nan_fill_dict_level)\
+            .drop(columns=['index'], errors='ignore')\
+            .replace({'AGE_NOTE': {None: "", " ": ""}})
         arcpy.AddMessage("    Nan Values Filled")
 
         # Export to gdb table
