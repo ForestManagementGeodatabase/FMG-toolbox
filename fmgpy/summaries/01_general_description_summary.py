@@ -160,7 +160,7 @@ for level in levels:
         out_df = out_df\
             .fillna(value=nan_fill_dict_level)\
             .drop(columns=['index'], errors='ignore')\
-            .replace({'AGE_NOTE': {None: "", " ": ""}})
+            .replace({'INV_SP': {"": 'NONE', " ": 'NONE', None: 'NONE'}})
         arcpy.AddMessage("    Nan Values Filled")
 
         # Export to gdb table
