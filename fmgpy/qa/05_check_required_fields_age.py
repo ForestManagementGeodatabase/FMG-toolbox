@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_required_fields_age
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_age = arcpy.GetParameterAsText(0)
@@ -16,13 +19,12 @@ misc_name = arcpy.GetParameterAsText(7)
 crew_name = arcpy.GetParameterAsText(8)
 date_name = arcpy.GetParameterAsText(9)
 
-
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
 # check each field collected dataset for required fields
-result = check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name,
-                                   orig_name, grw_name, misc_name, crew_name, date_name)
+result = clean_inputs.check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_name,
+                                                orig_name, grw_name, misc_name, crew_name, date_name)
 
 arcpy.SetParameterAsText(10, result)

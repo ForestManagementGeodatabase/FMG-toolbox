@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_plot_ids
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_center = arcpy.GetParameterAsText(0)
@@ -28,7 +31,7 @@ if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
 # check plot IDs - PRISM
-result_prism = check_plot_ids(fc_center,
+result_prism = clean_inputs.check_plot_ids(fc_center,
                               center_plot_id_field,
                               fc_prism,
                               prism_plot_id_field)
@@ -36,7 +39,7 @@ result_prism = check_plot_ids(fc_center,
 arcpy.SetParameterAsText(8, result_prism)
 
 # check plot IDs - FIXED
-result_fixed = check_plot_ids(fc_center,
+result_fixed = clean_inputs.check_plot_ids(fc_center,
                               center_plot_id_field,
                               fc_fixed,
                               fixed_plot_id_field)
@@ -44,7 +47,7 @@ result_fixed = check_plot_ids(fc_center,
 arcpy.SetParameterAsText(9, result_fixed)
 
 # check plot IDs - AGE
-result_age = check_plot_ids(fc_center,
+result_age = clean_inputs.check_plot_ids(fc_center,
                             center_plot_id_field,
                             fc_age,
                             age_plot_id_field)

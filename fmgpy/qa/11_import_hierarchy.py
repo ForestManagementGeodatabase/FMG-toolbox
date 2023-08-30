@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import import_hierarchy
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_polygons = arcpy.GetParameterAsText(0)
@@ -14,7 +17,7 @@ pool = arcpy.GetParameterAsText(5)
 comp = arcpy.GetParameterAsText(6)
 unit = arcpy.GetParameterAsText(7)
 site = arcpy.GetParameterAsText(8)
-stand = arcpy.GetParameterAsTextAsText(9)
+stand = arcpy.GetParameterAsText(9)
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_polygons)[0]:
@@ -32,7 +35,7 @@ if not split(fc_fixed)[0]:
 if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
-result = import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, comp, unit, site, stand)
+result = clean_inputs.import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, comp, unit, site, stand)
 
 out_polygons = result[0]
 arcpy.SetParameterAsText(10, out_polygons)

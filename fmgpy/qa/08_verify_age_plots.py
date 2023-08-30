@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_contractor_age_plots
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_center = arcpy.GetParameterAsText(0)
@@ -18,7 +21,7 @@ if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
 # verify required age trees have been collected
-result = check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, fc_age, age_plot_id)
+result = clean_inputs.check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, fc_age, age_plot_id)
 
 arcpy.SetParameterAsText(5, result)
 

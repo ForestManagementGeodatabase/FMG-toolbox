@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_required_fields_prism
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_prism = arcpy.GetParameterAsText(0)
@@ -20,7 +23,7 @@ if not split(fc_prism)[0]:
     fc_prism = join(arcpy.Describe(fc_prism).path, arcpy.Describe(fc_prism).name)
 
 # check each field collected dataset for required fields
-result = check_required_fields_prism(fc_prism, plot_name, species_name, dia_name,
+result = clean_inputs.check_required_fields_prism(fc_prism, plot_name, species_name, dia_name,
                                      class_name, health_name, misc_name, crew_name, date_name)
 
 arcpy.SetParameterAsText(9, result)

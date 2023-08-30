@@ -4,7 +4,6 @@ import arcpy
 import importlib
 from os.path import split, join
 import clean_inputs
-from clean_inputs import check_required_fields_center
 
 importlib.reload(clean_inputs)
 
@@ -18,6 +17,6 @@ if not split(fc_center)[0]:
     fc_center = join(arcpy.Describe(fc_center).path, arcpy.Describe(fc_center).name)
 
 # check each field collected dataset for required fields
-result = check_required_fields_center(fc_center, plot_name, flag_name)
+result = clean_inputs.check_required_fields_center(fc_center, plot_name, flag_name)
 
 arcpy.SetParameterAsText(3, result)

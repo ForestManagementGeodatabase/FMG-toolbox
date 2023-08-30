@@ -1,8 +1,12 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import remove_duplicates
+import clean_inputs
+
+importlib.reload(arcpy)
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_prism = arcpy.GetParameterAsText(0)
@@ -20,7 +24,7 @@ if not split(fc_fixed)[0]:
 if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
-result = remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age)
+result = clean_inputs.remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age)
 
 out_prism = result[0]
 arcpy.SetParameterAsText(4, out_prism)

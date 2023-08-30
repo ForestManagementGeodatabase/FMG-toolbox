@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_prism_fixed
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_prism = arcpy.GetParameterAsText(0)
@@ -19,7 +22,7 @@ if not split(fc_fixed)[0]:
     fc_fixed = join(arcpy.Describe(fc_fixed).path, arcpy.Describe(fc_fixed).name)
 
 # check each fixed plot has a prism plot and each prism plot has a fixed plot
-result = check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb)
+result = clean_inputs.check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb)
 
 out_prism = result[0]
 arcpy.SetParameterAsText(4, out_prism)

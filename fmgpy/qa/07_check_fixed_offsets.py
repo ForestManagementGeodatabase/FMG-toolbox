@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
 
 import arcpy
+import importlib
 from os.path import split, join
-from clean_inputs import check_fixed_center
+import clean_inputs
+
+importlib.reload(clean_inputs)
 
 # run this tool AFTER running check_plot_ids
 
@@ -21,6 +24,6 @@ if not split(fc_fixed)[0]:
     fc_fixed = join(arcpy.Describe(fc_fixed).path, arcpy.Describe(fc_fixed).name)
 
 # check fixed plot offset from plot centers
-result = check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_field, in_gdb)
+result = clean_inputs.check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_field, in_gdb)
 
 arcpy.SetParameterAsText(4, result)
