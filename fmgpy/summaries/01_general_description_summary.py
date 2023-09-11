@@ -255,13 +255,13 @@ for level in levels:
 
         # reindex output dataframe
         general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                             col_csv='resources/general_summary_cols_pid.csv')
+                                                             col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NaN values appropriately
-        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols_pid.csv')
+        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
 
         out_df = out_df\
             .fillna(value=nan_fill_dict_pid) \
@@ -270,6 +270,7 @@ for level in levels:
         arcpy.AddMessage("    Nan Values Filled")
 
         # Export to gdb table
+        out_df = fcalc.clean_dtypes_for_esri(out_df)
         table_name = "PID_General_Summary"
         table_path = os.path.join(out_gdb, table_name)
         out_df.spatial.to_table(table_path)

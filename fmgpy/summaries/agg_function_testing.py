@@ -268,3 +268,31 @@ def top5_ov_species_plot(tree_table):
 
     return ov_species
 
+# Work out NAN Dtypes
+# Import CSV defining tables
+col_csv = 'fmgpy/summaries/resources/general_summary_cols_pid.csv'
+col_list_df = pd.read_csv(col_csv)
+
+# Create df for just string fill nans
+col_list_str = col_list_df[col_list_df['REQ_NAN_STR_FILL'] == 'Yes']
+str_dict = None
+if len(col_list_str.index) > 0:
+    str_cols = col_list_str['COL_NAME'].values.tolist()
+    str_vals = col_list_str['VALUE_NAN_STR'].values.tolist()
+    str_dict = dict(zip(str_cols, str_vals))
+
+
+# Create df for just num fill nans
+col_list_num = col_list_df[col_list_df['REQ_NAN_NUM_FILL'] == 'Yes']
+num_dict = None
+if len(col_list_num.index) > 0:
+    num_cols = col_list_num['COL_NAME'].values.tolist()
+    num_vals = col_list_num['VALUE_NAN_NUM'].values.tolist()
+    num_dict = dict(zip(num_cols, num_vals))
+
+if str_dict is None:
+    out_dict = num_dict
+elif num_dict is None:
+    out_dict = str_dict
+else:
+    out_dict = num_dict | str_dict

@@ -162,22 +162,31 @@ def fmg_nan_fill(col_csv):
     # import the column definition csv
     col_list_df = pd.read_csv(col_csv)
 
-    # Filter to just fields that require nan filling
-    col_list_df_filt = col_list_df[col_list_df['REQ_NAN_FILL'] == 'Yes']
+    # Create dictionary for just string fill nans
+    col_list_str = col_list_df[col_list_df['REQ_NAN_STR_FILL'] == 'Yes']
+    str_dict = None
+    if len(col_list_str.index) > 0:
+        str_cols = col_list_str['COL_NAME'].values.tolist()
+        str_vals = col_list_str['VALUE_NAN_STR'].values.tolist()
+        str_dict = dict(zip(str_cols, str_vals))
 
-    # Create value lists for COL_NAME and VALUE_NAN
-    col_list = col_list_df_filt['COL_NAME'].values.tolist()
-    val_list = []
-    for x in col_list_df_filt['VALUE_NAN'].values.tolist():
-        if type(x) == int:
-            val_list.append(float(x))
-        else:
-            val_list.append(x)
+    # Create df for just num fill nans
+    col_list_num = col_list_df[col_list_df['REQ_NAN_NUM_FILL'] == 'Yes']
+    num_dict = None
+    if len(col_list_num.index) > 0:
+        num_cols = col_list_num['COL_NAME'].values.tolist()
+        num_vals = col_list_num['VALUE_NAN_NUM'].values.tolist()
+        num_dict = dict(zip(num_cols, num_vals))
 
-    # Zip lists into dict
-    nan_fill_dict = dict(zip(col_list, val_list))
+    # Return either or, or, if there are both str and num dicts, combine
+    if str_dict is None:
+        out_dict = num_dict
+    elif num_dict is None:
+        out_dict = str_dict
+    else:
+        out_dict = num_dict | str_dict
 
-    return nan_fill_dict
+    return out_dict
 
 
 # Plot count: use with group by - agg
@@ -267,6 +276,19 @@ def agg_count_notes(note_column):
     # count items in the list and return the count
     notecount = len(notes_clean)
     return notecount
+
+
+def clean_dtypes_for_esri(df):
+    # Convert dataframe dtypes which are not compatible with ArcGIS
+    # Use builtin Pandas dtype conversion
+    df = df.convert_dtypes(infer_objects=True)
+    # Then str convert any remaining special object/category fields
+    for col in df.columns:
+        # print(col, '/', df[col].dtype)
+        if df[col].dtype == 'object' or df[col].dtype == 'category':
+            df[col] = df[col].astype('str')
+    # Return modified df
+    return df
 
 
 # Plot count: use with group by - apply
@@ -549,7 +571,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -590,9 +612,6 @@ def create_plot_table(fixed_df, age_df):
         .merge(right=cleanage_df, how='left', left_on='PID', right_on='PID') \
         .reset_index()
 
-    # Define list of fields used to note invasive species
-    columnlist = ['GRD_SP1', 'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5']
-
     # Define list of specific invasive species
     invsp = ['HUJA', 'PHAR3', 'PHAU7']
 
@@ -612,7 +631,9 @@ def create_plot_table(fixed_df, age_df):
 
     # add and populate invasive species present column
     invsp_filter_df['INV_SP'] = invsp_filter_df \
-        .apply(lambda columnlist: inv_sp_list(columnlist), axis=1)
+        .apply(lambda x: inv_sp_list([x['GRD_SP1'], x['GRD_SP2'], x['GRD_SP3'],
+                                      x['NOT_SP1'], x['NOT_SP2'], x['NOT_SP3'],
+                                      x['NOT_SP4'], x['NOT_SP5']]), axis=1)
 
     # Set indices for merge
     plot_table.set_index('PID')
