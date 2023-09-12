@@ -273,7 +273,7 @@ for level in levels:
         out_df = fcalc.clean_dtypes_for_esri(out_df)
         table_name = "PID_General_Summary"
         table_path = os.path.join(out_gdb, table_name)
-        out_df.spatial.to_table(table_path)
+        out_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
 arcpy.AddMessage('Complete')

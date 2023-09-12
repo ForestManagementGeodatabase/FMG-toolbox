@@ -467,7 +467,7 @@ def qm_dbh(ba, tpa):
     #assert isinstance(ba, (float, np.float64)), "basal area must be a float"
     #assert isinstance(tpa, float, np.float64), "tpa must be a float"
 
-    qmdbh = np.sqrt((ba / tpa) / 0.005454154)
+    qmdbh = math.sqrt((ba / tpa) / 0.005454154)
     return qmdbh
 
 
@@ -687,6 +687,9 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
 
         # Add and Calculate QM DBH
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Enforce QM_DBH dtype
+        filtered_df = filtered_df.astype({'QM_DBH': 'float64'})
 
         # Set index for merge
         filtered_df.set_index('PID')
