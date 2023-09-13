@@ -189,6 +189,27 @@ def fmg_nan_fill(col_csv):
     return out_dict
 
 
+# Function to enforce data types in Python/Pandas
+def fmg_dtype_enforce(col_csv):
+    """ Creates a dictionary of dtypes for each column name as defined by the columns in the csv.
+
+    Keyword Args:
+        col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
+
+    Details: None
+    """
+
+    # Import the column csv
+    dtype_list_df = pd.read_csv(col_csv)
+
+    # Create the dictionary
+    dtype_cols = dtype_list_df['COL_NAME'].values.tolist()
+    dtype_types = dtype_list_df['OUTPUT_DTYPE'].values.tolist()
+    dtype_dict = dict(zip(dtype_cols, dtype_types))
+
+    return dtype_dict
+
+
 # Plot count: use with group by - agg
 def agg_plot_count(PID):
     """Counts unique plots, including no tree plots.
@@ -467,7 +488,7 @@ def qm_dbh(ba, tpa):
     #assert isinstance(ba, (float, np.float64)), "basal area must be a float"
     #assert isinstance(tpa, float, np.float64), "tpa must be a float"
 
-    qmdbh = math.sqrt((ba / tpa) / 0.005454154)
+    qmdbh = np.sqrt((ba / tpa) / 0.005454154)
     return qmdbh
 
 
@@ -719,6 +740,9 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
 
         # Add and Calculate QM DBH
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Enforce QM_DBH dtype
+        filtered_df = filtered_df.astype({'QM_DBH': 'float64'})
 
         # Set index for merge
         filtered_df.set_index('PID')

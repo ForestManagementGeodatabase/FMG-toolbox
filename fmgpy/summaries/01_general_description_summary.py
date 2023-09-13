@@ -13,7 +13,7 @@ import fmgpy.summaries.forest_calcs as fcalc
 fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS"
 age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS"
 prism_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS"
-out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb"
+out_gdb = .
 
 # Import ESRI feature classes as pandas dataframes
 fixed_df = pd.DataFrame.spatial.from_featureclass(fixed_fc)
