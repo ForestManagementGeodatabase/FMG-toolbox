@@ -664,7 +664,10 @@ def create_plot_table(fixed_df, age_df):
         .merge(right=invsp_filter_df,
                how='left')\
         .reset_index()\
-        .drop(columns=['index', 'level_0'])
+        .drop(columns=['index', 'level_0']) \
+        .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
+        .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": ''})
+
 
     return plot_table
 

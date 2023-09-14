@@ -1,26 +1,26 @@
-COL_NAME,ALIAS,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
-AREA_AC,Area (Acres),,No,0,Yes
-INVT_YEAR,Inventory Year or Years,,No,,No
-PLOT_CT,Total Number of Plots,,No,0,Yes
-TR_CT,Total Number of Trees,,No,0,Yes
-TR_LV_CT,Total Number of Live Trees,,No,0,Yes
-TR_D_CT,Total Number of Dead Trees,,No,0,Yes
-TR_AGE_CT,Total Number of Age Trees,,No,0,Yes
-LIVE_BA,BA for Live Trees,,No,0,Yes
-LIVE_TPA,TPA for Live Trees,,No,0,Yes
-LIVE_QMDBH,QMDBH For Live Trees,,No,0,Yes
-LIVE_AMD,Average Diameter for Live Trees,,No,0,Yes
-LIVE_MAX_DBH,Max DBH for Live Trees,,No,0,Yes
-INV_PRESENT,Invasive Species Present,No,Yes,,No
-INV_SP,List of Invasive Species Identified,NONE,Yes,,No
-OV_CLSR_MEAN,Overstory Closure,,No,0,Yes
-OV_CLSR_STD,Overstory Closure Standard Deviation,,No,0,Yes
-OV_HT_MEAN,Overstory Height,,No,0,Yes
-OV_HT_STD,Overstory Height Standard Deviation,,No,0,Yes
-UND_COV_MEAN,Understory Cover,,No,0,Yes
-UND_COV_STD,Understory Cover Standard Deviation,,No,0,Yes
-UND_HT_MEAN,Understory Height Mean,,No,0,Yes
-UND_HT_RG,Understory Height Range,,No,,No
-UND_HT_STD,Understory Height Standard Deviation,,No,0,Yes
-NUM_FIX_NOTES,Number of Notes from Fixed Plots,,No,0,Yes
-NUM_AGE_NOTES,Number of Notes from Age Plots,,No,0,Yes
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+AREA_AC,Area (Acres),float64,,No,0,Yes
+INVT_YEAR,Inventory Year or Years,string,,No,,No
+PLOT_CT,Total Number of Plots,float64,,No,0,Yes
+TR_CT,Total Number of Trees,float64,,No,0,Yes
+TR_LV_CT,Total Number of Live Trees,float64,,No,0,Yes
+TR_D_CT,Total Number of Dead Trees,float64,,No,0,Yes
+TR_AGE_CT,Total Number of Age Trees,float64,,No,0,Yes
+LIVE_BA,BA for Live Trees,float64,,No,0,Yes
+LIVE_TPA,TPA for Live Trees,float64,,No,0,Yes
+LIVE_QMDBH,QMDBH For Live Trees,float64,,No,0,Yes
+LIVE_AMD,Average Diameter for Live Trees,float64,,No,0,Yes
+LIVE_MAX_DBH,Max DBH for Live Trees,int32,,No,0,Yes
+INV_PRESENT,Invasive Species Present,string,No,Yes,,No
+INV_SP,List of Invasive Species Identified,string,NONE,Yes,,No
+OV_CLSR_MEAN,Overstory Closure,int32,,No,0,Yes
+OV_CLSR_STD,Overstory Closure Standard Deviation,int32,,No,0,Yes
+OV_HT_MEAN,Overstory Height,float64,,No,0,Yes
+OV_HT_STD,Overstory Height Standard Deviation,float64,,No,0,Yes
+UND_COV_MEAN,Understory Cover,float64,,No,0,Yes
+UND_COV_STD,Understory Cover Standard Deviation,float64,,No,0,Yes
+UND_HT_MEAN,Understory Height Mean,float64,,No,0,Yes
+UND_HT_RG,Understory Height Range,string,,No,,No
+UND_HT_STD,Understory Height Standard Deviation,float64,,No,0,Yes
+NUM_FIX_NOTES,Number of Notes from Fixed Plots,int32,,No,0,Yes
+NUM_AGE_NOTES,Number of Notes from Age Plots,int32,,No,0,Yes

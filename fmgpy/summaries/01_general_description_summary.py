@@ -13,7 +13,7 @@ import fmgpy.summaries.forest_calcs as fcalc
 fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS"
 age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS"
 prism_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS"
-out_gdb = .
+out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb"
 
 # Import ESRI feature classes as pandas dataframes
 fixed_df = pd.DataFrame.spatial.from_featureclass(fixed_fc)
@@ -149,13 +149,13 @@ for level in levels:
 
         # Reindex output dataframe
         general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                             col_csv='resources/general_summary_cols.csv')
+                                                             col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NaN values appropriately
-        nan_fill_dict_level = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols.csv')
+        nan_fill_dict_level = fcalc.fmg_nan_fill(col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
 
         out_df = out_df\
             .fillna(value=nan_fill_dict_level)\
@@ -163,10 +163,15 @@ for level in levels:
             .replace({'INV_SP': {"": 'NONE', " ": 'NONE', None: 'NONE'}})
         arcpy.AddMessage("    Nan Values Filled")
 
+        # Enforce ESRI compatible Dtypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
+        out_df = out_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
+
         # Export to gdb table
         table_name = level + "_General_Summary"
         table_path = os.path.join(out_gdb, table_name)
-        out_df.spatial.to_table(table_path)
+        out_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
@@ -254,8 +259,9 @@ for level in levels:
         arcpy.AddMessage("    All Component DFs Merged")
 
         # reindex output dataframe
-        general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                             col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
+        general_reindex_cols = \
+            fcalc.fmg_column_reindex_list(level=level,
+                                          col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
@@ -269,11 +275,15 @@ for level in levels:
             .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    Nan Values Filled")
 
+        # Enforce ESRI compatible DTypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
+        out_df = out_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
+
         # Export to gdb table
-        out_df = fcalc.clean_dtypes_for_esri(out_df)
         table_name = "PID_General_Summary"
         table_path = os.path.join(out_gdb, table_name)
         out_df.spatial.to_table(location=table_path, sanitize_columns=False)
-        arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
+        arcpy.AddMessage('    DataFrame exported to {0}'.format(table_path))
 
 arcpy.AddMessage('Complete')
