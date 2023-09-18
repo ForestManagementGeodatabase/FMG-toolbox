@@ -115,6 +115,11 @@ for level in levels:
     out_df = out_df.fillna(value=nan_fill_dict)
     arcpy.AddMessage("    No data/nan values set")
 
+    # Enforce ESRI compatible DTypes
+    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/age_summary_cols.csv')
+    out_df = out_df.astype(dtype=dtype_dict, copy=False)
+    arcpy.AddMessage("    Dtypes Enforced")
+
     # Export to gdb table
     table_name = level + "_Age_Summary"
     table_path = os.path.join(out_gdb, table_name)
