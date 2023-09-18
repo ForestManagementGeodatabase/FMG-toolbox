@@ -7,6 +7,7 @@ import math
 import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
+import itertools
 arcpy.env.overwriteOutput = True
 
 
@@ -259,21 +260,39 @@ def agg_tree_count(tr_sp):
 # List of invasive species: use with group by - agg
 # TODO: add function description
 def agg_inv_sp(inv_sp):
-    sp = []
+
+    sp_temp = []
+
     # Build list of invasive species codes
     for val in inv_sp:
-        if val is None:
+        if val == '':
+            continue
+        elif val is not None:
+            sp_temp.append(val.split(', '))
+
+    sp = list(itertools.chain.from_iterable(itertools.repeat(x, 1) if isinstance(x, str) else x for x in sp_temp))
+
+    # Convert array to list then single string
+    sp_array = np.array(sp)
+    sp_unique = np.unique(sp_array)
+    spval = ', '.join(sp_unique.tolist())
+
+    return spval
+
+
+# Create function to return YES if invasive species are present
+def agg_inv_present(inv_present):
+    inv_pres = []
+    for val in inv_present:
+        if val == 'No':
             continue
         else:
-            sp.append(val)
+            inv_pres.append(val)
 
-    # Strip nans from list
-    spclean = [x for x in sp if x == x]
+    if len(inv_pres) > 0:
+        inv_present = 'Yes'
 
-    # Reduce list to unique values and return as a string
-    spset = set(spclean)
-    spval = ', '.join(spset)
-    return spval
+    return inv_present
 
 
 # Count of notes: use with group by - agg
@@ -592,7 +611,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -666,8 +685,7 @@ def create_plot_table(fixed_df, age_df):
         .reset_index()\
         .drop(columns=['index', 'level_0']) \
         .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
-        .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": ''})
-
+        .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": 'No'})
 
     return plot_table
 

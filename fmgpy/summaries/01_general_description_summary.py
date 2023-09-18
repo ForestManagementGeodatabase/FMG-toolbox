@@ -56,7 +56,7 @@ for level in levels:
                 UND_COV_STD=('UND_COV', 'std'),
                 UND_HT_MEAN=('UND_HT2', 'mean'),
                 UND_HT_STD=('UND_HT2', 'std'),
-                INV_PRESENT=('INV_PRESENT', 'first'),
+                INV_PRESENT=('INV_PRESENT', fcalc.agg_inv_present),
                 INV_SP=('INV_SP', fcalc.agg_inv_sp),
                 NUM_FIX_NOTES=('FX_MISC', fcalc.agg_count_notes),
                 NUM_AGE_NOTES=('AGE_MISC', fcalc.agg_count_notes)
@@ -149,22 +149,23 @@ for level in levels:
 
         # Reindex output dataframe
         general_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                             col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
+                                                             col_csv='resources/general_summary_cols.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NaN values appropriately
-        nan_fill_dict_level = fcalc.fmg_nan_fill(col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
+        nan_fill_dict_level = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols.csv')
 
         out_df = out_df\
             .fillna(value=nan_fill_dict_level)\
             .drop(columns=['index'], errors='ignore')\
-            .replace({'INV_SP': {"": 'NONE', " ": 'NONE', None: 'NONE'}})
+            .replace({'INV_SP': {"": 'NONE', " ": 'NONE', None: 'NONE'},
+                      'INV_PRESENT': {"": 'No', " ": 'No', None: 'No'}})
         arcpy.AddMessage("    Nan Values Filled")
 
         # Enforce ESRI compatible Dtypes
-        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/summaries/resources/general_summary_cols.csv')
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/general_summary_cols.csv')
         out_df = out_df.astype(dtype=dtype_dict, copy=False)
         arcpy.AddMessage("    Dtypes Enforced")
 
@@ -261,22 +262,23 @@ for level in levels:
         # reindex output dataframe
         general_reindex_cols = \
             fcalc.fmg_column_reindex_list(level=level,
-                                          col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
+                                          col_csv='resources/general_summary_cols_pid.csv')
         out_df = out_df.reindex(labels=general_reindex_cols,
                                 axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NaN values appropriately
-        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
+        nan_fill_dict_pid = fcalc.fmg_nan_fill(col_csv='resources/general_summary_cols_pid.csv')
 
         out_df = out_df\
             .fillna(value=nan_fill_dict_pid) \
-            .replace({'AGE_NOTE': {None: "", " ": ""}})\
+            .replace({'AGE_NOTE': {None: "", " ": ""},
+                      'INV_SP': {"": 'NONE', " ": 'NONE', None: 'NONE'}})\
             .drop(columns=['index'], errors='ignore')
         arcpy.AddMessage("    Nan Values Filled")
 
         # Enforce ESRI compatible DTypes
-        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/summaries/resources/general_summary_cols_pid.csv')
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/general_summary_cols_pid.csv')
         out_df = out_df.astype(dtype=dtype_dict, copy=False)
         arcpy.AddMessage("    Dtypes Enforced")
 
