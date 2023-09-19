@@ -491,6 +491,18 @@ def overstory_sp_map(sp_rank):
         return 'OV_SP5'
 
 
+def health_rank_map(tr_hlth):
+    if tr_hlth == 'H':
+        return 1
+    if tr_hlth == 'S':
+        return 2
+    if tr_hlth == 'SD':
+        return 3
+    if tr_hlth == 'D':
+        return 4
+    if tr_hlth == 'NT':
+        return 5
+
 # Quadratic Mean Diameter at Breast Height (QM DBH)
 def qm_dbh(ba, tpa):
     """Calculates quadratic mean at diameter breast height. Returns one value.
@@ -611,7 +623,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -1351,14 +1363,8 @@ def health_dom_plot(tree_table, filter_statement):
     # switching the sort method would result in a data frame of most prevalent health, weighted toward
     # the least healthy
 
-    # Assign numeric ranking codes to each health category
-    conditions = [(health_join_df['TR_HLTH'] == 'H'),
-                  (health_join_df['TR_HLTH'] == 'S'),
-                  (health_join_df['TR_HLTH'] == 'SD'),
-                  (health_join_df['TR_HLTH'] == 'D'),
-                  (health_join_df['TR_HLTH'] == 'NT')]
-    values = [1, 2, 3, 4, 5]
-    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+    # Assign Numeric codes to health categories
+    health_join_df['TR_HLTH_NUM'] = health_join_df['TR_HLTH'].map(health_rank_map)
 
     # Sort dataframe by numeric ranking codes
     health_dom_df = health_join_df \
@@ -1470,13 +1476,7 @@ def health_dom_level(tree_table, filter_statement, level):
     # the least healthy
 
     # Assign numeric ranking codes to each health category
-    conditions = [(health_join_df['TR_HLTH'] == 'H'),
-                  (health_join_df['TR_HLTH'] == 'S'),
-                  (health_join_df['TR_HLTH'] == 'SD'),
-                  (health_join_df['TR_HLTH'] == 'D'),
-                  (health_join_df['TR_HLTH'] == 'NT')]
-    values = [1, 2, 3, 4, 5]
-    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+    health_join_df['TR_HLTH_NUM'] = health_join_df['TR_HLTH'].map(health_rank_map)
 
     # Sort dataframe by numeric ranking codes
     health_dom_df = health_join_df \
