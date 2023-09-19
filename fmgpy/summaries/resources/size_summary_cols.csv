@@ -1,61 +1,61 @@
-COL_NAME,ALIAS,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
-SAP_TPA,Sapling TPA,,No,0,Yes
-SAP_BA,Sapling BA,,No,0,Yes
-SAP_QMDBH,Sapling QM DBH,,No,0,Yes
-SAP_DOM_HLTH,Sapling Dominant Health Class,NONE,Yes,,No
-SAP_DOM_HLTH_PCMP,Sapling Dominant Health Class % Composition,,No,0,Yes
-SAP_DOM_SP,Sapling Dominant Species,NONE,Yes,,No
-SAP_DOM_SP_PCMP,Sapling Dominant Species % Composition,,No,0,Yes
-SAP_D_TPA,Dead Sapling TPA,,No,0,Yes
-SAP_D_BA,Dead Sapling BA,,No,0,Yes
-SAP_D_QMDBH,Dead Sapling QM DBH,,No,0,Yes
-POL_TPA,Pole Timber TPA,,No,0,Yes
-POL_BA,Pole Timber BA,,No,0,Yes
-POL_QMDBH,Pole Timber QM DBH,,No,0,Yes
-POL_DOM_HLTH,Pole Timber Dominant Health Class,NONE,Yes,,No
-POL_DOM_HLTH_PCMP,Pole Timber Dominant Health Class % Composition,,No,0,Yes
-POL_DOM_SP,Pole Timber Dominant Species,NONE,Yes,,No
-POL_DOM_SP_PCMP,Pole Timber Dominant Species % Composition,,No,0,Yes
-POL_D_TPA,Dead Pole Timber TPA,,No,0,Yes
-POL_D_BA,Dead Pole Timber BA,,No,0,Yes
-POL_D_QMDBH,Dead Pole Timber QM DBH,,No,0,Yes
-SAW_TPA,Saw Timber TPA,,No,0,Yes
-SAW_BA,Saw Timber BA,,No,0,Yes
-SAW_QMDBH,Saw Timber QM DBH,,No,0,Yes
-SAW_DOM_HLTH,Saw Timber Dominant Health Class,NONE,Yes,,No
-SAW_DOM_HLTH_PCMP,Saw Timber Dominant Health Class % Composition,,No,0,Yes
-SAW_DOM_SP,Saw Timber Dominant Species,NONE,Yes,,No
-SAW_DOM_SP_PCMP,Saw Timber Dominant Species % Composition,,No,0,Yes
-SAW_D_TPA,Dead Saw Timber TPA,,No,0,Yes
-SAW_D_BA,Dead Saw Timber BA,,No,0,Yes
-SAW_D_QMDBH,Dead Saw Timber QM DBH,,No,0,Yes
-MAT_TPA,Mature Timber TPA,,No,0,Yes
-MAT_BA,Mature Timber BA,,No,0,Yes
-MAT_QMDBH,Mature Timber QM DBH,,No,0,Yes
-MAT_DOM_HLTH,Mature Timber Dominant Health Class,NONE,Yes,,No
-MAT_DOM_HLTH_PCMP,Mature Timber Dominant Health Class % Composition,,No,0,Yes
-MAT_DOM_SP,Mature Timber Dominant Species,NONE,Yes,,No
-MAT_DOM_SP_PCMP,Mature Timber Dominant Species % Composition,,No,0,Yes
-MAT_D_TPA,Dead Mature Timber TPA,,No,0,Yes
-MAT_D_BA,Dead Mature Timber BA,,No,0,Yes
-MAT_D_QMDBH,Dead Mature Timber QM DBH,,No,0,Yes
-OVM_TPA,Overmature TPA,,No,0,Yes
-OVM_BA,Overmature BA,,No,0,Yes
-OVM_QMDBH,Overmature QM DBH,,No,0,Yes
-OVM_DOM_HLTH,Overmature Dominant Health Class,NONE,Yes,,No
-OVM_DOM_HLTH_PCMP,Overmature Dominant Health Class % Composition,,No,0,Yes
-OVM_DOM_SP,Overmature Dominant Species,NONE,Yes,,No
-OVM_DOM_SP_PCMP,Overmature Dominant Species % Composition,,No,0,Yes
-OVM_D_TPA,Dead Overmature TPA,,No,0,Yes
-OVM_D_BA,Dead Overmature BA,,No,0,Yes
-OVM_D_QMDBH,Dead Overmature QM DBH,,No,0,Yes
-LWT_TPA,Large Wildlife Tree TPA,,No,0,Yes
-LWT_BA,Large Wildlife Tree BA,,No,0,Yes
-LWT_QMDBH,Large Wildlife Tree QM DBH,,No,0,Yes
-LWT_DOM_HLTH,Large Wildlife Tree Dominant Health Class,NONE,Yes,,No
-LWT_DOM_HLTH_PCMP,Large Wildlife Tree Dominant Health Class % Composition,,No,0,Yes
-LWT_DOM_SP,Large Wildlife Tree Dominant Species,NONE,Yes,,No
-LWT_DOM_SP_PCMP,Large Wildlife Tree Dominant Species % Composition,,No,0,Yes
-LWT_D_TPA,Dead Large Wildlife Tree TPA,,No,0,Yes
-LWT_D_BA,Dead Large Wildlife Tree BA,,No,0,Yes
-LWT_D_QMDBH,Dead Large Wildlife Tree QM DBH,,No,0,Yes
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+SAP_TPA,Sapling TPA,float64,,No,0,Yes
+SAP_BA,Sapling BA,float64,,No,0,Yes
+SAP_QMDBH,Sapling QM DBH,float64,,No,0,Yes
+SAP_DOM_HLTH,Sapling Dominant Health Class,string,NONE,Yes,,No
+SAP_DOM_HLTH_PCMP,Sapling Dominant Health Class % Composition,float64,,No,0,Yes
+SAP_DOM_SP,Sapling Dominant Species,string,NONE,Yes,,No
+SAP_DOM_SP_PCMP,Sapling Dominant Species % Composition,float64,,No,0,Yes
+SAP_D_TPA,Dead Sapling TPA,float64,,No,0,Yes
+SAP_D_BA,Dead Sapling BA,float64,,No,0,Yes
+SAP_D_QMDBH,Dead Sapling QM DBH,float64,,No,0,Yes
+POL_TPA,Pole Timber TPA,float64,,No,0,Yes
+POL_BA,Pole Timber BA,float64,,No,0,Yes
+POL_QMDBH,Pole Timber QM DBH,float64,,No,0,Yes
+POL_DOM_HLTH,Pole Timber Dominant Health Class,string,NONE,Yes,,No
+POL_DOM_HLTH_PCMP,Pole Timber Dominant Health Class % Composition,float64,,No,0,Yes
+POL_DOM_SP,Pole Timber Dominant Species,string,NONE,Yes,,No
+POL_DOM_SP_PCMP,Pole Timber Dominant Species % Composition,float64,,No,0,Yes
+POL_D_TPA,Dead Pole Timber TPA,float64,,No,0,Yes
+POL_D_BA,Dead Pole Timber BA,float64,,No,0,Yes
+POL_D_QMDBH,Dead Pole Timber QM DBH,float64,,No,0,Yes
+SAW_TPA,Saw Timber TPA,float64,,No,0,Yes
+SAW_BA,Saw Timber BA,float64,,No,0,Yes
+SAW_QMDBH,Saw Timber QM DBH,float64,,No,0,Yes
+SAW_DOM_HLTH,Saw Timber Dominant Health Class,string,NONE,Yes,,No
+SAW_DOM_HLTH_PCMP,Saw Timber Dominant Health Class % Composition,float64,,No,0,Yes
+SAW_DOM_SP,Saw Timber Dominant Species,string,NONE,Yes,,No
+SAW_DOM_SP_PCMP,Saw Timber Dominant Species % Composition,float64,,No,0,Yes
+SAW_D_TPA,Dead Saw Timber TPA,float64,,No,0,Yes
+SAW_D_BA,Dead Saw Timber BA,float64,,No,0,Yes
+SAW_D_QMDBH,Dead Saw Timber QM DBH,float64,,No,0,Yes
+MAT_TPA,Mature Timber TPA,float64,,No,0,Yes
+MAT_BA,Mature Timber BA,float64,,No,0,Yes
+MAT_QMDBH,Mature Timber QM DBH,float64,,No,0,Yes
+MAT_DOM_HLTH,Mature Timber Dominant Health Class,string,NONE,Yes,,No
+MAT_DOM_HLTH_PCMP,Mature Timber Dominant Health Class % Composition,float64,,No,0,Yes
+MAT_DOM_SP,Mature Timber Dominant Species,string,NONE,Yes,,No
+MAT_DOM_SP_PCMP,Mature Timber Dominant Species % Composition,float64,,No,0,Yes
+MAT_D_TPA,Dead Mature Timber TPA,float64,,No,0,Yes
+MAT_D_BA,Dead Mature Timber BA,float64,,No,0,Yes
+MAT_D_QMDBH,Dead Mature Timber QM DBH,float64,,No,0,Yes
+OVM_TPA,Overmature TPA,float64,,No,0,Yes
+OVM_BA,Overmature BA,float64,,No,0,Yes
+OVM_QMDBH,Overmature QM DBH,float64,,No,0,Yes
+OVM_DOM_HLTH,Overmature Dominant Health Class,string,NONE,Yes,,No
+OVM_DOM_HLTH_PCMP,Overmature Dominant Health Class % Composition,float64,,No,0,Yes
+OVM_DOM_SP,Overmature Dominant Species,string,NONE,Yes,,No
+OVM_DOM_SP_PCMP,Overmature Dominant Species % Composition,float64,,No,0,Yes
+OVM_D_TPA,Dead Overmature TPA,float64,,No,0,Yes
+OVM_D_BA,Dead Overmature BA,float64,,No,0,Yes
+OVM_D_QMDBH,Dead Overmature QM DBH,float64,,No,0,Yes
+LWT_TPA,Large Wildlife Tree TPA,float64,,No,0,Yes
+LWT_BA,Large Wildlife Tree BA,float64,,No,0,Yes
+LWT_QMDBH,Large Wildlife Tree QM DBH,float64,,No,0,Yes
+LWT_DOM_HLTH,Large Wildlife Tree Dominant Health Class,string,NONE,Yes,,No
+LWT_DOM_HLTH_PCMP,Large Wildlife Tree Dominant Health Class % Composition,float64,,No,0,Yes
+LWT_DOM_SP,Large Wildlife Tree Dominant Species,string,NONE,Yes,,No
+LWT_DOM_SP_PCMP,Large Wildlife Tree Dominant Species % Composition,float64,,No,0,Yes
+LWT_D_TPA,Dead Large Wildlife Tree TPA,float64,,No,0,Yes
+LWT_D_BA,Dead Large Wildlife Tree BA,float64,,No,0,Yes
+LWT_D_QMDBH,Dead Large Wildlife Tree QM DBH,float64,,No,0,Yes
