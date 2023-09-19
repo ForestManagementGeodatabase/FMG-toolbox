@@ -194,40 +194,12 @@ for level in levels:
         # Handle NAN values for output
         nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/health_summary_cols.csv')
         health_summary_df = health_summary_df.fillna(value=nan_fill_dict)
-        # health_summary_df = health_summary_df.fillna(value={'DEAD_TPA': 0,
-        #                                                     'DEAD_BA': 0,
-        #                                                     'DEAD_QMDBH': 0,
-        #                                                     'DEAD_DOM_SP': 'NONE',
-        #                                                     'DEAD_DOM_SP_PCMP': 0,
-        #                                                     'SD_TPA': 0,
-        #                                                     'SD_BA': 0,
-        #                                                     'SD_QMDBH': 0,
-        #                                                     'SD_DOM_SP': 'NONE',
-        #                                                     'SD_DOM_SP_PCMP': 0,
-        #                                                     'STR_TPA': 0,
-        #                                                     'STR_BA': 0,
-        #                                                     'STR_QMDBH': 0,
-        #                                                     'STR_DOM_SP': 'NONE',
-        #                                                     'STR_DOM_SP_PCMP': 0,
-        #                                                     'HLTH_TPA': 0,
-        #                                                     'HLTH_BA': 0,
-        #                                                     'HLTH_QMDBH': 0,
-        #                                                     'HLTH_DOM_SP': 'NONE',
-        #                                                     'HLTH_DOM_SP_PCMP': 0,
-        #                                                     'LG_D_TPA': 0,
-        #                                                     'DOM_HLTH': 'NONE',
-        #                                                     'DOM_HLTH_PCMP': 0,
-        #                                                     'DOM_SP': 'NONE',
-        #                                                     'DOM_SP_PCMP': 0,
-        #                                                     'TYP_SP_DOM_HLTH': 'NONE',
-        #                                                     'TYP_SP_DOM_HLTH_PCMP': 0,
-        #                                                     'TYP_DOM_SP': 'NONE',
-        #                                                     'TYP_DOM_SP_PCMP': 0,
-        #                                                     'NTYP_SP_DOM_HLTH': 'NONE',
-        #                                                     'NTYP_SP_DOM_HLTH_PCMP': 0,
-        #                                                     'NTYP_DOM_SP': 'NONE',
-        #                                                     'NTYP_DOM_SP_PCMP': 0})
         arcpy.AddMessage("    No data/nan values set")
+
+        # Enforce ESRI compatible DTypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/health_summary_cols.csv')
+        health_summary_df = health_summary_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
 
         # Export to GDB Table
         table_name = level + '_Health_Summary'
@@ -383,42 +355,14 @@ for level in levels:
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NAN values for output
-        # nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/health_summary_cols.csv')
-        # health_summary_df = health_summary_df.fillna(value=nan_fill_dict)
-        health_summary_df = health_summary_df.fillna(value={'DEAD_TPA': 0,
-                                                            'DEAD_BA': 0,
-                                                            'DEAD_QMDBH': 0,
-                                                            'DEAD_DOM_SP': 'NONE',
-                                                            'DEAD_DOM_SP_PCMP': 0,
-                                                            'SD_TPA': 0,
-                                                            'SD_BA': 0,
-                                                            'SD_QMDBH': 0,
-                                                            'SD_DOM_SP': 'NONE',
-                                                            'SD_DOM_SP_PCMP': 0,
-                                                            'STR_TPA': 0,
-                                                            'STR_BA': 0,
-                                                            'STR_QMDBH': 0,
-                                                            'STR_DOM_SP': 'NONE',
-                                                            'STR_DOM_SP_PCMP': 0,
-                                                            'HLTH_TPA': 0,
-                                                            'HLTH_BA': 0,
-                                                            'HLTH_QMDBH': 0,
-                                                            'HLTH_DOM_SP': 'NONE',
-                                                            'HLTH_DOM_SP_PCMP': 0,
-                                                            'LG_D_TPA': 0,
-                                                            'DOM_HLTH': 'NONE',
-                                                            'DOM_HLTH_PCMP': 0,
-                                                            'DOM_SP': 'NONE',
-                                                            'DOM_SP_PCMP': 0,
-                                                            'TYP_SP_DOM_HLTH': 'NONE',
-                                                            'TYP_SP_DOM_HLTH_PCMP': 0,
-                                                            'TYP_DOM_SP': 'NONE',
-                                                            'TYP_DOM_SP_PCMP': 0,
-                                                            'NTYP_SP_DOM_HLTH': 'NONE',
-                                                            'NTYP_SP_DOM_HLTH_PCMP': 0,
-                                                            'NTYP_DOM_SP': 'NONE',
-                                                            'NTYP_DOM_SP_PCMP': 0})
+        nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/health_summary_cols.csv')
+        health_summary_df = health_summary_df.fillna(value=nan_fill_dict)
         arcpy.AddMessage("    No data/nan values set")
+
+        # Enforce ESRI compatible DTypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/health_summary_cols.csv')
+        health_summary_df = health_summary_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
 
         # Export to GDB Table
         table_name = level + '_Health_Summary'

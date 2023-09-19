@@ -503,6 +503,7 @@ def health_rank_map(tr_hlth):
     if tr_hlth == 'NT':
         return 5
 
+
 # Quadratic Mean Diameter at Breast Height (QM DBH)
 def qm_dbh(ba, tpa):
     """Calculates quadratic mean at diameter breast height. Returns one value.
@@ -623,7 +624,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -1403,6 +1404,7 @@ def health_dom_plot(tree_table, filter_statement):
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
         .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
+        .astype({'HLTH_DOM_PCMP': 'float64'}) \
         .reset_index()
 
     return health_dom_pct_df
@@ -1516,6 +1518,7 @@ def health_dom_level(tree_table, filter_statement, level):
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
         .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
+        .astype({'HLTH_DOM_PCMP': 'float64'}) \
         .reset_index()
 
     return health_dom_pct_df
