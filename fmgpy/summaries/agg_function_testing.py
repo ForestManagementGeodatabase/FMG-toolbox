@@ -296,3 +296,19 @@ elif num_dict is None:
     out_dict = str_dict
 else:
     out_dict = num_dict | str_dict
+
+# Create function to return YES if invasive species are present
+def agg_inv_present(inv_present):
+
+    inv_pres = []
+    for val in inv_present:
+        if val == 'No':
+            continue
+        else:
+            inv_pres.append(val)
+
+    if len(inv_pres)>0:
+        inv_present = 'Yes'
+
+    return inv_present
+

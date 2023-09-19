@@ -8,6 +8,7 @@ from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import math
 import pandas as pd
 import numpy as np
+import itertools
 import importlib
 import fmgpy.summaries.forest_calcs as fcalc
 
