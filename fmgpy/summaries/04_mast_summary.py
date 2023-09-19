@@ -137,28 +137,14 @@ for level in levels:
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NAN values for output
-        mast_summary_df = mast_summary_df.fillna(value={'HM_TPA': 0,
-                                                        'HM_BA': 0,
-                                                        'HM_QMDBH': 0,
-                                                        'HM_DOM_HLTH': 'NONE',
-                                                        'HM_DOM_HLTH_PCMP': 0,
-                                                        'HM_DOM_SP': 'NONE',
-                                                        'HM_DOM_SP_PCMP': 0,
-                                                        'SM_TPA': 0,
-                                                        'SM_BA': 0,
-                                                        'SM_QMDBH': 0,
-                                                        'SM_DOM_HLTH': 'NONE',
-                                                        'SM_DOM_HLTH_PCMP': 0,
-                                                        'SM_DOM_SP': 'NONE',
-                                                        'SM_DOM_SP_PCMP': 0,
-                                                        'LM_TPA': 0,
-                                                        'LM_BA': 0,
-                                                        'LM_QMDBH': 0,
-                                                        'LM_DOM_HLTH': 'NONE',
-                                                        'LM_DOM_HLTH_PCMP': 0,
-                                                        'LM_DOM_SP': 'NONE',
-                                                        'LM_DOM_SP_PCMP': 0})
+        nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/mast_summary_cols.csv')
+        mast_summary_df = mast_summary_df.fillna(value=nan_fill_dict)
         arcpy.AddMessage("    No data/nan values set")
+
+        # Enforce ESRI compatible DTypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/mast_summary_cols.csv')
+        mast_summary_df = mast_summary_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
 
         # Export to GDB Table
         table_name = level + '_Mast_Summary'
@@ -263,28 +249,14 @@ for level in levels:
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NAN values for output
-        mast_summary_df = mast_summary_df.fillna(value={'HM_TPA': 0,
-                                                        'HM_BA': 0,
-                                                        'HM_QMDBH': 0,
-                                                        'HM_DOM_HLTH': 'NONE',
-                                                        'HM_DOM_HLTH_PCMP': 0,
-                                                        'HM_DOM_SP': 'NONE',
-                                                        'HM_DOM_SP_PCMP': 0,
-                                                        'SM_TPA': 0,
-                                                        'SM_BA': 0,
-                                                        'SM_QMDBH': 0,
-                                                        'SM_DOM_HLTH': 'NONE',
-                                                        'SM_DOM_HLTH_PCMP': 0,
-                                                        'SM_DOM_SP': 'NONE',
-                                                        'SM_DOM_SP_PCMP': 0,
-                                                        'LM_TPA': 0,
-                                                        'LM_BA': 0,
-                                                        'LM_QMDBH': 0,
-                                                        'LM_DOM_HLTH': 'NONE',
-                                                        'LM_DOM_HLTH_PCMP': 0,
-                                                        'LM_DOM_SP': 'NONE',
-                                                        'LM_DOM_SP_PCMP': 0})
+        nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/mast_summary_cols.csv')
+        mast_summary_df = mast_summary_df.fillna(value=nan_fill_dict)
         arcpy.AddMessage("    No data/nan values set")
+
+        # Enforce ESRI compatible DTypes
+        dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/mast_summary_cols.csv')
+        mast_summary_df = mast_summary_df.astype(dtype=dtype_dict, copy=False)
+        arcpy.AddMessage("    Dtypes Enforced")
 
         # Export to GDB Table
         table_name = level + '_Mast_Summary'

@@ -1,22 +1,22 @@
-COL_NAME,ALIAS,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
-HM_TPA,Hard Mast TPA,,No,0,Yes
-HM_BA,Hard Mast BA,,No,0,Yes
-HM_QMDBH,Hard Mast QM DBH,,No,0,Yes
-HM_DOM_HLTH,Hard Mast Dominant Health Class,NONE,Yes,,No
-HM_DOM_HLTH_PCMP,Hard Mast Dominant Health Class % Composition,,No,0,Yes
-HM_DOM_SP,Hard Mast Dominant Species,NONE,Yes,,No
-HM_DOM_SP_PCMP,Hard Mast Dominant Species % Composition,,No,0,Yes
-SM_TPA,Soft Mast TPA,,No,0,Yes
-SM_BA,Soft Mast BA,,No,0,Yes
-SM_QMDBH,Soft Mast QM DBH,,No,0,Yes
-SM_DOM_HLTH,Soft Mast Dominant Health Class,NONE,Yes,,No
-SM_DOM_HLTH_PCMP,Soft Mast Dominant Health Class % Composition,,No,0,Yes
-SM_DOM_SP,Soft Mast Dominant Species,NONE,Yes,,No
-SM_DOM_SP_PCMP,Soft Mast Dominant Species % Composition,,No,0,Yes
-LM_TPA,Lightseed Mast TPA,,No,0,Yes
-LM_BA,Lightseed Mast BA,,No,0,Yes
-LM_QMDBH,Lightseed Mast QM DBH,,No,0,Yes
-LM_DOM_HLTH,Lightseed Mast Dominant Health Class,NONE,Yes,,No
-LM_DOM_HLTH_PCMP,Lightseed Mast Dominant Health Class % Composition,,No,0,Yes
-LM_DOM_SP,Lightseed Mast Dominant Species,NONE,Yes,,No
-LM_DOM_SP_PCMP,Lightseed Mast Dominant Species % Composition,,No,0,Yes
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+HM_TPA,Hard Mast TPA,float64,,No,0,Yes
+HM_BA,Hard Mast BA,float64,,No,0,Yes
+HM_QMDBH,Hard Mast QM DBH,float64,,No,0,Yes
+HM_DOM_HLTH,Hard Mast Dominant Health Class,string,NONE,Yes,,No
+HM_DOM_HLTH_PCMP,Hard Mast Dominant Health Class % Composition,float64,,No,0,Yes
+HM_DOM_SP,Hard Mast Dominant Species,string,NONE,Yes,,No
+HM_DOM_SP_PCMP,Hard Mast Dominant Species % Composition,float64,,No,0,Yes
+SM_TPA,Soft Mast TPA,float64,,No,0,Yes
+SM_BA,Soft Mast BA,float64,,No,0,Yes
+SM_QMDBH,Soft Mast QM DBH,float64,,No,0,Yes
+SM_DOM_HLTH,Soft Mast Dominant Health Class,string,NONE,Yes,,No
+SM_DOM_HLTH_PCMP,Soft Mast Dominant Health Class % Composition,float64,,No,0,Yes
+SM_DOM_SP,Soft Mast Dominant Species,string,NONE,Yes,,No
+SM_DOM_SP_PCMP,Soft Mast Dominant Species % Composition,float64,,No,0,Yes
+LM_TPA,Lightseed Mast TPA,float64,,No,0,Yes
+LM_BA,Lightseed Mast BA,float64,,No,0,Yes
+LM_QMDBH,Lightseed Mast QM DBH,float64,,No,0,Yes
+LM_DOM_HLTH,Lightseed Mast Dominant Health Class,string,NONE,Yes,,No
+LM_DOM_HLTH_PCMP,Lightseed Mast Dominant Health Class % Composition,float64,,No,0,Yes
+LM_DOM_SP,Lightseed Mast Dominant Species,string,NONE,Yes,,No
+LM_DOM_SP_PCMP,Lightseed Mast Dominant Species % Composition,float64,,No,0,Yes
