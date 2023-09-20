@@ -1,0 +1,50 @@
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+UND_SP1,Understory Sp 1,string,NONE,Yes,,No
+UND_SP2,Understory Sp 2,string,NONE,Yes,,No
+UND_SP3,Understory Sp 3,string,NONE,Yes,,No
+GRD_SP1,Ground Sp 1,string,NONE,Yes,,No
+GRD_SP2,Ground Sp 2,string,NONE,Yes,,No
+GRD_SP3,Ground Sp 3,string,NONE,Yes,,No
+NOT_SP1,Notable Sp 1,string,NONE,Yes,,No
+NOT_SP2,Notable Sp 2,string,NONE,Yes,,No
+NOT_SP3,Notable Sp 3,string,NONE,Yes,,No
+OV_SP1,Overstory Sp 1,string,NONE,Yes,,No
+OV_SP1_TPA,Overstory Sp 1 TPA,float64,,No,0,Yes
+OV_SP1_BA,Overstory Sp 1 BA,float64,,No,0,Yes
+OV_SP1_QMDBH,Overstory Sp 1 QM DBH,float64,,No,0,Yes
+OV_SP1_DOM_HLTH,Overstory Sp 1 Dominant Health Class,string,NONE,Yes,,No
+OV_SP1_DOM_HLTH_PCMP,Overstory Sp 1 Dominant Health Class % Composition,float64,,No,0,Yes
+OV_SP1_DOM_HLTH_TPA,Overstory Sp 1 TPA for Dominant Health Class,float64,,No,0,Yes
+OV_SP1_D_TPA,Overstory Sp 1 Dead TPA,float64,,No,0,Yes
+OV_SP2,Overstory Sp 2,string,NONE,Yes,,No
+OV_SP2_TPA,Overstory Sp 2 TPA,float64,,No,0,Yes
+OV_SP2_BA,Overstory Sp 2 BA,float64,,No,0,Yes
+OV_SP2_QMDBH,Overstory Sp 2 QM DBH,float64,,No,0,Yes
+OV_SP2_DOM_HLTH,Overstory Sp 2 Dominant Health Class,string,NONE,Yes,,No
+OV_SP2_DOM_HLTH_PCMP,Overstory Sp 2 Dominant Health Class % Composition,float64,,No,0,Yes
+OV_SP2_DOM_HLTH_TPA,Overstory Sp 2 TPA for Dominant Health Class,float64,,No,0,Yes
+OV_SP2_D_TPA,Overstory Sp 2 Dead TPA,float64,,No,0,Yes
+OV_SP3,Overstory Sp 3,string,NONE,Yes,,No
+OV_SP3_TPA,Overstory Sp 3 TPA,float64,,No,0,Yes
+OV_SP3_BA,Overstory Sp 3 BA,float64,,No,0,Yes
+OV_SP3_QMDBH,Overstory Sp 3 QM DBH,float64,,No,0,Yes
+OV_SP3_DOM_HLTH,Overstory Sp 3 Dominant Health Class,string,NONE,Yes,,No
+OV_SP3_DOM_HLTH_PCMP,Overstory Sp 3 Dominant Health Class % Composition,float64,,No,0,Yes
+OV_SP3_DOM_HLTH_TPA,Overstory Sp 3 TPA for Dominant Health Class,float64,,No,0,Yes
+OV_SP3_D_TPA,Overstory Sp 3 Dead TPA,float64,,No,0,Yes
+OV_SP4,Overstory Sp 4,string,NONE,Yes,,No
+OV_SP4_TPA,Overstory Sp 4 TPA,float64,,No,0,Yes
+OV_SP4_BA,Overstory Sp 4 BA,float64,,No,0,Yes
+OV_SP4_QMDBH,Overstory Sp 4 QM DBH,float64,,No,0,Yes
+OV_SP4_DOM_HLTH,Overstory Sp 4 Dominant Health Class,string,NONE,Yes,,No
+OV_SP4_DOM_HLTH_PCMP,Overstory Sp 4 Dominant Health Class % Composition,float64,,No,0,Yes
+OV_SP4_DOM_HLTH_TPA,Overstory Sp 4 TPA for Dominant Health Class,float64,,No,0,Yes
+OV_SP4_D_TPA,Overstory Sp 4 Dead TPA,float64,,No,0,Yes
+OV_SP5,Overstory Sp 5,string,NONE,Yes,,No
+OV_SP5_TPA,Overstory Sp 5 TPA,float64,,No,0,Yes
+OV_SP5_BA,Overstory Sp 5 BA,float64,,No,0,Yes
+OV_SP5_QMDBH,Overstory Sp 5 QM DBH,float64,,No,0,Yes
+OV_SP5_DOM_HLTH,Overstory Sp 5 Dominant Health Class,string,NONE,Yes,,No
+OV_SP5_DOM_HLTH_PCMP,Overstory Sp 5 Dominant Health Class % Composition,float64,,No,0,Yes
+OV_SP5_DOM_HLTH_TPA,Overstory Sp 5 TPA for Dominant Health Class,float64,,No,0,Yes
+OV_SP5_D_TPA,Overstory Sp 5 Dead TPA,float64,,No,0,Yes
