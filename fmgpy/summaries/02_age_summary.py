@@ -21,7 +21,6 @@ age_df = pd.DataFrame.spatial.from_featureclass(age_fc)
 # Create plot dataframe
 plot_table = fcalc.create_plot_table(fixed_df=fixed_df,
                                      age_df=age_df)
-arcpy.AddMessage('Plot table created')
 
 # Filter plot table to just records with age trees
 age_plots = plot_table.query("AGE_ORIG==AGE_ORIG")
