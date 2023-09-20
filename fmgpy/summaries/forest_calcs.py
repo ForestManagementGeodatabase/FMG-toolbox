@@ -628,7 +628,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR'])
 
     tree_table = tree_table\
@@ -747,20 +747,29 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
         # Add and Calculate QM DBH
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
-        # Enforce QM_DBH dtype
-        filtered_df = filtered_df.astype({'QM_DBH': 'float64'})
+        # Enforce dtypes
+        filtered_df = filtered_df.astype({'tree_count': 'int32',
+                                          'plot_count': 'int32',
+                                          'TPA': 'float64',
+                                          'BA': 'float64',
+                                          'QM_DBH': 'float64'})
 
         # Set index for merge
         filtered_df.set_index('PID')
 
         # Join results back to full set of PIDs and fill nans with 0
-        out_df = plotcount_df \
+        merge_df = plotcount_df \
             .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on='PID') \
-            .fillna(0) \
             .reset_index()
+
+        # Test merged df for data, then fillna if data
+        if len(merge_df.index) > 0:
+            out_df = merge_df.fillna(0)
+        else:
+            out_df = merge_df
 
         return out_df
 
@@ -1877,9 +1886,9 @@ def top5_ov_species_level(tree_table, level):
 
         # convert loop result list to dataframe
         health_dom_ovsp = pd.DataFrame(health_dom_list, columns=[level,
-                                                                 key+'_HLTH_DOM',
-                                                                 key+'_HLTH_DOM_PCMP',
-                                                                 key+'_HLTH_DOM_TPA',
+                                                                 key+'_DOM_HLTH',
+                                                                 key+'_DOM_HLTH_PCMP',
+                                                                 key+'_DOM_HLTH_TPA',
                                                                  key+'_D_TPA'])
 
         # Join dataframe to OV_SPECIES dataframe
@@ -1889,15 +1898,15 @@ def top5_ov_species_level(tree_table, level):
     # Re order columns
     ov_species = ov_species.reindex([level,
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_DOM_HLTH', 'OV_SP1_DOM_HLTH_PCMP', 'OV_SP1_DOM_HLTH_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP2_DOM_HLTH', 'OV_SP2_DOM_HLTH_PCMP', 'OV_SP2_DOM_HLTH_TPA', 'OV_SP2_D_TPA',
                                      'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP3_DOM_HLTH', 'OV_SP3_DOM_HLTH_PCMP', 'OV_SP3_DOM_HLTH_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_DOM_HLTH', 'OV_SP4_DOM_HLTH_PCMP', 'OV_SP4_DOM_HLTH_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
+                                     'OV_SP5_DOM_HLTH', 'OV_SP5_DOM_HLTH_PCMP', 'OV_SP5_DOM_HLTH_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
@@ -2045,15 +2054,15 @@ def top5_ov_species_plot(tree_table):
     # Re order columns
     ov_species = ov_species.reindex(['PID',
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_DOM_HLTH', 'OV_SP1_DOM_HLTH_PCMP', 'OV_SP1_DOM_HLTH_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP2_DOM_HLTH', 'OV_SP2_DOM_HLTH_PCMP', 'OV_SP2_DOM_HLTH_TPA', 'OV_SP2_D_TPA',
                                      'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP3_DOM_HLTH', 'OV_SP3_DOM_HLTH_PCMP', 'OV_SP3_DOM_HLTH_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_DOM_HLTH', 'OV_SP4_DOM_HLTH_PCMP', 'OV_SP4_DOM_HLTH_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
+                                     'OV_SP5_DOM_HLTH', 'OV_SP5_DOM_HLTH_PCMP', 'OV_SP5_DOM_HLTH_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
