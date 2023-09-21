@@ -31,6 +31,7 @@ levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 for level in levels:
     if level != 'PID':
+        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
@@ -159,6 +160,8 @@ for level in levels:
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     if level == 'PID':
+        arcpy.AddMessage('Work on {0}'.format(level))
+
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
         arcpy.AddMessage("    Base DF Created")

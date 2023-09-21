@@ -14,7 +14,7 @@ MID_BA,Midstory BA,float64,,No,0,Yes
 MID_QMDBH,Midstory QM DBH,float64,,No,0,Yes
 MID_D_TPA,Dead Midstory TPA,float64,,No,0,Yes
 MID_D_BA,Dead Midstory BA,float64,,No,0,Yes
-MID_QMDBH,Dead Midstory QM DBH,float64,,No,0,Yes
+MID_D_QMDBH,Dead Midstory QM DBH,float64,,No,0,Yes
 MID_DOM_HLTH,Midstory Dominant Health Class,string,NONE,Yes,,No
 MID_DOM_HLTH_PCMP,Midstory Dominant Health Class % Composition,float64,,No,0,Yes
 MID_DOM_SP,Midstory Dominant Species,string,NONE,Yes,,No
