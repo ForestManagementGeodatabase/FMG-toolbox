@@ -1,93 +1,93 @@
-TR_SP,TR_COUNT,MAST_TYPE,COM_NAME,TYP_BY_TR_CT,TYP_FOR_MVR
-ACNE2,7524,Lightseed,Box Elder,Common,Uncommon
-ACSA2,210400,Lightseed,Silver Maple,Common,Common
-ACSA3,230,Lightseed,Sugar Maple,Uncommon,Uncommon
-AEGL,1,Hard,Ohio Buckeye,Uncommon,Uncommon
-ALIN2,31,Lightseed,Grey Alder,Uncommon,Uncommon
-AMFR,0,Hard,False Indigo,Uncommon,Uncommon
-BEAL2,1,Lightseed,Yellow Birch,Uncommon,Uncommon
-BENI,4484,Lightseed,River Birch,Common,Uncommon
-BEPA,1,Lightseed,Paper Birch,Uncommon,Uncommon
-CAAL27,8,Hard,Mockernut Hickory,Uncommon,Uncommon
-CABI8,2,Lightseed,Southern Catalpa,Uncommon,Uncommon
-CACO15,409,Hard,Bitternut Hickory,Uncommon,Uncommon
-CAIL2,1864,Hard,Northern Pecan,Common,Uncommon
-CALA21,132,Hard,Shellbark Hickory,Uncommon,Uncommon
-CAOV2,91,Hard,Shagbark Hickory,Uncommon,Uncommon
-CARYA,17,Hard,Hickory Spp,Uncommon,Uncommon
-CASP8,15,Lightseed,Northern Catalpa,Uncommon,Uncommon
-CATO6,1,Hard,Mockernut Hickory,Uncommon,Uncommon
-CECA4,1,Soft,Eastern Redbud,Uncommon,Uncommon
-CELA,8,Soft,Sugarberry,Uncommon,Uncommon
-CELTI,3,Soft,Hackberry Spp,Uncommon,Uncommon
-CEOC,2337,Soft,Common Hackberry,Common,Uncommon
-CEOC2,259,Lightseed,Common Buttonbush,Uncommon,Uncommon
-COAM2,4,Soft,Silky Dogwood,Uncommon,Uncommon
-COFL2,1,Soft,Flowering Dogwood,Uncommon,Uncommon
-CORA6,1,Soft,Gray Dogwood,Uncommon,Uncommon
-CORNU,14,Soft,Dogwood Spp,Uncommon,Uncommon
-COSE16,0,Soft,Redosier Dogwood,Uncommon,Uncommon
-CRATA,128,Soft,Hawthorn Spp,Uncommon,Uncommon
-DIVI5,276,Soft,Common Persimmon,Uncommon,Uncommon
-FOAC,258,Soft,Swamp Privet,Uncommon,Uncommon
-FRAL4,6,Soft,Glossy Buckthorn,Uncommon,Uncommon
-FRAM2,21,Lightseed,White Ash,Uncommon,Uncommon
-FRAXI,396,Lightseed,Ash,Uncommon,Uncommon
-FRNI,244,Lightseed,Black Ash,Uncommon,Uncommon
-FRPE,19700,Lightseed,Green Ash,Common,Common
-GLTR,463,Lightseed,Honey Locust,Uncommon,Uncommon
-GYDI,308,Lightseed,Kentucky Coffeetree,Uncommon,Uncommon
-ILDE,1,Soft,Possumhaw,Uncommon,Uncommon
-ILVE,0,Soft,Common Winterberry,Uncommon,Uncommon
-JUCI,16,Hard,Butternut,Uncommon,Uncommon
-JUNI,330,Hard,Black Walnut,Uncommon,Uncommon
-JUVI,22,Soft,Eastern Redcedar,Uncommon,Uncommon
-LOMA6,1,Soft,Amur Honeysuckle,Uncommon,Uncommon
-LONICER,0,Soft,Honeysuckle,Uncommon,Uncommon
-MALUS,1,Soft,Apple,Uncommon,Uncommon
-MAPO,16,Soft,Osage Orange,Uncommon,Uncommon
-MOAL,404,Soft,White Mulberry,Uncommon,Uncommon
-MORU2,1028,Soft,Red Mulberry,Common,Common
-MORUS,131,Soft,Mulberry,Uncommon,Uncommon
-NOTREE,3526,None,None,,
-OSVI,16,Lightseed,Hop Hornbeam,Uncommon,Uncommon
-OTHER,219,Unknown,Unknown,,
-PIAB,1,Lightseed,Norway Spruce,Uncommon,Uncommon
-PIRE,30,Lightseed,Red Pine,Uncommon,Uncommon
-PIST,10,Lightseed,Eastern White Pine,Uncommon,Uncommon
-PLOC,1960,Lightseed,Sycamore,Common,Uncommon
-PODE3,29840,Lightseed,Eastern Cottonwood,Common,Common
-POGR4,18,Lightseed,Bigtooth Aspen,Uncommon,Uncommon
-POTR5,55,Lightseed,Quaking Aspen,Uncommon,Uncommon
-PRSE2,99,Soft,Black Cherry,Uncommon,Uncommon
-PRVI,1,Soft,Chokecherry,Uncommon,Uncommon
-PYCO4,1,Soft,Crab apple,Uncommon,Uncommon
-QUAL,83,Hard,White Oak,Uncommon,Uncommon
-QUBI,3557,Hard,Swamp White Oak,Common,Uncommon
-QUEL,454,Hard,Northern Pin Oak,Uncommon,Uncommon
-QUERC,56,Hard,Oak,Uncommon,Uncommon
-QULY,354,Hard,Overcup Oak,Uncommon,Uncommon
-QUMA2,988,Hard,Burr Oak,Uncommon,Uncommon
-QUMU,5,Hard,Chinkapin Oak,Uncommon,Uncommon
-QUPA,1,Hard,Hybrid Oak,Uncommon,Uncommon
-QUPA2,2233,Hard,Pin Oak,Common,Uncommon
-QURU,293,Hard,Red Oak,Uncommon,Uncommon
-QUVE,558,Hard,Black Oak,Uncommon,Uncommon
-RHCA3,64,Soft,Common Buckthorn,Uncommon,Uncommon
-RHTY,3,Soft,Staghorn Sumac,Uncommon,Uncommon
-ROPS,351,Lightseed,Black Locust,Uncommon,Uncommon
-SAIN3,601,Lightseed,Sandbar Willow,Uncommon,Uncommon
-SALIX,2008,Lightseed,Willow Spp,Common,Uncommon
-SANI,7125,Lightseed,Black Willow,Common,Common
-SAMBU,0,Soft,Elderberry,Uncommon,Uncommon
-STTR,0,Hard,American Bladdernut,Uncommon,Uncommon
-SNAG,1111,None,None,,
-TADI2,9,Lightseed,Bald Cypress,Uncommon,Uncommon
-TIAM,701,Soft,American Basswood,Uncommon,Uncommon
-ULAM,10856,Lightseed,American Elm,Common,Common
-ULMUS,18,Lightseed,Elm,Uncommon,Uncommon
-ULPU,36,Lightseed,Siberian Elm,Uncommon,Uncommon
-ULRU,39,Lightseed,Slippery Elm,Uncommon,Uncommon
-UNK,1185,Unknown,None,,
-VILE,4,Soft,Nannyberry,Uncommon,Uncommon
-XAAM,2,Soft,Rough Cocklebur,Uncommon,Uncommon
+TR_SP,TR_COUNT,MAST_TYPE,COM_NAME,TYP_BY_TR_CT,TYP_FOR_MVR,SP_RICH_TYPE
+ACNE2,7524,Lightseed,Box Elder,Common,Uncommon,Other
+ACSA2,210400,Lightseed,Silver Maple,Common,Common,Typical
+ACSA3,230,Lightseed,Sugar Maple,Uncommon,Uncommon,Other
+AEGL,1,Hard,Ohio Buckeye,Uncommon,Uncommon,Hard
+ALIN2,31,Lightseed,Grey Alder,Uncommon,Uncommon,Other
+AMFR,0,Hard,False Indigo,Uncommon,Uncommon,Hard
+BEAL2,1,Lightseed,Yellow Birch,Uncommon,Uncommon,Other
+BENI,4484,Lightseed,River Birch,Common,Uncommon,Other
+BEPA,1,Lightseed,Paper Birch,Uncommon,Uncommon,Other
+CAAL27,8,Hard,Mockernut Hickory,Uncommon,Uncommon,Hard
+CABI8,2,Lightseed,Southern Catalpa,Uncommon,Uncommon,Other
+CACO15,409,Hard,Bitternut Hickory,Uncommon,Uncommon,Hard
+CAIL2,1864,Hard,Northern Pecan,Common,Uncommon,Hard
+CALA21,132,Hard,Shellbark Hickory,Uncommon,Uncommon,Hard
+CAOV2,91,Hard,Shagbark Hickory,Uncommon,Uncommon,Hard
+CARYA,17,Hard,Hickory Spp,Uncommon,Uncommon,Hard
+CASP8,15,Lightseed,Northern Catalpa,Uncommon,Uncommon,Other
+CATO6,1,Hard,Mockernut Hickory,Uncommon,Uncommon,Hard
+CECA4,1,Soft,Eastern Redbud,Uncommon,Uncommon,Other
+CELA,8,Soft,Sugarberry,Uncommon,Uncommon,Other
+CELTI,3,Soft,Hackberry Spp,Uncommon,Uncommon,Other
+CEOC,2337,Soft,Common Hackberry,Common,Uncommon,Other
+CEOC2,259,Lightseed,Common Buttonbush,Uncommon,Uncommon,Other
+COAM2,4,Soft,Silky Dogwood,Uncommon,Uncommon,Other
+COFL2,1,Soft,Flowering Dogwood,Uncommon,Uncommon,Other
+CORA6,1,Soft,Gray Dogwood,Uncommon,Uncommon,Other
+CORNU,14,Soft,Dogwood Spp,Uncommon,Uncommon,Other
+COSE16,0,Soft,Redosier Dogwood,Uncommon,Uncommon,Other
+CRATA,128,Soft,Hawthorn Spp,Uncommon,Uncommon,Other
+DIVI5,276,Soft,Common Persimmon,Uncommon,Uncommon,Other
+FOAC,258,Soft,Swamp Privet,Uncommon,Uncommon,Other
+FRAL4,6,Soft,Glossy Buckthorn,Uncommon,Uncommon,Other
+FRAM2,21,Lightseed,White Ash,Uncommon,Uncommon,Other
+FRAXI,396,Lightseed,Ash,Uncommon,Uncommon,Other
+FRNI,244,Lightseed,Black Ash,Uncommon,Uncommon,Other
+FRPE,19700,Lightseed,Green Ash,Common,Common,Typical
+GLTR,463,Lightseed,Honey Locust,Uncommon,Uncommon,Other
+GYDI,308,Lightseed,Kentucky Coffeetree,Uncommon,Uncommon,Other
+ILDE,1,Soft,Possumhaw,Uncommon,Uncommon,Other
+ILVE,0,Soft,Common Winterberry,Uncommon,Uncommon,Other
+JUCI,16,Hard,Butternut,Uncommon,Uncommon,Hard
+JUNI,330,Hard,Black Walnut,Uncommon,Uncommon,Hard
+JUVI,22,Soft,Eastern Redcedar,Uncommon,Uncommon,Other
+LOMA6,1,Soft,Amur Honeysuckle,Uncommon,Uncommon,Other
+LONICER,0,Soft,Honeysuckle,Uncommon,Uncommon,Other
+MALUS,1,Soft,Apple,Uncommon,Uncommon,Other
+MAPO,16,Soft,Osage Orange,Uncommon,Uncommon,Other
+MOAL,404,Soft,White Mulberry,Uncommon,Uncommon,Other
+MORU2,1028,Soft,Red Mulberry,Common,Common,Typical
+MORUS,131,Soft,Mulberry,Uncommon,Uncommon,Other
+NOTREE,3526,None,None,,,
+OSVI,16,Lightseed,Hop Hornbeam,Uncommon,Uncommon,Other
+OTHER,219,Unknown,Unknown,,,
+PIAB,1,Lightseed,Norway Spruce,Uncommon,Uncommon,Other
+PIRE,30,Lightseed,Red Pine,Uncommon,Uncommon,Other
+PIST,10,Lightseed,Eastern White Pine,Uncommon,Uncommon,Other
+PLOC,1960,Lightseed,Sycamore,Common,Uncommon,Other
+PODE3,29840,Lightseed,Eastern Cottonwood,Common,Common,Typical
+POGR4,18,Lightseed,Bigtooth Aspen,Uncommon,Uncommon,Other
+POTR5,55,Lightseed,Quaking Aspen,Uncommon,Uncommon,Other
+PRSE2,99,Soft,Black Cherry,Uncommon,Uncommon,Other
+PRVI,1,Soft,Chokecherry,Uncommon,Uncommon,Other
+PYCO4,1,Soft,Crab apple,Uncommon,Uncommon,Other
+QUAL,83,Hard,White Oak,Uncommon,Uncommon,Hard
+QUBI,3557,Hard,Swamp White Oak,Common,Uncommon,Hard
+QUEL,454,Hard,Northern Pin Oak,Uncommon,Uncommon,Hard
+QUERC,56,Hard,Oak,Uncommon,Uncommon,Hard
+QULY,354,Hard,Overcup Oak,Uncommon,Uncommon,Hard
+QUMA2,988,Hard,Burr Oak,Uncommon,Uncommon,Hard
+QUMU,5,Hard,Chinkapin Oak,Uncommon,Uncommon,Hard
+QUPA,1,Hard,Hybrid Oak,Uncommon,Uncommon,Hard
+QUPA2,2233,Hard,Pin Oak,Common,Uncommon,Hard
+QURU,293,Hard,Red Oak,Uncommon,Uncommon,Hard
+QUVE,558,Hard,Black Oak,Uncommon,Uncommon,Hard
+RHCA3,64,Soft,Common Buckthorn,Uncommon,Uncommon,Other
+RHTY,3,Soft,Staghorn Sumac,Uncommon,Uncommon,Other
+ROPS,351,Lightseed,Black Locust,Uncommon,Uncommon,Other
+SAIN3,601,Lightseed,Sandbar Willow,Uncommon,Uncommon,Other
+SALIX,2008,Lightseed,Willow Spp,Common,Uncommon,Other
+SANI,7125,Lightseed,Black Willow,Common,Common,Typical
+SAMBU,0,Soft,Elderberry,Uncommon,Uncommon,Other
+STTR,0,Hard,American Bladdernut,Uncommon,Uncommon,Hard
+SNAG,1111,None,None,,,
+TADI2,9,Lightseed,Bald Cypress,Uncommon,Uncommon,Other
+TIAM,701,Soft,American Basswood,Uncommon,Uncommon,Other
+ULAM,10856,Lightseed,American Elm,Common,Common,Typical
+ULMUS,18,Lightseed,Elm,Uncommon,Uncommon,Other
+ULPU,36,Lightseed,Siberian Elm,Uncommon,Uncommon,Other
+ULRU,39,Lightseed,Slippery Elm,Uncommon,Uncommon,Other
+UNK,1185,Unknown,None,,,
+VILE,4,Soft,Nannyberry,Uncommon,Uncommon,Other
+XAAM,2,Soft,Rough Cocklebur,Uncommon,Uncommon,Other
