@@ -2149,6 +2149,61 @@ def get_groupby_modes(source, keys, values, dropna=True, return_counts=False):
     return final
 
 
+# Create both species richness metrics
+def create_sp_richness(tree_table, plot_table, level):
+    # Create base df
+    base_df = create_level_df(level, plot_table)
 
+    # Filter Tree Table
+    tree_table_live = tree_table[(tree_table['TR_HLTH'] != 'D') & (tree_table['TR_SP'] != 'NONE')]
+
+    # Create Single Number Sp Rich (count of unique species
+    sp_rich_ct = tree_table_live \
+        .groupby(level) \
+        .agg(SP_RICH=('TR_SP', 'nunique')) \
+        .reset_index() \
+        .set_index(level)
+
+    # Create compound species richness: 3 digit 'number' = CT Uniq SP Hard Mast, CT Uniq SP Other, CT Uniq SP Typical
+    # Count unique species for each SP richness category (Hard Mast, Other, Typical)
+    comp_sp_rich_ct = tree_table_live \
+        .groupby([level, 'SP_RICH_TYPE'], as_index=False) \
+        .agg(COMP_SP_CT=('TR_SP', 'nunique'))
+
+    # pivot count table to wide
+    comp_sp_pivot = comp_sp_rich_ct \
+        .pivot_table(index=level,
+                     columns='SP_RICH_TYPE',
+                     values=['COMP_SP_CT'],
+                     fill_value=0) \
+        .reset_index()
+
+    # Flatten multiindex and rename columns
+    comp_sp_pivot.columns = ["_".join(col) for col in comp_sp_pivot.columns.to_flat_index()]
+
+    # set string dtypes
+    level_col_name = level + '_'
+    comp_sp_rich = comp_sp_pivot \
+        .astype(dtype={'COMP_SP_CT_Hard': 'string',
+                       'COMP_SP_CT_Other': 'string',
+                       'COMP_SP_CT_Typical': 'string'}) \
+        .rename(columns={level_col_name: level}) \
+        .set_index(level)
+
+    # Concatenate counts into 3 digit string
+    comp_sp_rich['COMP_SP_RICH'] = comp_sp_rich.COMP_SP_CT_Hard.str.cat([comp_sp_rich.COMP_SP_CT_Other,
+                                                                         comp_sp_rich.COMP_SP_CT_Typical])
+
+    # Drop individual count cols from comp sp richness
+    comp_sp_rich = comp_sp_rich \
+        .drop(columns=['COMP_SP_CT_Hard', 'COMP_SP_CT_Other', 'COMP_SP_CT_Typical'])
+
+    # Combine dfs into single df
+    sp_richness = base_df.join(other=[sp_rich_ct, comp_sp_rich], how='left')
+    sp_richness = sp_richness[['SP_RICH', 'COMP_SP_RICH']].reset_index()
+
+    sp_richness = sp_richness.fillna(value={'SP_RICH': 0, 'COMP_SP_RICH': 'NONE'})
+
+    return sp_richness
 
 

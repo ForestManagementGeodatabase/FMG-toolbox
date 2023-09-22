@@ -49,9 +49,9 @@ MAPO,16,Soft,Osage Orange,Uncommon,Uncommon,Other
 MOAL,404,Soft,White Mulberry,Uncommon,Uncommon,Other
 MORU2,1028,Soft,Red Mulberry,Common,Common,Typical
 MORUS,131,Soft,Mulberry,Uncommon,Uncommon,Other
-NOTREE,3526,None,None,,,
+NOTREE,3526,None,None,,,No Tree
 OSVI,16,Lightseed,Hop Hornbeam,Uncommon,Uncommon,Other
-OTHER,219,Unknown,Unknown,,,
+OTHER,219,Unknown,Unknown,,,Other
 PIAB,1,Lightseed,Norway Spruce,Uncommon,Uncommon,Other
 PIRE,30,Lightseed,Red Pine,Uncommon,Uncommon,Other
 PIST,10,Lightseed,Eastern White Pine,Uncommon,Uncommon,Other
@@ -81,13 +81,13 @@ SALIX,2008,Lightseed,Willow Spp,Common,Uncommon,Other
 SANI,7125,Lightseed,Black Willow,Common,Common,Typical
 SAMBU,0,Soft,Elderberry,Uncommon,Uncommon,Other
 STTR,0,Hard,American Bladdernut,Uncommon,Uncommon,Hard
-SNAG,1111,None,None,,,
+SNAG,1111,None,None,,,Other
 TADI2,9,Lightseed,Bald Cypress,Uncommon,Uncommon,Other
 TIAM,701,Soft,American Basswood,Uncommon,Uncommon,Other
 ULAM,10856,Lightseed,American Elm,Common,Common,Typical
 ULMUS,18,Lightseed,Elm,Uncommon,Uncommon,Other
 ULPU,36,Lightseed,Siberian Elm,Uncommon,Uncommon,Other
 ULRU,39,Lightseed,Slippery Elm,Uncommon,Uncommon,Other
-UNK,1185,Unknown,None,,,
+UNK,1185,Unknown,None,,,Other
 VILE,4,Soft,Nannyberry,Uncommon,Uncommon,Other
 XAAM,2,Soft,Rough Cocklebur,Uncommon,Uncommon,Other
