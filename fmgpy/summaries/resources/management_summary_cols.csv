@@ -1,0 +1,6 @@
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+STOCK_PCT,Stocking Percent,float64,,No,0,Yes
+STOCK_PCT_HM,Hard Mast Stocking Percent,float64,,No,0,Yes
+STOCK_PCT_NHM,Non-Hard Mast Stocking Percent,float64,,No,0,Yes
+COMP_SP_RICH,Compound Species Richness,string,NONE,Yes,,No
+SP_RICH,Species Richness,float64,,No,0,Yes

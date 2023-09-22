@@ -109,36 +109,19 @@ TR_SP = [Typical Species]
 TR_SP = [Non Typical Species]
 
 # Species Richness working
-# Single Number Sp Rich
-sp_richness = tree_table \
-    .groupby('SID') \
-    .agg(SP_RICH=('TR_SP', 'nunique')) \
-    .reset_index()
+# inputs : tree_table, plot_table level
 
-# Compound Species Richness
-comp_sp_richness = tree_table \
-    .groupby(['SID', 'SP_RICH_TYPE'], as_index=False) \
-    .agg(COMP_SP_CT=('TR_SP', 'nunique'))
+# Stocking pct work
+amd_p1 = 0.259
+amd_p2 =
 
-comp_sp_pivot = comp_sp_richness \
-    .pivot_table(index='SID',
-                 columns='SP_RICH_TYPE',
-                 values=['COMP_SP_CT'],
-                 fill_value=0) \
-    .reset_index()
 
-comp_sp_pivot.columns = ["_".join(col) for col in comp_sp_pivot.columns.to_flat_index()]
 
-comp_sp_pivot = comp_sp_pivot \
-    .astype(dtype={'COMP_SP_CT_Hard': 'string',
-                   'COMP_SP_CT_Other': 'string',
-                   'COMP_SP_CT_Typical': 'string'}) \
-    .rename(columns={'SID_': 'SID'})
 
-comp_sp_pivot['COMP_SP_RICH'] = comp_sp_pivot.COMP_SP_CT_Hard.str.cat([comp_sp_pivot.COMP_SP_CT_Other,
-                                                                       comp_sp_pivot.COMP_SP_CT_Typical])
 
-out_df =
+
+
+
 
 
 

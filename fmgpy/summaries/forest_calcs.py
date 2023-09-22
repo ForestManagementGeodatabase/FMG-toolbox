@@ -541,12 +541,27 @@ def stocking_pct(avg_tpa, qm_dbh):
     Based on DOI:10.1093/njaf/27.4.132, "A Stocking Diagram for Midwestern Eastern Cottonwood-Silver
     Maple-American Sycamore Bottomland Forests"
     """
-    assert isinstance(avg_tpa, float), "avg_tpa must be a float"
-    assert isinstance(qm_dbh, float), "qm_dbh must be a float"
+    #assert isinstance(avg_tpa, float), "avg_tpa must be a float"
+    #assert isinstance(qm_dbh, float), "qm_dbh must be a float"
 
-    percent = avg_tpa * (0.0685724 + 0.0010125 * (0.259 + (0.973 * qm_dbh)) + 0.0023656 + qm_dbh ** 2)
+    # Define equation params
+    amd_p1 = 0.259
+    amd_p2 = 0.973
+    a_line_p1 = 0.0685724
+    a_line_p2 = 0.0010125
+    a_line_p3 = 0.0023656
 
-    return percent
+    try:
+        # Convert QM DBH to AMD
+        amd = amd_p1 + (amd_p2 * qm_dbh)
+
+        # Run stocking percent equation
+        stock_pct = avg_tpa * (a_line_p1 + a_line_p2 * amd + a_line_p3 * qm_dbh ** 2)
+
+    except TypeError:
+        stock_pct = None
+
+    return stock_pct
 
 
 # Percent Cover
