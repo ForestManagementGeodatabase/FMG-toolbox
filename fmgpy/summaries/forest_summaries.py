@@ -7,13 +7,12 @@ import math
 import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
-import fmgpy.summaries.forest_calcs as fcalc
+import forest_calcs as fcalc
 
 
 def general_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute General Description Summary--')
+    arcpy.AddMessage('--Execute General Description Summary on {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
@@ -268,13 +267,12 @@ def general_summary(plot_table, tree_table, out_gdb, level):
         out_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    DataFrame exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def age_summary(plot_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Age Summary--')
-    arcpy.AddMessage('Work on {0}'.format(level))
+    arcpy.AddMessage('--Execute Age Summary on {0}--'.format(level))
 
     # Create Base DF
     base_df = fcalc.create_level_df(level=level,
@@ -369,14 +367,13 @@ def age_summary(plot_table, out_gdb, level):
     out_df.spatial.to_table(table_path)
     arcpy.AddMessage('    merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage("Complete")
+    arcpy.AddMessage("    Complete")
     return table_path
 
 
 def health_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Health Summary--')
+    arcpy.AddMessage('--Execute Health Summaryon {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -713,14 +710,13 @@ def health_summary(plot_table, tree_table, out_gdb, level):
         health_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def mast_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Mast Summary--')
+    arcpy.AddMessage('--Execute Mast Summary on {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -951,14 +947,13 @@ def mast_summary(plot_table, tree_table, out_gdb, level):
         mast_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def size_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Size Summary--')
+    arcpy.AddMessage('--Execute Size Summary on {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1429,15 +1424,13 @@ def size_summary(plot_table, tree_table, out_gdb, level):
         size_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
-    arcpy.AddMessage('--Execute Species Summary--')
+    arcpy.AddMessage('--Execute Species Summary on {0}--'.format(level))
     if level != 'PID':
-
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1646,14 +1639,13 @@ def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
         sp_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def vert_comp_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Vertical Composition Summary--')
+    arcpy.AddMessage('--Execute Vertical Composition Summary on {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1910,14 +1902,13 @@ def vert_comp_summary(plot_table, tree_table, out_gdb, level):
         out_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 
 
 def management_summary(plot_table, tree_table, out_gdb, level):
-    arcpy.AddMessage('--Execute Management Summary--')
+    arcpy.AddMessage('--Execute Management Summary on {0}--'.format(level))
     if level != 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
@@ -2029,6 +2020,6 @@ def management_summary(plot_table, tree_table, out_gdb, level):
         manage_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-    arcpy.AddMessage('Complete')
+    arcpy.AddMessage('    Complete')
     return table_path
 

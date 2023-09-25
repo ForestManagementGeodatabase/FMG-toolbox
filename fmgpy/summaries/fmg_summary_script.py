@@ -1,4 +1,4 @@
-# Do some imports
+﻿# Do some imports
 import os
 import sys
 import arcpy
@@ -7,22 +7,22 @@ import math
 import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
-import fmgpy.summaries.forest_calcs as fcalc
-import fmgpy.summaries.forest_summaries as fsum
+import forest_calcs as fcalc
+import forest_summaries as fsum
 
 # Define Required Input Parameters
-prism_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS" #arcpy.GetParameterAsText(0)
-fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS" #arcpy.GetParameterAsText(1)
-age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS" #arcpy.GetParameterAsText(2)
-out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb" #arcpy.GetParameterAsText(3)
+prism_fc = arcpy.GetParameterAsText(0)
+fixed_fc = arcpy.GetParameterAsText(1)
+age_fc = arcpy.GetParameterAsText(2)
+out_gdb = arcpy.GetParameterAsText(3)
 
 # Define Optional Inupt Parameters
-pid_sum = 'True' #arcpy.GetParameterAsText(4)
-sid_sum = 'True' #arcpy.GetParameterAsText(5)
-site_sum = 'True' #arcpy.GetParameterAsText(6)
-unit_sum = 'True' #arcpy.GetParameterAsText(7)
-comp_sum = 'True' #arcpy.GetParameterAsText(8)
-pool_sum = 'True' #arcpy.GetParameterAsText(9)
+pid_sum = arcpy.GetParameterAsText(4)
+sid_sum = arcpy.GetParameterAsText(5)
+site_sum = arcpy.GetParameterAsText(6)
+unit_sum = arcpy.GetParameterAsText(7)
+comp_sum = arcpy.GetParameterAsText(8)
+pool_sum = arcpy.GetParameterAsText(9)
 
 # Evaluate Optional Input Parameters to build level list
 levels = []
@@ -60,28 +60,50 @@ arcpy.AddMessage('Checks passed, continuing with summaries')
 plot_table = fcalc.create_plot_table(fixed_df=fixed_df, age_df=age_df)
 tree_table = fcalc.create_tree_table(prism_df=prism_df)
 
+# Define output lists
+gen_sum = []
+age_sum = []
+health_sum = []
+mast_sum = []
+size_sum = []
+species_sum = []
+vert_sum = []
+manage_sum = []
+
 # Execute FMG Summaries
 for level in levels:
     out_gen_sum = fsum.general_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(10, out_gen_sum)
+    gen_sum.append(out_gen_sum)
 
     out_age_sum = fsum.age_summary(plot_table, out_gdb, level)
-    #arcpy.SetParameterAsText(11, out_age_sum)
+    age_sum.append(out_age_sum)
 
     out_health_sum = fsum.health_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(12, out_health_sum)
+    health_sum.append(out_health_sum)
 
     out_mast_sum = fsum.mast_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(13, out_mast_sum)
+    mast_sum.append(out_mast_sum)
 
     out_size_sum = fsum.size_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(14, out_size_sum)
+    size_sum.append(out_size_sum)
 
     out_species_sum = fsum.species_summary(plot_table, tree_table, fixed_df, out_gdb, level)
-    #arcpy.SetParameterAsText(15, out_species_sum)
+    species_sum.append(out_species_sum)
 
     out_vert_sum = fsum.vert_comp_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(16, out_vert_sum)
+    vert_sum.append(out_vert_sum)
 
     out_manage_sum = fsum.management_summary(plot_table, tree_table, out_gdb, level)
-    #arcpy.SetParameterAsText(17, out_manage_sum)
+    manage_sum.append(out_manage_sum)
+
+# Set ouput parameters for ESRI-land
+arcpy.SetParameterAsText(10, gen_sum)
+arcpy.SetParameterAsText(11, age_sum)
+arcpy.SetParameterAsText(12, health_sum)
+arcpy.SetParameterAsText(13, mast_sum)
+arcpy.SetParameterAsText(14, size_sum)
+arcpy.SetParameterAsText(15, species_sum)
+arcpy.SetParameterAsText(16, vert_sum)
+arcpy.SetParameterAsText(17, manage_sum)
+
+arcpy.AddMessage('FMG Summaries Complete - check output GDB for results')
