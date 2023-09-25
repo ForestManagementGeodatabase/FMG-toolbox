@@ -9,29 +9,10 @@ import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import fmgpy.summaries.forest_calcs as fcalc
 
-# Define inputs
-prism_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS"
-fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS"
-age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS"
-out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb"
-
-# Import ESRI feature classes as pandas dataframes
-fixed_df = pd.DataFrame.spatial.from_featureclass(fixed_fc)
-age_df = pd.DataFrame.spatial.from_featureclass(age_fc)
-prism_df = pd.DataFrame.spatial.from_featureclass(prism_fc)
-
-# Create base datasets
-plot_table = fcalc.create_plot_table(fixed_df=fixed_df, age_df=age_df)
-tree_table = fcalc.create_tree_table(prism_df=prism_df)
-
-# Allow output overwrite during testing
-arcpy.env.overwriteOutput = True
-
-# Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
 
 # loop through levels, producing healthy summary table for each
-for level in levels:
+def health_summary(plot_table, tree_table, out_gdb, level):
+    arcpy.AddMessage('--Execute Health Summary--')
     if level != 'PID':
         arcpy.AddMessage('Work on {0}'.format(level))
 
@@ -370,4 +351,6 @@ for level in levels:
         health_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
-arcpy.AddMessage('Complete')
+    arcpy.AddMessage('Complete')
+    return table_path
+

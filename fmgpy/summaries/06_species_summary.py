@@ -9,28 +9,9 @@ import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import fmgpy.summaries.forest_calcs as fcalc
 
-# Define inputs
-prism_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS"
-fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS"
-age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS"
-out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb"
 
-# Import ESRI feature classes as pandas dataframes
-fixed_df = pd.DataFrame.spatial.from_featureclass(fixed_fc)
-age_df = pd.DataFrame.spatial.from_featureclass(age_fc)
-prism_df = pd.DataFrame.spatial.from_featureclass(prism_fc)
-
-# Create base datasets
-plot_table = fcalc.create_plot_table(fixed_df=fixed_df, age_df=age_df)
-tree_table = fcalc.create_tree_table(prism_df=prism_df)
-
-# Allow output overwrite during testing
-arcpy.env.overwriteOutput = True
-
-# Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
-
-for level in levels:
+def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
+    arcpy.AddMessage('--Execute Species Summary--')
     if level != 'PID':
 
         arcpy.AddMessage('Work on {0}'.format(level))
@@ -170,8 +151,8 @@ for level in levels:
         # Reindex output dataframe
         sp_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
                                                         col_csv='resources/species_summary_cols.csv')
-        size_summary_df = sp_summary_df.reindex(labels=sp_reindex_cols,
-                                                axis='columns')
+        sp_summary_df = sp_summary_df.reindex(labels=sp_reindex_cols,
+                                              axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NAN values for output
@@ -222,8 +203,8 @@ for level in levels:
         # Reindex output dataframe
         sp_reindex_cols = fcalc.fmg_column_reindex_list(level=level,
                                                         col_csv='resources/species_summary_cols.csv')
-        size_summary_df = sp_summary_df.reindex(labels=sp_reindex_cols,
-                                                axis='columns')
+        sp_summary_df = sp_summary_df.reindex(labels=sp_reindex_cols,
+                                              axis='columns')
         arcpy.AddMessage("    Columns reordered")
 
         # Handle NAN values for output
@@ -241,6 +222,9 @@ for level in levels:
         table_path = os.path.join(out_gdb, table_name)
         sp_summary_df.spatial.to_table(table_path)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
+
+    arcpy.AddMessage('Complete')
+    return table_path
 
 
 

@@ -9,37 +9,20 @@ import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import fmgpy.summaries.forest_calcs as fcalc
 
-# Define inputs
-fixed_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS"
-age_fc = r"C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS"
-out_gdb = r"C:\LocalProjects\FMG\FMG_CODE_TESTING.gdb"
-
-# Import ESRi feature classes as pandas dataframes
-fixed_df = pd.DataFrame.spatial.from_featureclass(fixed_fc)
-age_df = pd.DataFrame.spatial.from_featureclass(age_fc)
-
-# Create plot dataframe
-plot_table = fcalc.create_plot_table(fixed_df=fixed_df,
-                                     age_df=age_df)
-
-# Filter plot table to just records with age trees
-age_plots = plot_table.query("AGE_ORIG==AGE_ORIG")
-arcpy.AddMessage('Age table created')
-
-# Define list of levels
-levels = ['PID', 'SID', 'SITE', 'UNIT', 'COMP', 'POOL']
-
-# Allow output overwrite during testing
-arcpy.env.overwriteOutput = True
 
 # loop through levels producing an ages summary table for each
-for level in levels:
+def age_summary(plot_table, out_gdb, level):
+    arcpy.AddMessage('--Execute Age Summary--')
     arcpy.AddMessage('Work on {0}'.format(level))
 
     # Create Base DF
     base_df = fcalc.create_level_df(level=level,
                                     plot_table=plot_table)
     arcpy.AddMessage('    Base df created')
+
+    # Filter plot table to just records with age trees
+    age_plots = plot_table.query("AGE_ORIG==AGE_ORIG")
+    arcpy.AddMessage('    Age table created')
 
     # Calculate unfiltered metrics group by agg:
     # Avg level Age (mean AGE_ORIG)
@@ -125,4 +108,5 @@ for level in levels:
     out_df.spatial.to_table(table_path)
     arcpy.AddMessage('    merged df exported to {0}'.format(table_path))
 
-arcpy.AddMessage("Complete")
+    arcpy.AddMessage("Complete")
+    return table_path
