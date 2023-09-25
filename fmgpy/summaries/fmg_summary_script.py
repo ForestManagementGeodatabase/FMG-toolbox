@@ -97,13 +97,13 @@ for level in levels:
     manage_sum.append(out_manage_sum)
 
 # Set ouput parameters for ESRI-land
-arcpy.SetParameterAsText(10, gen_sum)
-arcpy.SetParameterAsText(11, age_sum)
-arcpy.SetParameterAsText(12, health_sum)
-arcpy.SetParameterAsText(13, mast_sum)
-arcpy.SetParameterAsText(14, size_sum)
-arcpy.SetParameterAsText(15, species_sum)
-arcpy.SetParameterAsText(16, vert_sum)
-arcpy.SetParameterAsText(17, manage_sum)
+arcpy.SetParameter(10, gen_sum)
+arcpy.SetParameter(11, age_sum)
+arcpy.SetParameter(12, health_sum)
+arcpy.SetParameter(13, mast_sum)
+arcpy.SetParameter(14, size_sum)
+arcpy.SetParameter(15, species_sum)
+arcpy.SetParameter(16, vert_sum)
+arcpy.SetParameter(17, manage_sum)
 
 arcpy.AddMessage('FMG Summaries Complete - check output GDB for results')
