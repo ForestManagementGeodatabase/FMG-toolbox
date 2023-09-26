@@ -155,7 +155,7 @@ def general_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
+
         # Drop unecessary plot table columns
         plot_metrics = plot_table.drop(columns=
                                        ['UND_SP1', 'UND_SP2', 'UND_SP3',
@@ -548,7 +548,6 @@ def health_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -836,7 +835,6 @@ def mast_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1197,7 +1195,6 @@ def size_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1589,8 +1586,6 @@ def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
 
     elif level == 'PID':
 
-        arcpy.AddMessage('Work on {0}'.format(level))
-
         # Create Base DF
         base_df = fcalc.create_level_df(level, plot_table)
         arcpy.AddMessage("    Base DF Created")
@@ -1774,7 +1769,6 @@ def vert_comp_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     if level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
@@ -1965,7 +1959,6 @@ def management_summary(plot_table, tree_table, out_gdb, level):
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     if level == 'PID':
-        arcpy.AddMessage('Work on {0}'.format(level))
 
         # Create base table
         base_df = fcalc.create_level_df(level, plot_table)
