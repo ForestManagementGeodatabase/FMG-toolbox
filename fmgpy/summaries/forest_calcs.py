@@ -643,7 +643,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
 
     tree_table = tree_table\
@@ -1012,6 +1012,100 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
         return out_df
 
 
+# Generate TPA, BA, QM DBH given multiple case fields at PID level (no pivot, stays long)
+def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_columns):
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting data frame will be a
+    single instance of a plot/PID and case, with just 3 columns for TPA, BA and QDBH.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas series: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column      -- list: column names for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
+                            for each case in this column
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin(case_columns).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby('PID', as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count)) \
+        .set_index('PID')
+
+    # Add level to case columns
+    case_columns.insert(0, 'PID')
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Plot_Count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        # Set dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Plot_Count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        # Set dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+
 # Generate TPA, BA, QM DBH at non-PID levels
 def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
     """Creates a dataframe with BA, TPA and QM DBH columns at a specified level based on the provided filter.
@@ -1325,6 +1419,114 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
                    how='left',
                    on=level) \
             .reset_index()
+
+        return out_df
+
+
+# Generate TPA, BA, QM DBH given a case field at non-PID level (no pivot, stays long)
+def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_columns, level):
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting dataframe will be a single
+    instance of a level and case, with just 3 columns for TPA, BA and QMDBH
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column      -- string: field name for groupby  method, ba, tpa and qm dbh will be
+                            calculated for each category in this field
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin(case_columns).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby(level, as_index=False) \
+        .agg(Plot_Count=('PID', agg_plot_count)) \
+        .set_index(level)
+
+    # Add level to case columns
+    case_columns.insert(0, level)
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table, add unfiltered plot count field
+        filtered_df = tree_table[filter_statement] \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+            Tree_Count=('TR_SP', agg_tree_count),
+            Stand_Dens=('TR_DENS', sum)
+        ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
+        filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons
+        out_df = plotcount_df \
+            .drop(columns=['Plot_Count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on=level) \
+            .reset_index()
+
+        # Handle Dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Stand_Dens=('TR_DENS', sum),
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
+        filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons and fill nan with 0
+        out_df = plotcount_df \
+            .drop(columns=['Plot_Count'])\
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Handle dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
 
         return out_df
 
