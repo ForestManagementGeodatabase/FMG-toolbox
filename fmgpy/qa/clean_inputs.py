@@ -74,7 +74,7 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     # check inputs
 
     arcpy.AddMessage(
-        f"Checking Plot ID fields for {fc_center}"
+        f"\nChecking Plot ID fields for {os.path.basename(fc_center)}"
     )
 
     # create dataframes
@@ -88,10 +88,29 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
         try:
             center_df[center_plot_id_field] = center_df[center_plot_id_field].astype(int)
             arcpy.AddMessage(
-                f"{os.path.basename(fc_center)} plot ID field type converted to integer.")
+                f"    {os.path.basename(fc_center)} plot ID field type converted to integer")
         except:
-            arcpy.AddError(f"{os.path.basename(fc_center)} plot ID field type must be short or long integer, quitting.")
+            arcpy.AddError(f"    {os.path.basename(fc_center)} plot ID field type must be short "
+                           f"or long integer, quitting.")
+            center_df.spatial.to_featureclass(fc_center,
+                                              overwrite=True,
+                                              sanitize_columns=False)
             sys.exit(0)
+
+    # check main plot ID field for duplicate values
+    # if duplicates found, quit with message
+    duplicate_plots = center_df[center_df.duplicated([center_plot_id_field])]
+
+    if len(duplicate_plots.index) > 0:
+        center_df["DUPLICATE_PLOT_ID"] = center_df[center_plot_id_field].isin(duplicate_plots[center_plot_id_field])
+        yes_no(center_df, "DUPLICATE_PLOT_ID")
+
+        arcpy.AddError(f"    Duplicate plot IDs found in {os.path.basename(fc_center)}, quitting."
+                       f" Check flag field '"'DUPLICATE_PLOT_ID'"' and re-number plots before running again")
+        center_df.spatial.to_featureclass(fc_center,
+                                          overwrite=True,
+                                          sanitize_columns=False)
+        sys.exit(0)
 
     # check input plot ID field to ensure it is integer
     if check_df[check_plot_id_field].dtype == 'int64':
@@ -100,9 +119,13 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
         try:
             check_df[check_plot_id_field] = check_df[check_plot_id_field].astype(int)
             arcpy.AddMessage(
-                f"{os.path.basename(fc_check)} plot ID field type converted to integer.")
+                f"    {os.path.basename(fc_check)} plot ID field type converted to integer")
         except:
-            arcpy.AddError(f"{os.path.basename(fc_check)} plot ID field type must be short or long integer, quitting.")
+            arcpy.AddError(f"    {os.path.basename(fc_check)} plot ID field type must be short "
+                           f"or long integer, quitting.")
+            check_df.spatial.to_featureclass(fc_check,
+                                             overwrite=True,
+                                             sanitize_columns=False)
             sys.exit(0)
 
     # flag plot IDs not in main fc (returns boolean)
@@ -136,7 +159,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
         in_gdb               --  Path to working geodatabase
         """
 
-    arcpy.AddMessage("Checking spatial relationship between plot center and fixed plots")
+    arcpy.AddMessage("\nChecking spatial relationship between plot center and fixed plots")
 
     # output fc
     center_fixed_join = os.path.join(in_gdb, "center_fixed_SPjoin")
@@ -171,7 +194,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
     arcpy.management.DeleteField(fc_fixed, "PLOT_fixed")
     arcpy.management.Delete(center_fixed_join)
 
-    arcpy.AddMessage(f"\nFlag fields populated, check of {os.path.basename(fc_center)} "
+    arcpy.AddMessage(f"Flag fields populated, check of {os.path.basename(fc_center)} "
                      f"and {os.path.basename(fc_fixed)} complete")
 
     # overwrite input FC
@@ -196,7 +219,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     """
 
     arcpy.AddMessage(
-        "Checking for existence of corresponding prism and fixed plots"
+        "\nChecking for existence of corresponding prism and fixed plots"
     )
 
     # create dataframes
@@ -220,7 +243,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
         f"    Fixed plots {fc_fixed} checked for corresponding prism plots")
 
     arcpy.AddMessage(
-        "Checking spatial relationship between prism and fixed plots")
+        "    Checking spatial relationship between prism and fixed plots")
 
     # location for spatial join fc
     prism_fixed_join = os.path.join(in_gdb, "prism_fixed_SPjoin")
@@ -272,7 +295,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # convert count to Yes/No
     merge_fixed['PRISM_ID_MATCHES'] = merge_fixed.apply(lambda x: unique_val(x['PRISM_ID_MATCHES']), axis=1)
 
-    arcpy.AddMessage(f"\nFlag fields populated, completed check of {os.path.basename(fc_prism)} "
+    arcpy.AddMessage(f"Flag fields populated, completed check of {os.path.basename(fc_prism)} "
                      f"and {os.path.basename(fc_fixed)}")
 
     # cleanup
@@ -299,7 +322,7 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     """
 
     # check to ensure Age plots exit where required, adding and populating a flag field on the plot center feature class
-    arcpy.AddMessage("Checking plots for corresponding age record")
+    arcpy.AddMessage("\nChecking plots for corresponding age record")
 
     # create dataframes
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
@@ -315,7 +338,7 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     # reset plot to int
     center_df["PLOT"] = center_df["PLOT"].astype(int)
 
-    arcpy.AddMessage("\nCheck complete")
+    arcpy.AddMessage("Check complete")
 
     # overwrite input FC
     center_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
@@ -331,7 +354,7 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     flag_name -- Name of plot type flag field
     """
     # check plot center fc has all needed fields
-    arcpy.AddMessage("Begin check of plot center points")
+    arcpy.AddMessage("\nBegin check of plot center points")
 
     # list of required fields
     rf_center = [
@@ -363,7 +386,6 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     center_df.loc[center_df['MIS_FIELDS'] == '', 'HAS_MIS_FIELD'] = "No"
 
     arcpy.AddMessage("    HAS_MIS_FIELDS populated")
-    arcpy.AddMessage("\nCheck complete")
 
     # overwrite input FC
     center_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
@@ -386,7 +408,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     date_name    -- Name of date field
     """
 
-    arcpy.AddMessage("Begin check of prism plots")
+    arcpy.AddMessage("\nBegin check of prism plots")
 
     # list of required fields
     rf_prism = [
@@ -445,13 +467,13 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
                                                                        "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
-    arcpy.AddMessage("    MIS_FIELDS populated for treed records")
+    arcpy.AddMessage("    MIS_FIELDS populated for tree records")
 
     # populate HAS_MIS_FIELD
     prism_df.loc[prism_df['MIS_FIELDS'] != '', 'HAS_MIS_FIELD'] = "Yes"
     prism_df.loc[prism_df['MIS_FIELDS'] == '', 'HAS_MIS_FIELD'] = "No"
 
-    arcpy.AddMessage("    HAS_MIS_FIELDS populated for treed records")
+    arcpy.AddMessage("    HAS_MIS_FIELDS populated for tree records")
 
     # populate CANOPY_DBH_FLAG
     # flag all trees with dia > 50"
@@ -469,7 +491,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     prism_df.loc[(prism_df.TR_DIA < 30) & (prism_df.TR_CL == 'D'),
     'CANOPY_DBH_FLAG'] = "Class = D and diameter < 30in"
 
-    arcpy.AddMessage("\nCheck complete")
+    arcpy.AddMessage("Check complete")
 
     # overwrite input FC
     prism_df.spatial.to_featureclass(fc_prism,
@@ -496,7 +518,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     date_name    -- Name of date field
     """
 
-    arcpy.AddMessage("Begin check of age plots")
+    arcpy.AddMessage("\nBegin check of age plots")
 
     # list of required fields
     rf_age = [
@@ -562,7 +584,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     # recast numerical fields to correct type
     age_df["AGE_DIA"] = age_df["AGE_DIA"].round(1)
 
-    arcpy.AddMessage("\nCheck complete")
+    arcpy.AddMessage("Check complete")
 
     # overwrite input FC
     age_df.spatial.to_featureclass(fc_age,
@@ -590,7 +612,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     date_name     -- Name of date field
     """
 
-    arcpy.AddMessage("Begin check of fixed plots")
+    arcpy.AddMessage("\nBegin check of fixed plots")
 
     # list of required fields
     rf_fixed = [
@@ -679,7 +701,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     # return 0 if no tree present
     fixed_df.loc[fixed_df.UND_SP1.isin(["NONE", "None", "", " "]), 'UND_HT2'] = 0
 
-    arcpy.AddMessage("\nCheck complete")
+    arcpy.AddMessage("Check complete")
 
     # overwrite input FC
     fixed_df.spatial.to_featureclass(fc_fixed,
@@ -689,7 +711,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     return fc_fixed
 
 
-def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age):
+def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age, fc_center):
     """Checks prism, fixed, and age plots for duplicate geometry. Fixed plots are also checked for duplicate plot IDs.
 
     Keyword Arguments:
@@ -698,7 +720,7 @@ def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age):
     fc_age    -- Path to age feature class
     """
 
-    arcpy.AddMessage("Checking for and removing duplicates")
+    arcpy.AddMessage("\nChecking for and removing duplicates")
 
     # create dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
@@ -731,12 +753,12 @@ def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age):
                                    overwrite=True,
                                    sanitize_columns=False)
 
-    arcpy.AddMessage("\nCheck complete"
+    arcpy.AddMessage("Check complete"
                      f"\nRemoved {len(prism_duplicates.index)} duplicates from prism plots"
                      f"\nRemoved {len(fixed_duplicates.index)} duplicates from fixed plots"
                      f"\nRemoved {len(age_duplicates.index)} duplicates from age plots")
 
-    return fc_prism, fc_fixed, fc_age
+    return fc_prism, fc_fixed, fc_age, fc_center
 
 
 def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, comp, unit, site, stand):
@@ -780,7 +802,7 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
     arcpy.management.DeleteField(fc_center, levels)
 
     arcpy.AddMessage(
-        "Checking spatial relationship between plots and FMG polygons")
+        "\nChecking spatial relationship between plots and FMG polygons")
 
     # location for spatial join fc
     in_gdb = arcpy.Describe(fc_center).path
@@ -789,7 +811,7 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
     arcpy.analysis.SpatialJoin(target_features=fc_center,
                                join_features=fc_polygons,
                                out_feature_class=plots_spatial_join,
-                               join_operation="JOIN_ONE_TO_MANY",
+                               join_operation="JOIN_ONE_TO_ONE",
                                match_option="INTERSECT")
 
     with arcpy.da.UpdateCursor(plots_spatial_join, "SID") as cursor:
