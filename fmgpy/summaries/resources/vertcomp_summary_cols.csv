@@ -1,0 +1,25 @@
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+CNP_TPA,Canopy TPA,float64,,No,0,Yes
+CNP_BA,Canopy BA,float64,,No,0,Yes
+CNP_QMDBH,Canopy QM DBH,float64,,No,0,Yes
+CNP_D_TPA,Dead Canopy TPA,float64,,No,0,Yes
+CNP_D_BA,Dead Canopy BA,float64,,No,0,Yes
+CNP_D_QMDBH,Dead Canopy QM DBH,float64,,No,0,Yes
+CNP_DOM_HLTH,Canopy Dominant Health Class,string,NONE,Yes,,No
+CNP_DOM_HLTH_PCMP,Canopy Dominant Health Class % Composition,float64,,No,0,Yes
+CNP_DOM_SP,Canopy Dominant Species,string,NONE,Yes,,No
+CNP_DOM_SP_PCMP,Canopy Dominant Species % Composition,float64,,No,0,Yes
+MID_TPA,Midstory TPA,float64,,No,0,Yes
+MID_BA,Midstory BA,float64,,No,0,Yes
+MID_QMDBH,Midstory QM DBH,float64,,No,0,Yes
+MID_D_TPA,Dead Midstory TPA,float64,,No,0,Yes
+MID_D_BA,Dead Midstory BA,float64,,No,0,Yes
+MID_D_QMDBH,Dead Midstory QM DBH,float64,,No,0,Yes
+MID_DOM_HLTH,Midstory Dominant Health Class,string,NONE,Yes,,No
+MID_DOM_HLTH_PCMP,Midstory Dominant Health Class % Composition,float64,,No,0,Yes
+MID_DOM_SP,Midstory Dominant Species,string,NONE,Yes,,No
+MID_DOM_SP_PCMP,Midstory Dominant Species % Composition,float64,,No,0,Yes
+INT_DOM_HLTH,Intermediate Dominant Health Class,string,NONE,Yes,,No
+INT_DOM_HLTH_PCMP,Intermediate Dominant Health Class % Composition,float64,,No,0,Yes
+INT_DOM_SP,Intermidiate Dominant Species,string,NONE,Yes,,No
+INT_DOM_SP_PCMP,Intermediate Dominant Species % Composition,float64,,No,0,Yes

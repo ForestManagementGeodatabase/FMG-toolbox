@@ -7,6 +7,7 @@ import math
 import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
+import itertools
 arcpy.env.overwriteOutput = True
 
 
@@ -162,22 +163,52 @@ def fmg_nan_fill(col_csv):
     # import the column definition csv
     col_list_df = pd.read_csv(col_csv)
 
-    # Filter to just fields that require nan filling
-    col_list_df_filt = col_list_df[col_list_df['REQ_NAN_FILL'] == 'Yes']
+    # Create dictionary for just string fill nans
+    col_list_str = col_list_df[col_list_df['REQ_NAN_STR_FILL'] == 'Yes']
+    str_dict = None
+    if len(col_list_str.index) > 0:
+        str_cols = col_list_str['COL_NAME'].values.tolist()
+        str_vals = col_list_str['VALUE_NAN_STR'].values.tolist()
+        str_dict = dict(zip(str_cols, str_vals))
 
-    # Create value lists for COL_NAME and VALUE_NAN
-    col_list = col_list_df_filt['COL_NAME'].values.tolist()
-    val_list = []
-    for x in col_list_df_filt['VALUE_NAN'].values.tolist():
-        if type(x) == int:
-            val_list.append(float(x))
-        else:
-            val_list.append(x)
+    # Create df for just num fill nans
+    col_list_num = col_list_df[col_list_df['REQ_NAN_NUM_FILL'] == 'Yes']
+    num_dict = None
+    if len(col_list_num.index) > 0:
+        num_cols = col_list_num['COL_NAME'].values.tolist()
+        num_vals = col_list_num['VALUE_NAN_NUM'].values.tolist()
+        num_dict = dict(zip(num_cols, num_vals))
 
-    # Zip lists into dict
-    nan_fill_dict = dict(zip(col_list, val_list))
+    # Return either or, or, if there are both str and num dicts, combine
+    if str_dict is None:
+        out_dict = num_dict
+    elif num_dict is None:
+        out_dict = str_dict
+    else:
+        out_dict = num_dict | str_dict
 
-    return nan_fill_dict
+    return out_dict
+
+
+# Function to enforce data types in Python/Pandas
+def fmg_dtype_enforce(col_csv):
+    """ Creates a dictionary of dtypes for each column name as defined by the columns in the csv.
+
+    Keyword Args:
+        col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
+
+    Details: None
+    """
+
+    # Import the column csv
+    dtype_list_df = pd.read_csv(col_csv)
+
+    # Create the dictionary
+    dtype_cols = dtype_list_df['COL_NAME'].values.tolist()
+    dtype_types = dtype_list_df['OUTPUT_DTYPE'].values.tolist()
+    dtype_dict = dict(zip(dtype_cols, dtype_types))
+
+    return dtype_dict
 
 
 # Plot count: use with group by - agg
@@ -229,21 +260,39 @@ def agg_tree_count(tr_sp):
 # List of invasive species: use with group by - agg
 # TODO: add function description
 def agg_inv_sp(inv_sp):
-    sp = []
+
+    sp_temp = []
+
     # Build list of invasive species codes
     for val in inv_sp:
-        if val is None:
+        if val == '':
+            continue
+        elif val is not None:
+            sp_temp.append(val.split(', '))
+
+    sp = list(itertools.chain.from_iterable(itertools.repeat(x, 1) if isinstance(x, str) else x for x in sp_temp))
+
+    # Convert array to list then single string
+    sp_array = np.array(sp)
+    sp_unique = np.unique(sp_array)
+    spval = ', '.join(sp_unique.tolist())
+
+    return spval
+
+
+# Create function to return YES if invasive species are present
+def agg_inv_present(inv_present):
+    inv_pres = []
+    for val in inv_present:
+        if val == 'No':
             continue
         else:
-            sp.append(val)
+            inv_pres.append(val)
 
-    # Strip nans from list
-    spclean = [x for x in sp if x == x]
+    if len(inv_pres) > 0:
+        inv_present = 'Yes'
 
-    # Reduce list to unique values and return as a string
-    spset = set(spclean)
-    spval = ', '.join(spset)
-    return spval
+    return inv_present
 
 
 # Count of notes: use with group by - agg
@@ -267,6 +316,19 @@ def agg_count_notes(note_column):
     # count items in the list and return the count
     notecount = len(notes_clean)
     return notecount
+
+
+def clean_dtypes_for_esri(df):
+    # Convert dataframe dtypes which are not compatible with ArcGIS
+    # Use builtin Pandas dtype conversion
+    df = df.convert_dtypes(infer_objects=True)
+    # Then str convert any remaining special object/category fields
+    for col in df.columns:
+        # print(col, '/', df[col].dtype)
+        if df[col].dtype == 'object' or df[col].dtype == 'category':
+            df[col] = df[col].astype('str')
+    # Return modified df
+    return df
 
 
 # Plot count: use with group by - apply
@@ -429,6 +491,19 @@ def overstory_sp_map(sp_rank):
         return 'OV_SP5'
 
 
+def health_rank_map(tr_hlth):
+    if tr_hlth == 'H':
+        return 1
+    if tr_hlth == 'S':
+        return 2
+    if tr_hlth == 'SD':
+        return 3
+    if tr_hlth == 'D':
+        return 4
+    if tr_hlth == 'NT':
+        return 5
+
+
 # Quadratic Mean Diameter at Breast Height (QM DBH)
 def qm_dbh(ba, tpa):
     """Calculates quadratic mean at diameter breast height. Returns one value.
@@ -445,7 +520,11 @@ def qm_dbh(ba, tpa):
     #assert isinstance(ba, (float, np.float64)), "basal area must be a float"
     #assert isinstance(tpa, float, np.float64), "tpa must be a float"
 
-    qmdbh = np.sqrt((ba / tpa) / 0.005454154)
+    try:
+        qmdbh = np.sqrt((ba / tpa) / 0.005454154)
+    except TypeError:
+        qmdbh = None
+
     return qmdbh
 
 
@@ -462,12 +541,27 @@ def stocking_pct(avg_tpa, qm_dbh):
     Based on DOI:10.1093/njaf/27.4.132, "A Stocking Diagram for Midwestern Eastern Cottonwood-Silver
     Maple-American Sycamore Bottomland Forests"
     """
-    assert isinstance(avg_tpa, float), "avg_tpa must be a float"
-    assert isinstance(qm_dbh, float), "qm_dbh must be a float"
+    #assert isinstance(avg_tpa, float), "avg_tpa must be a float"
+    #assert isinstance(qm_dbh, float), "qm_dbh must be a float"
 
-    percent = avg_tpa * (0.0685724 + 0.0010125 * (0.259 + (0.973 * qm_dbh)) + 0.0023656 + qm_dbh ** 2)
+    # Define equation params
+    amd_p1 = 0.259
+    amd_p2 = 0.973
+    a_line_p1 = 0.0685724
+    a_line_p2 = 0.0010125
+    a_line_p3 = 0.0023656
 
-    return percent
+    try:
+        # Convert QM DBH to AMD
+        amd = amd_p1 + (amd_p2 * qm_dbh)
+
+        # Run stocking percent equation
+        stock_pct = avg_tpa * (a_line_p1 + a_line_p2 * amd + a_line_p3 * qm_dbh ** 2)
+
+    except TypeError:
+        stock_pct = None
+
+    return stock_pct
 
 
 # Percent Cover
@@ -550,7 +644,7 @@ def create_tree_table(prism_df):
 
     # Add SP_TYPE Column
     crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
-        .filter(items=['TR_SP', 'TYP_FOR_MVR'])
+        .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
 
     tree_table = tree_table\
         .merge(right=crosswalk_df, how='left', on='TR_SP')\
@@ -590,9 +684,6 @@ def create_plot_table(fixed_df, age_df):
         .merge(right=cleanage_df, how='left', left_on='PID', right_on='PID') \
         .reset_index()
 
-    # Define list of fields used to note invasive species
-    columnlist = ['GRD_SP1', 'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5']
-
     # Define list of specific invasive species
     invsp = ['HUJA', 'PHAR3', 'PHAU7']
 
@@ -612,7 +703,9 @@ def create_plot_table(fixed_df, age_df):
 
     # add and populate invasive species present column
     invsp_filter_df['INV_SP'] = invsp_filter_df \
-        .apply(lambda columnlist: inv_sp_list(columnlist), axis=1)
+        .apply(lambda x: inv_sp_list([x['GRD_SP1'], x['GRD_SP2'], x['GRD_SP3'],
+                                      x['NOT_SP1'], x['NOT_SP2'], x['NOT_SP3'],
+                                      x['NOT_SP4'], x['NOT_SP5']]), axis=1)
 
     # Set indices for merge
     plot_table.set_index('PID')
@@ -622,7 +715,9 @@ def create_plot_table(fixed_df, age_df):
         .merge(right=invsp_filter_df,
                how='left')\
         .reset_index()\
-        .drop(columns=['index', 'level_0'])
+        .drop(columns=['index', 'level_0']) \
+        .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
+        .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": 'No'})
 
     return plot_table
 
@@ -667,17 +762,29 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
         # Add and Calculate QM DBH
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
 
+        # Enforce dtypes
+        filtered_df = filtered_df.astype({'tree_count': 'int32',
+                                          'plot_count': 'int32',
+                                          'TPA': 'float64',
+                                          'BA': 'float64',
+                                          'QM_DBH': 'float64'})
+
         # Set index for merge
         filtered_df.set_index('PID')
 
         # Join results back to full set of PIDs and fill nans with 0
-        out_df = plotcount_df \
+        merge_df = plotcount_df \
             .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='left',
                    on='PID') \
-            .fillna(0) \
             .reset_index()
+
+        # Test merged df for data, then fillna if data
+        if len(merge_df.index) > 0:
+            out_df = merge_df.fillna(0)
+        else:
+            out_df = merge_df
 
         return out_df
 
@@ -695,6 +802,9 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
 
         # Add and Calculate QM DBH
         filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Enforce QM_DBH dtype
+        filtered_df = filtered_df.astype({'QM_DBH': 'float64'})
 
         # Set index for merge
         filtered_df.set_index('PID')
@@ -898,6 +1008,100 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
                    how='inner',
                    on='PID') \
             .reset_index()
+
+        return out_df
+
+
+# Generate TPA, BA, QM DBH given multiple case fields at PID level (no pivot, stays long)
+def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_columns):
+    """Creates a dataframe with BA, TPA and QM DBH columns at the plot level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting data frame will be a
+    single instance of a plot/PID and case, with just 3 columns for TPA, BA and QDBH.
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas series: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column      -- list: column names for groupby and pivot_table methods, ba, tpa and qm dbh will be calculated
+                            for each case in this column
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin(case_columns).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby('PID', as_index=False) \
+        .agg(plot_count=('PID', agg_plot_count)) \
+        .set_index('PID')
+
+    # Add level to case columns
+    case_columns.insert(0, 'PID')
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table
+        filtered_df = tree_table[filter_statement] \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Plot_Count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        # Set dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Plot_Count=('PID', agg_plot_count),
+                TPA=('TR_DENS', sum),
+                BA=('TR_BA', sum)
+            )
+
+        # Add and Calculate QM DBH
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of PIDs
+        out_df = plotcount_df \
+            .drop(columns=['plot_count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on='PID') \
+            .reset_index()
+
+        # Set dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
 
         return out_df
 
@@ -1219,6 +1423,114 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         return out_df
 
 
+# Generate TPA, BA, QM DBH given a case field at non-PID level (no pivot, stays long)
+def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_columns, level):
+    """Creates a dataframe with BA, TPA and QM DBH columns at a specified level. The function does not pivot
+    on the case field, instead leaving it in long form. Each row of the resulting dataframe will be a single
+    instance of a level and case, with just 3 columns for TPA, BA and QMDBH
+
+    Keyword Args:
+        tree_table       -- dataframe: input tree_table, produced by the create_tree_table function
+        filter_statement -- pandas method: filter statement to be used on the input dataframe, should be a full filter
+                            statement i.e. dataframe.field.filter. If no filter is required, None should be supplied.
+        case_column      -- string: field name for groupby  method, ba, tpa and qm dbh will be
+                            calculated for each category in this field
+        level            -- string: field name for desired FMG level, i.e. SID, SITE, UNIT
+
+    Details: filter statement should not be a string, rather just the pandas dataframe filter statement:
+    for live trees use: ~tree_table.TR_HLTH.isin(["D", "DEAD"])
+    for dead trees use: tree_table.TR_HLTH.isin(["D", "DEAD"])
+    if no filter is required, None should be passed in as the keyword argument.
+    """
+
+    # Check input parameters are valid
+    assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    assert tree_table.columns.isin(case_columns).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin([level]).any(), "df must contain column specified as level param"
+
+    # Create data frame that preserves unfiltered count of plots by level
+    plotcount_df = tree_table \
+        .groupby(level, as_index=False) \
+        .agg(Plot_Count=('PID', agg_plot_count)) \
+        .set_index(level)
+
+    # Add level to case columns
+    case_columns.insert(0, level)
+
+    # Test for filter statement and run script based on filter or no filter
+    if filter_statement is not None:
+
+        # Filter, group and sum tree table, add unfiltered plot count field
+        filtered_df = tree_table[filter_statement] \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+            Tree_Count=('TR_SP', agg_tree_count),
+            Stand_Dens=('TR_DENS', sum)
+        ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
+        filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons
+        out_df = plotcount_df \
+            .drop(columns=['Plot_Count']) \
+            .merge(right=filtered_df,
+                   how='inner',
+                   on=level) \
+            .reset_index()
+
+        # Handle Dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+    elif filter_statement is None:
+
+        # Group and sum tree table
+        filtered_df = tree_table \
+            .groupby(by=case_columns, as_index=False) \
+            .agg(
+                Tree_Count=('TR_SP', agg_tree_count),
+                Stand_Dens=('TR_DENS', sum),
+            ) \
+            .set_index(level) \
+            .merge(right=plotcount_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Add and calculate TPA, BA, QM_DBH
+        baf = 10
+        filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
+        filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
+        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+
+        # Join results back to full set of level polygons and fill nan with 0
+        out_df = plotcount_df \
+            .drop(columns=['Plot_Count'])\
+            .merge(right=filtered_df,
+                   how='left',
+                   on=level) \
+            .reset_index()
+
+        # Handle dtypes
+        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+                       .fillna(value={'QM_DBH': 0})\
+                       .drop(columns=['index'])
+
+        return out_df
+
+
 # Generate dominate health and percent composition for plot summaries
 def health_dom_plot(tree_table, filter_statement):
     """Creates a dataframe with most dominant health and percentage of total that health category comprises
@@ -1282,14 +1594,8 @@ def health_dom_plot(tree_table, filter_statement):
     # switching the sort method would result in a data frame of most prevalent health, weighted toward
     # the least healthy
 
-    # Assign numeric ranking codes to each health category
-    conditions = [(health_join_df['TR_HLTH'] == 'H'),
-                  (health_join_df['TR_HLTH'] == 'S'),
-                  (health_join_df['TR_HLTH'] == 'SD'),
-                  (health_join_df['TR_HLTH'] == 'D'),
-                  (health_join_df['TR_HLTH'] == 'NT')]
-    values = [1, 2, 3, 4, 5]
-    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+    # Assign Numeric codes to health categories
+    health_join_df['TR_HLTH_NUM'] = health_join_df['TR_HLTH'].map(health_rank_map)
 
     # Sort dataframe by numeric ranking codes
     health_dom_df = health_join_df \
@@ -1328,6 +1634,7 @@ def health_dom_plot(tree_table, filter_statement):
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
         .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
+        .astype({'HLTH_DOM_PCMP': 'float64'}) \
         .reset_index()
 
     return health_dom_pct_df
@@ -1401,13 +1708,7 @@ def health_dom_level(tree_table, filter_statement, level):
     # the least healthy
 
     # Assign numeric ranking codes to each health category
-    conditions = [(health_join_df['TR_HLTH'] == 'H'),
-                  (health_join_df['TR_HLTH'] == 'S'),
-                  (health_join_df['TR_HLTH'] == 'SD'),
-                  (health_join_df['TR_HLTH'] == 'D'),
-                  (health_join_df['TR_HLTH'] == 'NT')]
-    values = [1, 2, 3, 4, 5]
-    health_join_df['TR_HLTH_NUM'] = np.select(conditions, values)
+    health_join_df['TR_HLTH_NUM'] = health_join_df['TR_HLTH'].map(health_rank_map)
 
     # Sort dataframe by numeric ranking codes
     health_dom_df = health_join_df \
@@ -1447,6 +1748,7 @@ def health_dom_level(tree_table, filter_statement, level):
                        'HLTH_TPA',
                        'OVERALL_TPA']) \
         .rename(columns={'TR_HLTH': 'HLTH_DOM'}) \
+        .astype({'HLTH_DOM_PCMP': 'float64'}) \
         .reset_index()
 
     return health_dom_pct_df
@@ -1692,7 +1994,7 @@ def top5_ov_species_level(tree_table, level):
     # Rank each species within a single level group, based on sort
     species_df['SP_RANK'] = species_df.groupby([level]).cumcount().add(1)
 
-    # Filter on keep flag field where the value is less than or equal to 5
+    # Filter on keep species rank where the value is less than or equal to 5
     species_df = species_df[species_df.SP_RANK <= 5]
 
     # Assign categorical variable for species rank to assist in pivot column naming
@@ -1705,7 +2007,9 @@ def top5_ov_species_level(tree_table, level):
     species_pivot_df2.columns = ['_'.join(col) for col in species_pivot_df2.columns.values]
 
     # reset index
-    species_pivot_df2 = species_pivot_df2.reset_index()
+    species_pivot_df2 = species_pivot_df2\
+        .reset_index()\
+        .infer_objects()
 
     # Rename columns
     ov_species = species_pivot_df2 \
@@ -1799,9 +2103,9 @@ def top5_ov_species_level(tree_table, level):
 
         # convert loop result list to dataframe
         health_dom_ovsp = pd.DataFrame(health_dom_list, columns=[level,
-                                                                 key+'_HLTH_DOM',
-                                                                 key+'_HLTH_DOM_PCMP',
-                                                                 key+'_HLTH_DOM_TPA',
+                                                                 key+'_DOM_HLTH',
+                                                                 key+'_DOM_HLTH_PCMP',
+                                                                 key+'_DOM_HLTH_TPA',
                                                                  key+'_D_TPA'])
 
         # Join dataframe to OV_SPECIES dataframe
@@ -1811,15 +2115,15 @@ def top5_ov_species_level(tree_table, level):
     # Re order columns
     ov_species = ov_species.reindex([level,
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_DOM_HLTH', 'OV_SP1_DOM_HLTH_PCMP', 'OV_SP1_DOM_HLTH_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP2_DOM_HLTH', 'OV_SP2_DOM_HLTH_PCMP', 'OV_SP2_DOM_HLTH_TPA', 'OV_SP2_D_TPA',
                                      'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP3_DOM_HLTH', 'OV_SP3_DOM_HLTH_PCMP', 'OV_SP3_DOM_HLTH_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_DOM_HLTH', 'OV_SP4_DOM_HLTH_PCMP', 'OV_SP4_DOM_HLTH_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
+                                     'OV_SP5_DOM_HLTH', 'OV_SP5_DOM_HLTH_PCMP', 'OV_SP5_DOM_HLTH_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
@@ -1967,23 +2271,156 @@ def top5_ov_species_plot(tree_table):
     # Re order columns
     ov_species = ov_species.reindex(['PID',
                                      'OV_SP1', 'OV_SP1_BA', 'OV_SP1_TPA', 'OV_SP1_QMDBH',
-                                     'OV_SP1_HLTH_DOM', 'OV_SP1_HLTH_DOM_PCMP', 'OV_SP1_HLTH_DOM_TPA', 'OV_SP1_D_TPA',
+                                     'OV_SP1_DOM_HLTH', 'OV_SP1_DOM_HLTH_PCMP', 'OV_SP1_DOM_HLTH_TPA', 'OV_SP1_D_TPA',
                                      'OV_SP2', 'OV_SP2_BA', 'OV_SP2_TPA', 'OV_SP2_QMDBH',
-                                     'OV_SP2_HLTH_DOM', 'OV_SP2_HLTH_DOM_PCMP', 'OV_SP2_HLTH_DOM_TPA', 'OV_SP2_D_TPA',
+                                     'OV_SP2_DOM_HLTH', 'OV_SP2_DOM_HLTH_PCMP', 'OV_SP2_DOM_HLTH_TPA', 'OV_SP2_D_TPA',
                                      'OV_SP3', 'OV_SP3_BA', 'OV_SP3_TPA', 'OV_SP3_QMDBH',
-                                     'OV_SP3_HLTH_DOM', 'OV_SP3_HLTH_DOM_PCMP', 'OV_SP3_HLTH_DOM_TPA', 'OV_SP3_D_TPA',
+                                     'OV_SP3_DOM_HLTH', 'OV_SP3_DOM_HLTH_PCMP', 'OV_SP3_DOM_HLTH_TPA', 'OV_SP3_D_TPA',
                                      'OV_SP4', 'OV_SP4_BA', 'OV_SP4_TPA', 'OV_SP4_QMDBH',
-                                     'OV_SP4_HLTH_DOM', 'OV_SP4_HLTH_DOM_PCMP', 'OV_SP4_HLTH_DOM_TPA', 'OV_SP4_D_TPA',
+                                     'OV_SP4_DOM_HLTH', 'OV_SP4_DOM_HLTH_PCMP', 'OV_SP4_DOM_HLTH_TPA', 'OV_SP4_D_TPA',
                                      'OV_SP5', 'OV_SP5_BA', 'OV_SP5_TPA', 'OV_SP5_QMDBH',
-                                     'OV_SP5_HLTH_DOM', 'OV_SP5_HLTH_DOM_PCMP', 'OV_SP5_HLTH_DOM_TPA', 'OV_SP5_D_TPA'],
+                                     'OV_SP5_DOM_HLTH', 'OV_SP5_DOM_HLTH_PCMP', 'OV_SP5_DOM_HLTH_TPA', 'OV_SP5_D_TPA'],
                                     axis="columns")
 
     return ov_species
 
 
+# Determine most common und and grnd species
+def get_groupby_modes(source, keys, values, dropna=True, return_counts=False):
+    """
+    A function that groups a pandas dataframe by some of its columns (keys) and
+    returns the most common value of each group for some of its columns (values).
+    The output is sorted by the counts of the first column in values (because it
+    uses pd.DataFrame.value_counts internally).
+    An equivalent one-liner if values is a singleton list is:
+    (
+        source
+        .value_counts(keys+values)
+        .pipe(lambda x: x[~x.droplevel(values).index.duplicated()])
+        .reset_index(name=f"{values[0]}_count")
+    )
+    If there are multiple modes for some group, it returns the value with the
+    lowest Unicode value (because under the hood, it drops duplicate indexes in a
+    sorted dataframe), unlike, e.g. df.groupby(keys)[values].agg(pd.Series.mode).
+    Must have Pandas 1.1.0 or later for the function to work and must have
+    Pandas 1.3.0 or later for the dropna parameter to work.
+    -----------------------------------------------------------------------------
+    Parameters:
+    -----------
+    source: pandas dataframe.
+        A pandas dataframe with at least two columns.
+    keys: list.
+        A list of column names of the pandas dataframe passed as source. It is
+        used to determine the groups for the groupby.
+    values: list.
+        A list of column names of the pandas dataframe passed as source.
+        If it is a singleton list, the output contains the mode of each group
+        for this column. If it is a list longer than 1, then the modes of each
+        group for the additional columns are assigned as new columns.
+    dropna: bool, default: True.
+        Whether to count NaN values as the same or not. If True, NaN values are
+        treated by their default property, NaN != NaN. If False, NaN values in
+        each group are counted as the same values (NaN could potentially be a
+        most common value).
+    return_counts: bool, default: False.
+        Whether to include the counts of each group's mode. If True, the output
+        contains a column for the counts of each mode for every column in values.
+        If False, the output only contains the modes of each group for each
+        column in values.
+    -----------------------------------------------------------------------------
+    Returns:
+    --------
+    a pandas dataframe.
+    -----------------------------------------------------------------------------
+    Example:
+    --------
+    get_groupby_modes(source=df,
+                      keys=df.columns[:2].tolist(),
+                      values=df.columns[-2:].tolist(),
+                      dropna=True,
+                      return_counts=False)
+    """
+
+    def _get_counts(df, keys, v, dropna):
+        c = df.value_counts(keys + v, dropna=dropna)
+        return c[~c.droplevel(v).index.duplicated()]
+
+    counts = _get_counts(source, keys, values[:1], dropna)
+
+    if len(values) == 1:
+        if return_counts:
+            final = counts.reset_index(name=f"{values[0]}_count")
+        else:
+            final = counts.reset_index()[keys + values[:1]]
+    else:
+        final = counts.reset_index(name=f"{values[0]}_count", level=values[0])
+        if not return_counts:
+            final = final.drop(columns=f"{values[0]}_count")
+        for v in values:
+            counts = _get_counts(source, keys, [v], dropna).reset_index(level=v)
+            if return_counts:
+                final[[v, f"{v}_count"]] = counts
+            else:
+                final[v] = counts[v]
+        final = final.reset_index()
+    return final
 
 
+# Create both species richness metrics
+def create_sp_richness(tree_table, plot_table, level):
+    # Create base df
+    base_df = create_level_df(level, plot_table)
 
+    # Filter Tree Table
+    tree_table_live = tree_table[(tree_table['TR_HLTH'] != 'D') & (tree_table['TR_SP'] != 'NONE')]
 
+    # Create Single Number Sp Rich (count of unique species
+    sp_rich_ct = tree_table_live \
+        .groupby(level) \
+        .agg(SP_RICH=('TR_SP', 'nunique')) \
+        .reset_index() \
+        .set_index(level)
+
+    # Create compound species richness: 3 digit 'number' = CT Uniq SP Hard Mast, CT Uniq SP Other, CT Uniq SP Typical
+    # Count unique species for each SP richness category (Hard Mast, Other, Typical)
+    comp_sp_rich_ct = tree_table_live \
+        .groupby([level, 'SP_RICH_TYPE'], as_index=False) \
+        .agg(COMP_SP_CT=('TR_SP', 'nunique'))
+
+    # pivot count table to wide
+    comp_sp_pivot = comp_sp_rich_ct \
+        .pivot_table(index=level,
+                     columns='SP_RICH_TYPE',
+                     values=['COMP_SP_CT'],
+                     fill_value=0) \
+        .reset_index()
+
+    # Flatten multiindex and rename columns
+    comp_sp_pivot.columns = ["_".join(col) for col in comp_sp_pivot.columns.to_flat_index()]
+
+    # set string dtypes
+    level_col_name = level + '_'
+    comp_sp_rich = comp_sp_pivot \
+        .astype(dtype={'COMP_SP_CT_Hard': 'string',
+                       'COMP_SP_CT_Other': 'string',
+                       'COMP_SP_CT_Typical': 'string'}) \
+        .rename(columns={level_col_name: level}) \
+        .set_index(level)
+
+    # Concatenate counts into 3 digit string
+    comp_sp_rich['COMP_SP_RICH'] = comp_sp_rich.COMP_SP_CT_Hard.str.cat([comp_sp_rich.COMP_SP_CT_Other,
+                                                                         comp_sp_rich.COMP_SP_CT_Typical])
+
+    # Drop individual count cols from comp sp richness
+    comp_sp_rich = comp_sp_rich \
+        .drop(columns=['COMP_SP_CT_Hard', 'COMP_SP_CT_Other', 'COMP_SP_CT_Typical'])
+
+    # Combine dfs into single df
+    sp_richness = base_df.join(other=[sp_rich_ct, comp_sp_rich], how='left')
+    sp_richness = sp_richness[['SP_RICH', 'COMP_SP_RICH']].reset_index()
+
+    sp_richness = sp_richness.fillna(value={'SP_RICH': 0, 'COMP_SP_RICH': 'NONE'})
+
+    return sp_richness
 
 

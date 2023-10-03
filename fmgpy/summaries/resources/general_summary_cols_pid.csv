@@ -1,25 +1,25 @@
-COL_NAME,ALIAS,VALUE_NAN,REQ_NAN_FILL
-AREA_AC,Area (Acres),0,Yes
-INVT_YEAR,Inventory Year or Years,,No
-TR_CT,Total Number of Trees,0,Yes
-TR_LV_CT,Total Number of Live Trees,0,Yes
-TR_D_CT,Total Number of Dead Trees,0,Yes
-LIVE_BA,BA for Live Trees,0,Yes
-LIVE_TPA,TPA for Live Trees,0,Yes
-LIVE_QMDBH,QMDBH For Live Trees,0,Yes
-LIVE_AMD,Average Diameter for Live Trees,0,Yes
-LIVE_MAX_DBH,Max DBH for Live Trees,0,Yes
-INV_PRESENT,Invasive Species Present,No,Yes
-INV_SP,List of Invasive Species Identified,NONE,Yes
-OV_CLSR,Overstory Closure,0,Yes
-OV_HT,Overstory Height,0,Yes
-UND_COV,Understory Cover,0,Yes
-UND_HT_MEAN,Understory Height Mean,0,Yes
-UND_HT_RG,Understory Height Range,,No
-AGE_SP,Aged Tree Species,NONE,Yes
-AGE_DIA,Aged Tree Diameter,0,Yes
-AGE_ORIG,Aged Tree Year of Origin,,No
-AGE_GRW,Aged Tree Growth,0,Yes
-AGE_MAST_TYPE,Aged Tree Mast Type,None,Yes
-AGE_NOTE,Note from Age Plots,,No
-FIXED_NOTE,Note from Fixed Plots,,No
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL
+AREA_AC,Area (Acres),float64,,No,0,Yes
+INVT_YEAR,Inventory Year or Years,string,,No,,No
+TR_CT,Total Number of Trees,float64,,No,0,Yes
+TR_LV_CT,Total Number of Live Trees,float64,,No,0,Yes
+TR_D_CT,Total Number of Dead Trees,float64,,No,0,Yes
+LIVE_BA,BA for Live Trees,float64,,No,0,Yes
+LIVE_TPA,TPA for Live Trees,float64,,No,0,Yes
+LIVE_QMDBH,QMDBH For Live Trees,float64,,No,0,Yes
+LIVE_AMD,Average Diameter for Live Trees,float64,,No,0,Yes
+LIVE_MAX_DBH,Max DBH for Live Trees,int32,,No,0,Yes
+INV_PRESENT,Invasive Species Present,string,No,Yes,,No
+INV_SP,List of Invasive Species Identified,string,NONE,Yes,,No
+OV_CLSR,Overstory Closure,int32,,No,0,Yes
+OV_HT,Overstory Height,int32,,No,0,Yes
+UND_COV,Understory Cover,int32,,No,0,Yes
+UND_HT_MEAN,Understory Height Mean,float64,,No,0,Yes
+UND_HT_RG,Understory Height Range,string,,No,,No
+AGE_SP,Aged Tree Species,string,NONE,Yes,,No
+AGE_DIA,Aged Tree Diameter,float64,,No,0,Yes
+AGE_ORIG,Aged Tree Year of Origin,int32,,No,0,Yes
+AGE_GRW,Aged Tree Growth,int32,,No,0,Yes
+AGE_MAST_TYPE,Aged Tree Mast Type,string,None,Yes,,No
+AGE_NOTE,Note from Age Plots,string,,No,,No
+FIXED_NOTE,Note from Fixed Plots,string,,No,,No
