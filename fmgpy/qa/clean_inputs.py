@@ -74,7 +74,7 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     # check inputs
 
     arcpy.AddMessage(
-        f"\nChecking Plot ID fields for {os.path.basename(fc_center)}"
+        f"\nChecking Plot ID fields for {os.path.basename(fc_check)}"
     )
 
     # create dataframes
@@ -83,12 +83,10 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
 
     # check main plot ID field to ensure it is integer
     if center_df[center_plot_id_field].dtype == 'int64':
-        arcpy.AddMessage(f"    {os.path.basename(fc_center)} plot ID field type is correct")
+        pass
     else:
         try:
             center_df[center_plot_id_field] = center_df[center_plot_id_field].astype(int)
-            arcpy.AddMessage(
-                f"    {os.path.basename(fc_center)} plot ID field type converted to integer")
         except:
             arcpy.AddError(f"    {os.path.basename(fc_center)} plot ID field type must be short "
                            f"or long integer, quitting.")
@@ -118,8 +116,6 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     else:
         try:
             check_df[check_plot_id_field] = check_df[check_plot_id_field].astype(int)
-            arcpy.AddMessage(
-                f"    {os.path.basename(fc_check)} plot ID field type converted to integer")
         except:
             arcpy.AddError(f"    {os.path.basename(fc_check)} plot ID field type must be short "
                            f"or long integer, quitting.")
@@ -159,7 +155,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
         in_gdb               --  Path to working geodatabase
         """
 
-    arcpy.AddMessage("\nChecking spatial relationship between plot center and fixed plots")
+    arcpy.AddMessage("\nChecking fixed plots have correct plot ID")
 
     # output fc
     center_fixed_join = os.path.join(in_gdb, "center_fixed_SPjoin")
@@ -172,7 +168,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
                                fc_center,
                                center_fixed_join,
                                match_option="CLOSEST",
-                               distance_field_name="DIST_FROM_CENTER_M")
+                               distance_field_name="METERS_FROM_PLOT_CENTER")
 
     # create dataframes
     join_df = pd.DataFrame.spatial.from_featureclass(center_fixed_join)
@@ -183,7 +179,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
 
     # add DIST_FROM_ACTUAL_M and CORRECT_PLOT_ID fields to fixed_df
     fixed_df = fixed_df.assign(
-        DIST_FROM_CENTER_M=fixed_df['OBJECTID'].map(join_df.set_index('OBJECTID')["DIST_FROM_CENTER_M"]))
+        METERS_FROM_PLOT_CENTER=fixed_df['OBJECTID'].map(join_df.set_index('OBJECTID')["METERS_FROM_PLOT_CENTER"]))
 
     fixed_df = fixed_df.assign(
         CORRECT_PLOT_ID=fixed_df['OBJECTID'].map(join_df.set_index('OBJECTID')["CORRECT_PLOT_ID"]))
@@ -194,8 +190,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
     arcpy.management.DeleteField(fc_fixed, "PLOT_fixed")
     arcpy.management.Delete(center_fixed_join)
 
-    arcpy.AddMessage(f"Flag fields populated, check of {os.path.basename(fc_center)} "
-                     f"and {os.path.basename(fc_fixed)} complete")
+    arcpy.AddMessage(f"CORRECT_PLOT_ID and METERS_FROM_PLOT_CENTER populated, check complete")
 
     # overwrite input FC
     fixed_df.spatial.to_featureclass(fc_fixed, sanitize_columns=False)
@@ -203,7 +198,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
 
 
 def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
-    """ Checks to make sure there is a prism plot for every fixed plot and that there is a
+    """Checks to make sure there is a prism plot for every fixed plot and that there is a
     fixed plot for each prism plot. This is accomplished by comparing unique sets of plot
     IDs present for each feature class and populating fields indicating if this relationship
     holds true.
@@ -219,7 +214,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     """
 
     arcpy.AddMessage(
-        "\nChecking for existence of corresponding prism and fixed plots"
+        "\nChecking for matched pairs of prism and fixed plots"
     )
 
     # create dataframes
@@ -234,13 +229,13 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     prism_df["HAS_FIXED"] = prism_df[prism_plot_id].isin(fixed_df[fixed_plot_id])
     yes_no(prism_df, 'HAS_FIXED')
     arcpy.AddMessage(
-        f"    Prism plots {fc_prism} checked for corresponding fixed plots")
+        f"    Prism plots checked for corresponding fixed plots")
 
     # flag fixed plot IDs without corresponding prism plot
     fixed_df["HAS_PRISM"] = fixed_df[fixed_plot_id].isin(prism_df[prism_plot_id])
     yes_no(fixed_df, 'HAS_PRISM')
     arcpy.AddMessage(
-        f"    Fixed plots {fc_fixed} checked for corresponding prism plots")
+        f"    Fixed plots checked for corresponding prism plots")
 
     arcpy.AddMessage(
         "    Checking spatial relationship between prism and fixed plots")
@@ -257,7 +252,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
                                out_feature_class=prism_fixed_join,
                                join_operation="JOIN_ONE_TO_MANY",
                                match_option="CLOSEST",
-                               distance_field_name="DIST_FROM_FIXED_M")
+                               distance_field_name="METERS_FROM_FIXED_PLOT")
 
     # create dataframe from spatial join
     join_df = pd.DataFrame.spatial.from_featureclass(prism_fixed_join)
@@ -267,7 +262,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
 
     # add DIST_FROM_ACTUAL_M and CORRECT_PLOT_ID fields to prism_df
     prism_df = prism_df.assign(
-        DIST_FROM_FIXED_M=prism_df['OBJECTID'].map(join_df.set_index('TARGET_FID')["DIST_FROM_FIXED_M"]))
+        METERS_FROM_FIXED_PLOT=prism_df['OBJECTID'].map(join_df.set_index('TARGET_FID')["METERS_FROM_FIXED_PLOT"]))
 
     prism_df = prism_df.assign(
         CORRECT_PLOT_ID=prism_df['OBJECTID'].map(join_df.set_index('TARGET_FID')["CORRECT_PLOT_ID"]))
@@ -295,8 +290,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # convert count to Yes/No
     merge_fixed['PRISM_ID_MATCHES'] = merge_fixed.apply(lambda x: unique_val(x['PRISM_ID_MATCHES']), axis=1)
 
-    arcpy.AddMessage(f"Flag fields populated, completed check of {os.path.basename(fc_prism)} "
-                     f"and {os.path.basename(fc_fixed)}")
+    arcpy.AddMessage(f"Flag fields populated, completed check of prism and fixed plots")
 
     # cleanup
     arcpy.management.DeleteField(fc_prism, "PLOT_prism")
@@ -322,7 +316,7 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     """
 
     # check to ensure Age plots exit where required, adding and populating a flag field on the plot center feature class
-    arcpy.AddMessage("\nChecking plots for corresponding age record")
+    arcpy.AddMessage("\nChecking for presence of all needed age tree records")
 
     # create dataframes
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
@@ -338,7 +332,7 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     # reset plot to int
     center_df["PLOT"] = center_df["PLOT"].astype(int)
 
-    arcpy.AddMessage("Check complete")
+    arcpy.AddMessage("HAS_AGE populated, check complete")
 
     # overwrite input FC
     center_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
@@ -354,7 +348,7 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     flag_name -- Name of plot type flag field
     """
     # check plot center fc has all needed fields
-    arcpy.AddMessage("\nBegin check of plot center points")
+    arcpy.AddMessage("\nChecking plot centers for required fields")
 
     # list of required fields
     rf_center = [
@@ -386,6 +380,7 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
     center_df.loc[center_df['MIS_FIELDS'] == '', 'HAS_MIS_FIELD'] = "No"
 
     arcpy.AddMessage("    HAS_MIS_FIELDS populated")
+    arcpy.AddMessage("Check complete")
 
     # overwrite input FC
     center_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
@@ -408,7 +403,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     date_name    -- Name of date field
     """
 
-    arcpy.AddMessage("\nBegin check of prism plots")
+    arcpy.AddMessage("\nChecking prism plots for required fields")
 
     # list of required fields
     rf_prism = [
@@ -518,7 +513,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     date_name    -- Name of date field
     """
 
-    arcpy.AddMessage("\nBegin check of age plots")
+    arcpy.AddMessage("\nChecking age plots for required fields")
 
     # list of required fields
     rf_age = [
@@ -612,7 +607,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     date_name     -- Name of date field
     """
 
-    arcpy.AddMessage("\nBegin check of fixed plots")
+    arcpy.AddMessage("\nChecking fixed plots for required fields")
 
     # list of required fields
     rf_fixed = [
