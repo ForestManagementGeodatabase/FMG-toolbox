@@ -1069,7 +1069,7 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             .reset_index()
 
         # Set dtypes
-        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+        out_df = out_df.astype({'TPA': 'float64', 'QM_DBH': 'float64'})\
                        .fillna(value={'QM_DBH': 0})\
                        .drop(columns=['index'])
 
@@ -1099,7 +1099,7 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             .reset_index()
 
         # Set dtypes
-        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+        out_df = out_df.astype({'TPA': 'float64', 'QM_DBH': 'float64'})\
                        .fillna(value={'QM_DBH': 0})\
                        .drop(columns=['index'])
 
@@ -1488,7 +1488,7 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
             .reset_index()
 
         # Handle Dtypes
-        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+        out_df = out_df.astype({'TPA': 'float64', 'QM_DBH': 'float64'})\
                        .fillna(value={'QM_DBH': 0})\
                        .drop(columns=['index'])
 
@@ -1524,7 +1524,7 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
             .reset_index()
 
         # Handle dtypes
-        out_df = out_df.astype({'TR_SP': 'string', 'TPA': 'float64', 'QM_DBH': 'float64'})\
+        out_df = out_df.astype({'TPA': 'float64', 'QM_DBH': 'float64'})\
                        .fillna(value={'QM_DBH': 0})\
                        .drop(columns=['index'])
 

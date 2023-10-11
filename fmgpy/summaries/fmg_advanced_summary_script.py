@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import forest_calcs as fcalc
-import forest_summaries as fsum
 
 # Define Required Input Parameters
 prism_fc = arcpy.GetParameterAsText(0)
