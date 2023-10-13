@@ -698,26 +698,45 @@ def create_plot_table(fixed_df, age_df):
                                  plot_table['NOT_SP5'].isin(invsp)] \
         .reset_index()
 
-    # add and populate invasive presence column
-    invsp_filter_df['INV_PRESENT'] = 'Yes'
+    # Count the rows in the filtered dataset
+    invsp_filter_df_len = len(invsp_filter_df)
 
-    # add and populate invasive species present column
-    invsp_filter_df['INV_SP'] = invsp_filter_df \
-        .apply(lambda x: inv_sp_list([x['GRD_SP1'], x['GRD_SP2'], x['GRD_SP3'],
-                                      x['NOT_SP1'], x['NOT_SP2'], x['NOT_SP3'],
-                                      x['NOT_SP4'], x['NOT_SP5']]), axis=1)
+    # do the invasive species operations only if there are invasive species present
+    if invsp_filter_df_len > 0:
 
-    # Set indices for merge
-    plot_table.set_index('PID')
-    invsp_filter_df.set_index('PID')
+        # add and populate invasive presence column
+        invsp_filter_df['INV_PRESENT'] = 'Yes'
 
-    plot_table = plot_table \
-        .merge(right=invsp_filter_df,
-               how='left')\
-        .reset_index()\
-        .drop(columns=['index', 'level_0']) \
-        .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
-        .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": 'No'})
+        # add and populate invasive species present column
+        invsp_filter_df['INV_SP'] = invsp_filter_df \
+            .apply(lambda x: inv_sp_list([x['GRD_SP1'], x['GRD_SP2'], x['GRD_SP3'],
+                                          x['NOT_SP1'], x['NOT_SP2'], x['NOT_SP3'],
+                                          x['NOT_SP4'], x['NOT_SP5']]), axis=1)
+
+        # Set indices for merge
+        plot_table.set_index('PID')
+        invsp_filter_df.set_index('PID')
+
+        plot_table = plot_table \
+            .merge(right=invsp_filter_df,
+                   how='left')\
+            .reset_index()\
+            .drop(columns=['index', 'level_0']) \
+            .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
+            .fillna(value={"AGE_MISC": '', "INV_SP": '', "INV_PRESENT": 'No'})
+
+    elif invsp_filter_df_len == 0:
+
+        # Add and populate invasive species columns
+        plot_table['INV_SP'] = ''
+        plot_table['INV_PRESENT'] = 'No'
+
+        # Clean up plot table
+        plot_table = plot_table\
+            .reset_index() \
+            .drop(columns=['index', 'level_0'], errors='ignore') \
+            .astype(dtype={"INV_SP": 'string', "INV_PRESENT": 'string'}) \
+            .fillna(value={"AGE_MISC": ''})
 
     return plot_table
 
