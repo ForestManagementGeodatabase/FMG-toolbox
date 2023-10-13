@@ -687,15 +687,18 @@ def create_plot_table(fixed_df, age_df):
     # Define list of specific invasive species
     invsp = ['HUJA', 'PHAR3', 'PHAU7']
 
+    # Drop shape from plot table
+    plot_table2 = plot_table.drop(columns=['SHAPE'])
+
     # filter dataset to just records with invasive species
-    invsp_filter_df = plot_table[plot_table['GRD_SP1'].isin(invsp) |
-                                 plot_table['GRD_SP2'].isin(invsp) |
-                                 plot_table['GRD_SP3'].isin(invsp) |
-                                 plot_table['NOT_SP1'].isin(invsp) |
-                                 plot_table['NOT_SP2'].isin(invsp) |
-                                 plot_table['NOT_SP3'].isin(invsp) |
-                                 plot_table['NOT_SP4'].isin(invsp) |
-                                 plot_table['NOT_SP5'].isin(invsp)] \
+    invsp_filter_df = plot_table2[plot_table['GRD_SP1'].isin(invsp) |
+                                  plot_table['GRD_SP2'].isin(invsp) |
+                                  plot_table['GRD_SP3'].isin(invsp) |
+                                  plot_table['NOT_SP1'].isin(invsp) |
+                                  plot_table['NOT_SP2'].isin(invsp) |
+                                  plot_table['NOT_SP3'].isin(invsp) |
+                                  plot_table['NOT_SP4'].isin(invsp) |
+                                  plot_table['NOT_SP5'].isin(invsp)] \
         .reset_index()
 
     # Count the rows in the filtered dataset

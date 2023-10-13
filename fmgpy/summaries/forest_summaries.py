@@ -163,7 +163,8 @@ def general_summary(plot_table, tree_table, out_gdb, level):
                                         'NOT_SP1', 'NOT_SP2', 'NOT_SP3',
                                         'NOT_SP4', 'NOT_SP5',
                                         'COL_CREW', 'AGENCY', 'DISTRICT',
-                                        'ITERATION', 'SHAPE'])
+                                        'ITERATION', 'SHAPE'],
+                                       errors='ignore')
 
         # Rename Columns
         plot_metrics = plot_metrics.rename(columns={'AGE_MISC': 'AGE_NOTE',
