@@ -13,6 +13,7 @@ fc_prism = arcpy.GetParameterAsText(0)
 fc_fixed = arcpy.GetParameterAsText(1)
 fixed_plot_id = arcpy.GetParameterAsText(2)
 fc_age = arcpy.GetParameterAsText(3)
+fc_center = arcpy.GetParameterAsText(4)
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_prism)[0]:
@@ -24,11 +25,16 @@ if not split(fc_fixed)[0]:
 if not split(fc_age)[0]:
     fc_age = join(arcpy.Describe(fc_age).path, arcpy.Describe(fc_age).name)
 
-result = clean_inputs.remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age)
+if not split(fc_center)[0]:
+    fc_center = join(arcpy.Describe(fc_center).path, arcpy.Describe(fc_center).name)
+
+result = clean_inputs.remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age, fc_center)
 
 out_prism = result[0]
-arcpy.SetParameterAsText(4, out_prism)
+arcpy.SetParameterAsText(5, out_prism)
 out_fixed = result[1]
-arcpy.SetParameterAsText(5, out_fixed)
+arcpy.SetParameterAsText(6, out_fixed)
 out_age = result[2]
-arcpy.SetParameterAsText(6, out_age)
+arcpy.SetParameterAsText(7, out_age)
+out_center = result[3]
+arcpy.SetParameterAsText(8, out_center)

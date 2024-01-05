@@ -470,6 +470,19 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
 
     arcpy.AddMessage("    HAS_MIS_FIELDS populated for tree records")
 
+    # add mast type field
+    if 'MAST_TYPE' in prism_df.columns:
+        # delete field if already in dataset
+        prism_df.drop(columns=['MAST_TYPE'])
+    else:
+        pass
+    crosswalk_df = pd.read_csv('../summaries/resources/MAST_SP_TYP_Crosswalk.csv') \
+        .filter(items=['TR_SP', 'MAST_TYPE'])
+
+    prism_df = prism_df.merge(right=crosswalk_df, how='left', on='TR_SP')
+
+    arcpy.AddMessage("    MAST_TYPE field populated")
+
     # populate CANOPY_DBH_FLAG
     # flag all trees with dia > 50"
     prism_df.loc[prism_df['TR_DIA'] > 50, 'CANOPY_DBH_FLAG'] = "Tree diameter > 50in"
@@ -575,6 +588,20 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     age_df.loc[age_df['AGE_ORIG'].isnull(), 'VALID_AGE'] = "No"
 
     arcpy.AddMessage("    VALID_AGE populated")
+
+    # add mast type field
+    if 'MAST_TYPE' in age_df.columns:
+        # delete field if already in dataset
+        age_df.drop(columns=['MAST_TYPE'])
+    else:
+        pass
+    crosswalk_df = pd.read_csv('../summaries/resources/MAST_SP_TYP_Crosswalk.csv') \
+        .filter(items=['TR_SP', 'MAST_TYPE']) \
+        .rename(columns={'TR_SP': 'AGE_SP'})
+
+    age_df = age_df.merge(right=crosswalk_df, how='left', on='AGE_SP')
+
+    arcpy.AddMessage("    MAST_TYPE field populated")
 
     # recast numerical fields to correct type
     age_df["AGE_DIA"] = age_df["AGE_DIA"].round(1)
@@ -687,14 +714,16 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
                "35'-40'": 37.5,
                "40'-45'": 42.5,
                "45'-50'": 47.5,
-               ">50'": 52.5
+               ">50'": 52.5,
+               "NONE": 0,
+               "None": 0,
+               "None ": 0,
+               "": 0,
+               " ": 0
                }
 
     # return average of height range
     fixed_df['UND_HT2'] = fixed_df.apply(lambda x: get_value(heights, x['UND_HT']), axis=1)
-
-    # return 0 if no tree present
-    fixed_df.loc[fixed_df.UND_SP1.isin(["NONE", "None", "", " "]), 'UND_HT2'] = 0
 
     arcpy.AddMessage("Check complete")
 
@@ -724,7 +753,7 @@ def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age, fc_center):
 
     # generate dataframes of duplicate rows
     prism_duplicates = prism_df[prism_df.duplicated(["SHAPE"])]
-    fixed_duplicates = fixed_df[fixed_df.duplicated([fixed_plot_id, "SHAPE"])]
+    fixed_duplicates = fixed_df[fixed_df.duplicated(["SHAPE"])]
     age_duplicates = age_df[age_df.duplicated(["SHAPE"])]
 
     # add boolean DUPLICATE field
@@ -826,7 +855,8 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
     center_df['PLOT_PAD'] = center_df['PLOT_PAD'].str.zfill(4)
 
     # add fields
-    center_merge_df = center_df.merge(join_df[['PLOT', pool, comp, unit, site, stand]], on='PLOT', how='left')
+    center_merge_df = center_df.merge(join_df[['PLOT', pool, comp, unit, site, stand]], on='PLOT', how='left') \
+        .rename(columns={pool: 'POOL', comp: 'COMP', unit: 'UNIT', site: 'SITE', stand: 'STAND'})
 
     # add padded plot ID to stand ID
     center_merge_df['PID'] = center_merge_df[stand] + "pl" + center_merge_df['PLOT_PAD']
@@ -841,11 +871,14 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
 
     # add hierarchy fields to prism, fixed, and age
     prism_merge_df = prism_df \
-        .merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID', 'VALID_SID']], on='PLOT', how='left')
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+               on='PLOT', how='left')
     fixed_merge_df = fixed_df \
-        .merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID', 'VALID_SID']], on='PLOT', how='left')
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+               on='PLOT', how='left')
     age_merge_df = age_df \
-        .merge(center_merge_df[['PLOT', pool, comp, unit, site, stand, 'PID', 'VALID_SID']], on='PLOT', how='left')
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+               on='PLOT', how='left')
 
     # cleanup
     center_merge_df = center_merge_df.drop(columns=['PLOT_PAD'])
