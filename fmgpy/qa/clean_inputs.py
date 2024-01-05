@@ -29,6 +29,15 @@ def match(col_a, col_b):
         return "No"
 
 
+def cast_as_int(df_name):
+    col_list = list(df_name.select_dtypes(include=['Int64', 'int64', 'Int32']))
+    for i in col_list:
+        if i == 'OBJECTID':
+            pass
+        else:
+            df_name[i] = df_name[i].astype(int)
+
+
 def rename_fields(df, user_field, field_name):
     """Checks if required field name is already in use in dataset and, if different from supplied field,
     renames original field before renaming supplied field to prevent duplicate field names
@@ -77,9 +86,11 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
         f"\nChecking Plot ID fields for {os.path.basename(fc_check)}"
     )
 
-    # create dataframes
+    # create dataframes and handle integer dtypes
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
     check_df = pd.DataFrame.spatial.from_featureclass(fc_check)
+    cast_as_int(center_df)
+    cast_as_int(check_df)
 
     # check main plot ID field to ensure it is integer
     if center_df[center_plot_id_field].dtype == 'int64':
@@ -173,6 +184,8 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
     # create dataframes
     join_df = pd.DataFrame.spatial.from_featureclass(center_fixed_join)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
+    cast_as_int(join_df)
+    cast_as_int(fixed_df)
 
     # populate CORRECT_PLOT_ID field based on plot center ID == fixed plot ID
     join_df["CORRECT_PLOT_ID"] = join_df.apply(lambda x: match(x["PLOT_center"], x["PLOT_fixed"]), axis=1)
@@ -220,6 +233,8 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # create dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
+    cast_as_int(prism_df)
+    cast_as_int(fixed_df)
 
     # clear flag field from any previous run
     if 'PRISM_ID_MATCHES' in fixed_df.columns:
@@ -321,8 +336,12 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     # create dataframes
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
+    cast_as_int(center_df)
+    cast_as_int(age_df)
 
     # populate HAS_AGE field for each plot where age_flag_field = A (if not A, HAS_AGE = 'N/A')
+    # center_df.loc[center_df[age_flag_field] == 'A', 'HAS_AGE'] = center_df[center_plot_id_field].isin(
+    #     age_df[age_plot_id])
     center_df['HAS_AGE'] = center_df[center_plot_id_field].isin(age_df[age_plot_id])
     yes_no(center_df, 'HAS_AGE')
 
@@ -357,6 +376,7 @@ def check_required_fields_center(fc_center, plot_name, flag_name):
 
     # create dataframe
     center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
+    cast_as_int(center_df)
 
     # format field names
     center_df = rename_fields(center_df, plot_name, "PLOT")
@@ -417,6 +437,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
 
     # create dataframe
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
+    cast_as_int(prism_df)
 
     # format field names
     prism_df = rename_fields(prism_df, plot_name, "PLOT")
@@ -541,6 +562,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
 
     # create dataframe
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
+    cast_as_int(age_df)
 
     # format field names
     age_df = rename_fields(age_df, plot_name, "PLOT")
@@ -650,6 +672,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
 
     # create dataframe
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
+    cast_as_int(fixed_df)
 
     # format field names
     fixed_df = rename_fields(fixed_df, plot_name, "PLOT")
@@ -749,6 +772,9 @@ def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age, fc_center):
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
+    cast_as_int(prism_df)
+    cast_as_int(fixed_df)
+    cast_as_int(age_df)
 
     # generate dataframes of duplicate rows
     prism_duplicates = prism_df[prism_df.duplicated(["SHAPE"])]
@@ -806,12 +832,13 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
-
-    # convert PLOT to int if float
-    center_df.PLOT = center_df.PLOT.astype(int)
+    cast_as_int(center_df)
+    cast_as_int(prism_df)
+    cast_as_int(fixed_df)
+    cast_as_int(age_df)
 
     # remove hierarchy fields from any previous tool run
-    levels = [pool, comp, unit, site, stand, 'PID', 'VALID_SID']
+    levels = [pool, comp, unit, site, stand, 'PID', 'COMP', 'VALID_SID']
     for l in levels:
         if l in center_df.columns:
             center_df = center_df.drop(columns=[l])
@@ -845,6 +872,7 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
 
     # create dataframe from spatial join
     join_df = pd.DataFrame.spatial.from_featureclass(plots_spatial_join)
+    cast_as_int(join_df)
 
     arcpy.AddMessage(
         "Adding fields")
@@ -855,10 +883,10 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
 
     # add fields
     center_merge_df = center_df.merge(join_df[['PLOT', pool, comp, unit, site, stand]], on='PLOT', how='left') \
-        .rename(columns={pool: 'POOL', comp: 'COMP', unit: 'UNIT', site: 'SITE', stand: 'STAND'})
+        .rename(columns={pool: 'POOL', comp: 'COMP', unit: 'UNIT', site: 'SITE', stand: 'SID'})
 
     # add padded plot ID to stand ID
-    center_merge_df['PID'] = center_merge_df[stand] + "pl" + center_merge_df['PLOT_PAD']
+    center_merge_df['PID'] = center_merge_df['SID'] + "p" + center_merge_df['PLOT_PAD']
 
     # populate flag field - an empty SID means the plot is outside the FMG polygons
     center_merge_df.loc[center_merge_df['SID'] != '', 'VALID_SID'] = "Yes"
@@ -870,13 +898,13 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
 
     # add hierarchy fields to prism, fixed, and age
     prism_merge_df = prism_df \
-        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID', 'VALID_SID']],
                on='PLOT', how='left')
     fixed_merge_df = fixed_df \
-        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID', 'VALID_SID']],
                on='PLOT', how='left')
     age_merge_df = age_df \
-        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'STAND', 'PID', 'VALID_SID']],
+        .merge(center_merge_df[['PLOT', 'POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID', 'VALID_SID']],
                on='PLOT', how='left')
 
     # cleanup
@@ -887,9 +915,9 @@ def import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed, fc_age, pool, c
         "Saving output")
 
     # overwrite input FC
-    center_merge_df.spatial.to_featureclass(fc_center, sanitize_columns=False)
-    prism_merge_df.spatial.to_featureclass(fc_prism, sanitize_columns=False)
-    fixed_merge_df.spatial.to_featureclass(fc_fixed, sanitize_columns=False)
-    age_merge_df.spatial.to_featureclass(fc_age, sanitize_columns=False)
+    center_merge_df.spatial.to_featureclass(fc_center, overwrite=True, sanitize_columns=False)
+    prism_merge_df.spatial.to_featureclass(fc_prism, overwrite=True, sanitize_columns=False)
+    fixed_merge_df.spatial.to_featureclass(fc_fixed, overwrite=True, sanitize_columns=False)
+    age_merge_df.spatial.to_featureclass(fc_age, overwrite=True, sanitize_columns=False)
 
     return fc_polygons, center_merge_df, prism_merge_df, fixed_merge_df, age_merge_df
