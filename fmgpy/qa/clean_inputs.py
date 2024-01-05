@@ -323,8 +323,7 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
 
     # populate HAS_AGE field for each plot where age_flag_field = A (if not A, HAS_AGE = 'N/A')
-    center_df.loc[center_df[age_flag_field] == 'A', 'HAS_AGE'] = center_df[center_plot_id_field].isin(
-        age_df[age_plot_id])
+    center_df['HAS_AGE'] = center_df[center_plot_id_field].isin(age_df[age_plot_id])
     yes_no(center_df, 'HAS_AGE')
 
     center_df.loc[center_df[age_flag_field] != 'A', 'HAS_AGE'] = 'N/A'
