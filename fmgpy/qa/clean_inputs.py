@@ -757,7 +757,7 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
     return fc_fixed
 
 
-def remove_duplicates(fc_prism, fc_fixed, fixed_plot_id, fc_age, fc_center):
+def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     """Checks prism, fixed, and age plots for duplicate geometry. Fixed plots are also checked for duplicate plot IDs.
 
     Keyword Arguments:

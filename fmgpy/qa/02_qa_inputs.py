@@ -104,7 +104,7 @@ hierarchy_result = clean_inputs.import_hierarchy(fc_polygons, fc_center, fc_pris
                                                  fc_age, pool, comp, unit, site, stand)
 
 # remove duplicates
-deduplication_result = clean_inputs.remove_duplicates(fc_prism, fc_fixed, 'PLOT', fc_age, fc_center)
+deduplication_result = clean_inputs.remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center)
 out_center = deduplication_result[3]
 arcpy.SetParameterAsText(39, out_center)
 out_prism = deduplication_result[0]
