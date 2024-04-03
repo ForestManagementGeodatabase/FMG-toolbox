@@ -12,8 +12,8 @@ arcpy.env.overwriteOutput = True
 
 
 def yes_no(df_name, field_name):
-    df_name.loc[df_name[field_name] == 1, field_name] = "Yes"
-    df_name.loc[df_name[field_name] == 0, field_name] = "No"
+    df_name[field_name] = df_name[field_name].astype(str)
+    df_name[field_name] = df_name[field_name].replace({'False': "No", 'True': "Yes"})
 
 
 def get_value(d, val):
@@ -35,7 +35,7 @@ def cast_as_int(df_name):
         if i == 'OBJECTID':
             pass
         else:
-            df_name[i] = df_name[i].astype(int)
+            df_name[i] = df_name[i].astype('Int32')
 
 
 def rename_fields(df, user_field, field_name):
