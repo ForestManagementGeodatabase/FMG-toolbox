@@ -604,8 +604,8 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     # revert NA values to 0
 
     # check for valid years, must have full 4 digits
-    age_df.loc[age_df['AGE_ORIG'] > 1499, 'VALID_AGE'] = "Yes"
-    age_df.loc[age_df['AGE_ORIG'] <= 1499, 'VALID_AGE'] = "No"
+    age_df.loc[age_df['AGE_ORIG'] > 1900, 'VALID_AGE'] = "Yes"
+    age_df.loc[age_df['AGE_ORIG'] <= 1900, 'VALID_AGE'] = "No"
     age_df.loc[age_df['AGE_ORIG'].isnull(), 'VALID_AGE'] = "No"
 
     arcpy.AddMessage("    VALID_AGE populated")
@@ -766,7 +766,7 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     fc_age    -- Path to age feature class
     """
 
-    arcpy.AddMessage("\nChecking for and removing duplicates")
+    arcpy.AddMessage("\nChecking for and flagging duplicates")
 
     # create dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
@@ -787,9 +787,11 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     age_df["DUPLICATE"] = age_df['OBJECTID'].isin(age_duplicates['OBJECTID'])
 
     # subset rows where DUPLICATE is false and drop field
-    prism_df = prism_df[(~prism_df.DUPLICATE)].drop(columns=['DUPLICATE'])
-    fixed_df = fixed_df[(~fixed_df.DUPLICATE)].drop(columns=['DUPLICATE'])
-    age_df = age_df[(~age_df.DUPLICATE)].drop(columns=['DUPLICATE'])
+    # *** skip this for now, Tate wants to just flag duplicates
+    # FieldMaps has the ability to snap to existing geometry
+    # prism_df = prism_df[(~prism_df.DUPLICATE)].drop(columns=['DUPLICATE'])
+    # fixed_df = fixed_df[(~fixed_df.DUPLICATE)].drop(columns=['DUPLICATE'])
+    # age_df = age_df[(~age_df.DUPLICATE)].drop(columns=['DUPLICATE'])
 
     # overwrite input FCs
     prism_df.spatial.to_featureclass(fc_prism,
