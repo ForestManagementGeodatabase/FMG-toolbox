@@ -298,23 +298,10 @@ def agg_inv_present(inv_present):
 # Count of notes: use with group by - agg
 # TODO: add function description
 def agg_count_notes(note_column):
-    notes = []
-    # make a list of valid notes
-    for note in note_column:
-        if note == '':
-            continue
-        if note == ' ':
-            continue
-        if note is None:
-            continue
-        else:
-            notes.append(note)
-
-    # Strip nans from list
-    notes_clean = [x for x in notes if x == x]
-
-    # count items in the list and return the count
-    notecount = len(notes_clean)
+    note_column.replace('', pd.NA, inplace=True)
+    note_column.replace(' ', pd.NA, inplace=True)
+    note_column_clean = note_column.dropna()
+    notecount = len(note_column_clean)
     return notecount
 
 
