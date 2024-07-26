@@ -365,7 +365,7 @@ def age_summary(plot_table, out_gdb, level):
     # Export to gdb table
     table_name = level + "_Age_Summary"
     table_path = os.path.join(out_gdb, table_name)
-    out_df.spatial.to_table(table_path)
+    out_df.spatial.to_table(location=table_path, sanitize_columns=False)
     arcpy.AddMessage('    merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage("    Complete")
@@ -545,7 +545,7 @@ def health_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Health_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        health_summary_df.spatial.to_table(table_path)
+        health_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
@@ -707,7 +707,7 @@ def health_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Health_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        health_summary_df.spatial.to_table(table_path)
+        health_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage('    Complete')
@@ -832,7 +832,7 @@ def mast_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Mast_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        mast_summary_df.spatial.to_table(table_path)
+        mast_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
@@ -943,7 +943,7 @@ def mast_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Mast_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        mast_summary_df.spatial.to_table(table_path)
+        mast_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage('    Complete')
@@ -1192,7 +1192,7 @@ def size_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Size_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        size_summary_df.spatial.to_table(table_path)
+        size_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
@@ -1419,7 +1419,7 @@ def size_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = 'PID_Size_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        size_summary_df.spatial.to_table(table_path)
+        size_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage('    Complete')
@@ -1582,7 +1582,7 @@ def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Species_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        sp_summary_df.spatial.to_table(table_path)
+        sp_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     elif level == 'PID':
@@ -1632,7 +1632,7 @@ def species_summary(plot_table, tree_table, fixed_df, out_gdb, level):
         # Export to GDB Table
         table_name = 'PID_Species_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        sp_summary_df.spatial.to_table(table_path)
+        sp_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage('    Complete')
@@ -1956,7 +1956,7 @@ def management_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = level + '_Management_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        manage_summary_df.spatial.to_table(table_path)
+        manage_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     if level == 'PID':
@@ -2011,7 +2011,7 @@ def management_summary(plot_table, tree_table, out_gdb, level):
         # Export to GDB Table
         table_name = 'PID_Management_Summary'
         table_path = os.path.join(out_gdb, table_name)
-        manage_summary_df.spatial.to_table(table_path)
+        manage_summary_df.spatial.to_table(location=table_path, sanitize_columns=False)
         arcpy.AddMessage('    Merged df exported to {0}'.format(table_path))
 
     arcpy.AddMessage('    Complete')
