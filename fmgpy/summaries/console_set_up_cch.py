@@ -10,15 +10,23 @@ import pandas as pd
 import numpy as np
 import itertools
 import importlib
-import fmgpy.summaries.forest_calcs as fcalc
+import summaries.forest_calcs as fcalc
 
 
-# Define Some input data
+# Define Some input data - pool 12 full
 output_gdb = r'C:\LocalProjects\FMG\LocalWorking\FMG_Code_Testing.gdb'
 level = 'SID'
 age = r'C:\LocalProjects\FMG\FMG-Toolbox\test\data\FMG_OracleSchema.gdb\AGE_PLOTS'
 fixed = r'C:\LocalProjects\FMG\FMG-Toolbox\test\data\FMG_OracleSchema.gdb\FIXED_PLOTS'
 prism = r'C:\LocalProjects\FMG\FMG-Toolbox\test\data\FMG_OracleSchema.gdb\PRISM_PLOTS'
+filter_statement = None
+
+# Define some input data - null return on inv_sp
+output_gdb = r'C:\LocalProjects\FMG\LocalWorking\FMG_Code_Testing.gdb'
+level = 'SID'
+age = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Age_QA_20231013'
+fixed = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Fixed_QA_20231013'
+prism = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Prism_QA_20231013'
 filter_statement = None
 
 # Reimport statements for dev changes
