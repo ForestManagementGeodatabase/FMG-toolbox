@@ -1,0 +1,27 @@
+COL_NAME,ALIAS,OUTPUT_DTYPE
+OV_CLSR_MEAN,Overstory Closure,int32
+UND_HT_RG,Understory Height Range,string
+LIVE_BA,BA for Live Trees,float64
+INV_PRESENT,Invasive Species Present,string
+INV_SP,Invasive Species Identified,string
+INVT_YEAR,Inventory Year or Years,string
+HM_TPA,Hard Mast TPA,float64
+AGE_ORIG,Mean Origin Year,int32
+DEAD_TPA,Dead TPA,float64
+SD_TPA,Significant Decline TPA,float64
+STR_TPA,Stressed TPA,float64
+HLTH_TPA,Healthy TPA,float64
+CNP_TPA,Canopy TPA,float64
+CNP_D_TPA,Dead Canopy TPA,float64
+CNP_DOM_HLTH,Canopy Dominant Health Class,string
+CNP_DOM_HLTH_PCMP,Canopy Dominant Health Class % Composition,float64
+CNP_DOM_SP,Canopy Dominant Species,string
+CNP_DOM_SP_PCMP,Canopy Dominant Species % Composition,float64
+MID_DOM_HLTH,Midstory Dominant Health Class,string
+MID_DOM_HLTH_PCMP,Midstory Dominant Health Class % Composition,float64
+MID_DOM_SP,Midstory Dominant Species,string
+MID_DOM_SP_PCMP,Midstory Dominant Species % Composition,float64
+INT_DOM_HLTH,Intermediate Dominant Health Class,string
+INT_DOM_HLTH_PCMP,Intermediate Dominant Health Class % Composition,float64
+INT_DOM_SP,Intermidiate Dominant Species,string
+INT_DOM_SP_PCMP,Intermediate Dominant Species % Composition,float64
