@@ -15,24 +15,24 @@ from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
 
 # Define input geodatabase with summary tables parameter
-in_summary_gdb = arcpy.GetParameterAsText(0)
+in_summary_gdb = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb" #arcpy.GetParameterAsText(0)
 
 # Define FMG hierarchy levels for output parameters (script tool radio buttons)
-site_view = arcpy.GetParameterAsText(1)
-unit_view = arcpy.GetParameterAsText(2)
-comp_view = arcpy.GetParameterAsText(3)
-pool_view = arcpy.GetParameterAsText(4)
+site_view = 'true' #arcpy.GetParameterAsText(1)
+unit_view = 'true' #arcpy.GetParameterAsText(2)
+comp_view = 'true' #arcpy.GetParameterAsText(3)
+pool_view = 'true' #arcpy.GetParameterAsText(4)
 
 # Define FMG Hierarchy polygon feature class parameters (use validation to turn these on based on output levels
 # selected above. See link for script tool validation code examples.
 # https://pro.arcgis.com/en/pro-app/latest/arcpy/geoprocessing_and_python/customizing-script-tool-behavior.htm
-SITE = arcpy.GetParameterAsText(5)
-UNIT = arcpy.GetParameterAsText(6)
-COMP = arcpy.GetParameterAsText(7)
-POOL = arcpy.GetParameterAsText(8)
+SITE = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb\SITE" #arcpy.GetParameterAsText(5)
+UNIT = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb\UNIT" #arcpy.GetParameterAsText(6)
+COMP = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb\COMPARTMENT" #arcpy.GetParameterAsText(7)
+POOL = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb\POOL" #arcpy.GetParameterAsText(8)
 
 # Define output geodatabase (default to input geodatabase)
-out_view_gdb = arcpy.GetParameterAsText(9)
+out_view_gdb = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb" #arcpy.GetParameterAsText(9)
 
 # From input parameters, build a dictionary to guide work iterations
 # Build list of levels to evaluate
