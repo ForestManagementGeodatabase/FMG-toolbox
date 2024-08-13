@@ -13,6 +13,7 @@ import arcpy
 import arcgis
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
+import fmgpy.summaries.forest_calcs as fcalc
 
 # Define input geodatabase with summary tables parameter
 in_summary_gdb = r"C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_Testing_20240724.gdb" #arcpy.GetParameterAsText(0)
@@ -43,6 +44,8 @@ if unit_view.lower() == 'true':
     levels.append('UNIT')
 if comp_view.lower() == 'true':
     levels.append('COMP')
+if comp_view.lower() == 'true':
+    levels.append('COMPARTMENT')
 if pool_view.lower() == 'true':
     levels.append('POOL')
 
@@ -77,7 +80,7 @@ for level in levels:
     df_hlt_filt = df_hlt_sum.filter(items=['DEAD_TPA', 'SD_TPA', 'STR_TPA', 'HLTH_TPA'])
     df_mst_filt = df_mst_sum.filter(items=['HM_TPA'])
     df_vtc_filt = df_vtc_sum.filter(items=['CNP_TPA', 'CNP_D_TPA', 'CNP_DOM_HLTH', 'CNP_DOM_HLTH_PCMP',
-                                           'CNP_DOM_SP', 'CNP_DOM_SP_PCMP', 'MID_DOM_HLTH', 'MID_COM_HLTH_PCMP',
+                                           'CNP_DOM_SP', 'CNP_DOM_SP_PCMP', 'MID_DOM_HLTH', 'MID_DOM_HLTH_PCMP',
                                            'MID_DOM_SP', 'MID_DOM_SP_PCMP', 'INT_DOM_HLTH', 'INT_DOM_HLTH_PCMP',
                                            'INT_DOM_SP', 'INT_DOM_SP_PCMP'])
     df_geometry = df_geometry.drop(columns=['LAST_EDITED_DATE', 'LAST_EDITED_USER', 'CREATED_DATE', 'CREATED_USER',
@@ -95,12 +98,28 @@ for level in levels:
 
     df_clean = df_merged.round(decimals=2)
 
+    # Reindex output df
+    reindex_cols = fcalc.fmg_column_reindex_list(level=level,
+                                                 col_csv='fmgpy/reports/resources/public_view_cols.csv')
+    out_df = df_clean.reindex(labels=reindex_cols,
+                            axis='columns')
+
+    # Handle nan values appropriately
+    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='fmgpy/reports/resources/public_view_cols.csv')
+    out_df = out_df\
+        .fillna(value=nan_fill_dict)\
+        .drop(columns=['index'], errors='ignore')
+
+    # Enforce ESRI Compatible Dtypes
+    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/reports/resources/public_view_cols.csv')
+    out_df = out_df.astype(dtype=dtype_dict, copy=False)
+
     # send back to ESRI-land
     out_fc = os.path.join(out_view_gdb, f"{level}_PublicView")
-    df_clean.spatial.to_featureclass(location=out_fc,
-                                     has_z=False,
-                                     has_m=False,
-                                     sanitize_columns=False)
+    out_df.spatial.to_featureclass(location=out_fc,
+                                   has_z=False,
+                                   has_m=False,
+                                   sanitize_columns=False)
 
     # Make pretty ESRI land data
 
