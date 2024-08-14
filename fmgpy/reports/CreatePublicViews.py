@@ -44,8 +44,6 @@ if unit_view.lower() == 'true':
     levels.append('UNIT')
 if comp_view.lower() == 'true':
     levels.append('COMP')
-if comp_view.lower() == 'true':
-    levels.append('COMPARTMENT')
 if pool_view.lower() == 'true':
     levels.append('POOL')
 
