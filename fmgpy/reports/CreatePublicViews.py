@@ -37,17 +37,21 @@ POOL = arcpy.GetParameterAsText(8)
 out_view_gdb = arcpy.GetParameterAsText(9)
 arcpy.AddMessage('Input parameters defined')
 
-# From input parameters, build a dictionary to guide work iterations
-# Build list of levels to evaluate
+# Build list of levels and dict of geometries
 levels = []
+summary_geom = {}
 if site_view.lower() == 'true':
     levels.append('SITE')
+    summary_geom.update(SITE=SITE)
 if unit_view.lower() == 'true':
     levels.append('UNIT')
+    summary_geom.update(UNIT=UNIT)
 if comp_view.lower() == 'true':
     levels.append('COMP')
+    summary_geom.update(COMP=COMP)
 if pool_view.lower() == 'true':
     levels.append('POOL')
+    summary_geom.update(POOL=POOL)
 
 # Set GIS environments
 arcpy.env.workspace = in_summary_gdb
@@ -55,16 +59,15 @@ arcpy.env.workspace = in_summary_gdb
 # Pull list of all tables
 summary_tables = arcpy.ListTables()
 
-# Create dict of geometry parameters
-summary_geom = {'SITE': SITE, 'UNIT': UNIT, 'COMP': COMP, 'POOL': POOL}
-
-# Create empty list of output feature classes
+# Create empty list to hold output feature classes
 out_feature_classes = []
 arcpy.AddMessage('Level list, workspace, and summary geometries defined')
 
 # Start work loop
 for level in levels:
     arcpy.AddMessage('Creating public view table for {0}'.format(level))
+
+    # Build and sort list of summary tables if they have the current loop's level in the name
     level_tables = [i for i in summary_tables if level in i]
     level_tables.sort()
 
@@ -76,7 +79,7 @@ for level in levels:
     df_vtc_sum = pd.DataFrame.spatial.from_table(level_tables[7]).set_index(level)
     arcpy.AddMessage('    Tabular dataframes created')
 
-    # make supporting geom df
+    # make supporting geom df using the current loop's level as a key to extract path value from dict
     df_geometry = pd.DataFrame.spatial.from_featureclass(summary_geom[level]).set_index(level)
     arcpy.AddMessage('    Spatial dataframe created')
 
@@ -159,24 +162,9 @@ for feature_class in out_feature_classes:
     arcpy.AddMessage('Aliases Set')
 arcpy.AddMessage('Complete: Create FMG Public View')
 
-# Set output parameters from out_feature_classes list
-if len(out_feature_classes) == 4:
-    arcpy.SetParameterAsText(10, out_feature_classes[0])
-    arcpy.SetParameterAsText(11, out_feature_classes[1])
-    arcpy.SetParameterAsText(12, out_feature_classes[2])
-    arcpy.SetParameterAsText(13, out_feature_classes[3])
+# Set output parameter from out_feature_classes list
+arcpy.SetParameter(8, out_feature_classes)
 
-elif len(out_feature_classes) == 3:
-    arcpy.SetParameterAsText(10, out_feature_classes[0])
-    arcpy.SetParameterAsText(11, out_feature_classes[1])
-    arcpy.SetParameterAsText(12, out_feature_classes[2])
-
-elif len(out_feature_classes) == 2:
-    arcpy.SetParameterAsText(10, out_feature_classes[0])
-    arcpy.SetParameterAsText(11, out_feature_classes[1])
-
-elif len(out_feature_classes) == 1:
-    arcpy.SetParameterAsText(10, out_feature_classes[0])
 
 
 
