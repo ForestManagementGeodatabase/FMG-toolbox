@@ -10,10 +10,13 @@
 # Do Imports
 import os
 import arcpy
+import sys
 import arcgis
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
-import fmgpy.summaries.forest_calcs as fcalc
+import pathlib
+sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
+import summaries.forest_calcs as fcalc
 
 # Define input geodatabase with summary tables parameter
 arcpy.AddMessage('Starting: Create FMG Public View')
@@ -21,16 +24,16 @@ in_summary_gdb = arcpy.GetParameterAsText(0)
 
 # Define FMG hierarchy levels for output parameters (script tool radio buttons)
 site_view = arcpy.GetParameterAsText(1)
-unit_view = arcpy.GetParameterAsText(2)
-comp_view = arcpy.GetParameterAsText(3)
-pool_view = arcpy.GetParameterAsText(4)
+unit_view = arcpy.GetParameterAsText(3)
+comp_view = arcpy.GetParameterAsText(5)
+pool_view = arcpy.GetParameterAsText(7)
 
 # Define FMG Hierarchy polygon feature class parameters (use validation to turn these on based on output levels
 # selected above. See link for script tool validation code examples.
 # https://pro.arcgis.com/en/pro-app/latest/arcpy/geoprocessing_and_python/customizing-script-tool-behavior.htm
-SITE = arcpy.GetParameterAsText(5)
-UNIT = arcpy.GetParameterAsText(6)
-COMP = arcpy.GetParameterAsText(7)
+SITE = arcpy.GetParameterAsText(2)
+UNIT = arcpy.GetParameterAsText(4)
+COMP = arcpy.GetParameterAsText(6)
 POOL = arcpy.GetParameterAsText(8)
 
 # Define output geodatabase (default to input geodatabase)
@@ -112,20 +115,20 @@ for level in levels:
 
     # Reindex output df
     reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                 col_csv='fmgpy/reports/resources/public_view_cols.csv')
+                                                 col_csv='resources/public_view_cols.csv')
     out_df = df_clean.reindex(labels=reindex_cols,
                             axis='columns')
     arcpy.AddMessage('    Create and reindex output dataframe')
 
     # Handle nan values appropriately
-    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='fmgpy/reports/resources/public_view_cols.csv')
+    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/public_view_cols.csv')
     out_df = out_df\
         .fillna(value=nan_fill_dict)\
         .drop(columns=['index'], errors='ignore')
     arcpy.AddMessage('    Output dataframe nan values filled')
 
     # Enforce ESRI Compatible Dtypes
-    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/reports/resources/public_view_cols.csv')
+    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/public_view_cols.csv')
     out_df = out_df.astype(dtype=dtype_dict, copy=False)
     arcpy.AddMessage('    Output dataframe ESRI-compatible dtypes enforced')
 
@@ -136,12 +139,12 @@ for level in levels:
                                    has_z=False,
                                    has_m=False,
                                    sanitize_columns=False)
-    arcpy.AddMessage('    Output dataframe exported to {0{'.format(out_fc))
+    arcpy.AddMessage('    Output dataframe exported to {0}'.format(out_fc))
 
 # Make pretty ESRI land data
 # Create dict from CSV
 # import the column definition csv
-alias_csv = pd.read_csv('fmgpy/reports/resources/public_view_cols.csv')
+alias_csv = pd.read_csv('resources/public_view_cols.csv')
 arcpy.AddMessage('Setting field aliases for exported public views')
 # Create dictionary for field name: field alias
 alias_dict = None
@@ -163,7 +166,7 @@ for feature_class in out_feature_classes:
 arcpy.AddMessage('Complete: Create FMG Public View')
 
 # Set output parameter from out_feature_classes list
-arcpy.SetParameter(8, out_feature_classes)
+arcpy.SetParameter(10, out_feature_classes)
 
 
 
