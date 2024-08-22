@@ -86,7 +86,7 @@ for level in levels:
         if sum_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species Summary')
             sum_sp_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_SP'])
-            sum_sp_name = "PID_Adv_Species_Summary"
+            sum_sp_name = "PID_ZAdv_Species_Summary"
             sum_sp_path = os.path.join(out_gdb, sum_sp_name)
             sum_sp_df.spatial.to_table(location=sum_sp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_path)
@@ -94,7 +94,7 @@ for level in levels:
         if sum_sp_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species by Mast Types Summary')
             sum_sp_by_mast_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_SP', 'MAST_TYPE'])
-            sum_sp_by_mast_name = "PID_Adv_SpeciesByMastType_Summary"
+            sum_sp_by_mast_name = "PID_ZAdv_SpeciesByMastType_Summary"
             sum_sp_by_mast_path = os.path.join(out_gdb, sum_sp_by_mast_name)
             sum_sp_by_mast_df.spatial.to_table(location=sum_sp_by_mast_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_mast_path)
@@ -102,7 +102,7 @@ for level in levels:
         if sum_sp_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Size Summary')
             sum_sp_by_size_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_SP', 'TR_SIZE'])
-            sum_sp_by_size_name = "PID_Adv_SpeciesBySize_Summary"
+            sum_sp_by_size_name = "PID_ZAdv_SpeciesBySize_Summary"
             sum_sp_by_size_path = os.path.join(out_gdb, sum_sp_by_size_name)
             sum_sp_by_size_df.spatial.to_table(location=sum_sp_by_size_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_size_path)
@@ -110,7 +110,7 @@ for level in levels:
         if sum_sp_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Vertical Composition Summary')
             sum_sp_by_vertcomp_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_SP', 'VERT_COMP'])
-            sum_sp_by_vertcomp_name = "PID_Adv_SpeciesByVertComp_Summary"
+            sum_sp_by_vertcomp_name = "PID_ZAdv_SpeciesByVertComp_Summary"
             sum_sp_by_vertcomp_path = os.path.join(out_gdb, sum_sp_by_vertcomp_name)
             sum_sp_by_vertcomp_df.spatial.to_table(location=sum_sp_by_vertcomp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_vertcomp_path)
@@ -118,7 +118,7 @@ for level in levels:
         if sum_hlth.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health Summary')
             sum_hlth_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_HLTH'])
-            sum_hlth_df_name = "PID_Adv_Health_Summary"
+            sum_hlth_df_name = "PID_ZAdv_Health_Summary"
             sum_hlth_df_path = os.path.join(out_gdb, sum_hlth_df_name)
             sum_hlth_df.spatial.to_table(location=sum_hlth_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_df_path)
@@ -126,7 +126,7 @@ for level in levels:
         if sum_hlth_by_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Species Summary')
             sum_hlth_by_sp_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_HLTH', 'TR_SP'])
-            sum_hlth_by_sp_df_name = "PID_Adv_HealthBySpecies_Summary"
+            sum_hlth_by_sp_df_name = "PID_ZAdv_HealthBySpecies_Summary"
             sum_hlth_by_sp_df_path = os.path.join(out_gdb, sum_hlth_by_sp_df_name)
             sum_hlth_by_sp_df.spatial.to_table(location=sum_hlth_by_sp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_sp_df_path)
@@ -134,7 +134,7 @@ for level in levels:
         if sum_hlth_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Mast Types Summary')
             sum_hlth_by_mast_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_HLTH', 'MAST_TYPE'])
-            sum_hlth_by_mast_df_name = "PID_Adv_HealthByMastType_Summary"
+            sum_hlth_by_mast_df_name = "PID_ZAdv_HealthByMastType_Summary"
             sum_hlth_by_mast_df_path = os.path.join(out_gdb, sum_hlth_by_mast_df_name)
             sum_hlth_by_mast_df.spatial.to_table(location=sum_hlth_by_mast_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_mast_df_path)
@@ -142,7 +142,7 @@ for level in levels:
         if sum_hlth_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Size Summary')
             sum_hlth_by_size_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_HLTH', 'TR_SIZE'])
-            sum_hlth_by_size_df_name = "PID_Adv_HealthBySize_Summary"
+            sum_hlth_by_size_df_name = "PID_ZAdv_HealthBySize_Summary"
             sum_hlth_by_size_df_path = os.path.join(out_gdb, sum_hlth_by_size_df_name)
             sum_hlth_by_size_df.spatial.to_table(location=sum_hlth_by_size_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_size_df_path)
@@ -150,7 +150,7 @@ for level in levels:
         if sum_hlth_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Vertical Composition Summary')
             sum_hlth_by_vertcomp_df = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, None, ['TR_HLTH', 'VERT_COMP'])
-            sum_hlth_by_vertcomp_df_name = "PID_Adv_HealthByVertComp_Summary"
+            sum_hlth_by_vertcomp_df_name = "PID_ZAdv_HealthByVertComp_Summary"
             sum_hlth_by_vertcomp_df_path = os.path.join(out_gdb, sum_hlth_by_vertcomp_df_name)
             sum_hlth_by_vertcomp_df.spatial.to_table(location=sum_hlth_by_vertcomp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_vertcomp_df_path)
@@ -161,7 +161,7 @@ for level in levels:
         if sum_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species Summary')
             sum_sp_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_SP'], level)
-            sum_sp_name = level + "_Adv_Species_Summary"
+            sum_sp_name = level + "_ZAdv_Species_Summary"
             sum_sp_path = os.path.join(out_gdb, sum_sp_name)
             sum_sp_df.spatial.to_table(location=sum_sp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_path)
@@ -169,7 +169,7 @@ for level in levels:
         if sum_sp_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species by Mast Types Summary')
             sum_sp_by_mast_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_SP', 'MAST_TYPE'], level)
-            sum_sp_by_mast_name = level + "_Adv_SpeciesByMastType_Summary"
+            sum_sp_by_mast_name = level + "_ZAdv_SpeciesByMastType_Summary"
             sum_sp_by_mast_path = os.path.join(out_gdb, sum_sp_by_mast_name)
             sum_sp_by_mast_df.spatial.to_table(location=sum_sp_by_mast_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_mast_path)
@@ -177,7 +177,7 @@ for level in levels:
         if sum_sp_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Size Summary')
             sum_sp_by_size_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_SP', 'TR_SIZE'], level)
-            sum_sp_by_size_name = level + "_Adv_SpeciesBySize_Summary"
+            sum_sp_by_size_name = level + "_ZAdv_SpeciesBySize_Summary"
             sum_sp_by_size_path = os.path.join(out_gdb, sum_sp_by_size_name)
             sum_sp_by_size_df.spatial.to_table(location=sum_sp_by_size_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_size_path)
@@ -185,7 +185,7 @@ for level in levels:
         if sum_sp_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Vertical Composition Summary')
             sum_sp_by_vertcomp_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_SP', 'VERT_COMP'], level)
-            sum_sp_by_vertcomp_name = level + "_Adv_SpeciesByVertComp_Summary"
+            sum_sp_by_vertcomp_name = level + "_ZAdv_SpeciesByVertComp_Summary"
             sum_sp_by_vertcomp_path = os.path.join(out_gdb, sum_sp_by_vertcomp_name)
             sum_sp_by_vertcomp_df.spatial.to_table(location=sum_sp_by_vertcomp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_vertcomp_path)
@@ -193,7 +193,7 @@ for level in levels:
         if sum_hlth.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health Summary')
             sum_hlth_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_HLTH'], level)
-            sum_hlth_df_name = level + "_Adv_Health_Summary"
+            sum_hlth_df_name = level + "_ZAdv_Health_Summary"
             sum_hlth_df_path = os.path.join(out_gdb, sum_hlth_df_name)
             sum_hlth_df.spatial.to_table(location=sum_hlth_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_df_path)
@@ -201,7 +201,7 @@ for level in levels:
         if sum_hlth_by_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Species Summary')
             sum_hlth_by_sp_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_HLTH', 'TR_SP'], level)
-            sum_hlth_by_sp_df_name = level + "_Adv_HealthBySpecies_Summary"
+            sum_hlth_by_sp_df_name = level + "_ZAdv_HealthBySpecies_Summary"
             sum_hlth_by_sp_df_path = os.path.join(out_gdb, sum_hlth_by_sp_df_name)
             sum_hlth_by_sp_df.spatial.to_table(location=sum_hlth_by_sp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_sp_df_path)
@@ -209,7 +209,7 @@ for level in levels:
         if sum_hlth_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Mast Types Summary')
             sum_hlth_by_mast_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_HLTH', 'MAST_TYPE'], level)
-            sum_hlth_by_mast_df_name = level + "_Adv_HealthByMastType_Summary"
+            sum_hlth_by_mast_df_name = level + "_ZAdv_HealthByMastType_Summary"
             sum_hlth_by_mast_df_path = os.path.join(out_gdb, sum_hlth_by_mast_df_name)
             sum_hlth_by_mast_df.spatial.to_table(location=sum_hlth_by_mast_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_mast_df_path)
@@ -217,7 +217,7 @@ for level in levels:
         if sum_hlth_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Size Summary')
             sum_hlth_by_size_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_HLTH', 'TR_SIZE'], level)
-            sum_hlth_by_size_df_name = level+ "_Adv_HealthBySize_Summary"
+            sum_hlth_by_size_df_name = level+ "_ZAdv_HealthBySize_Summary"
             sum_hlth_by_size_df_path = os.path.join(out_gdb, sum_hlth_by_size_df_name)
             sum_hlth_by_size_df.spatial.to_table(location=sum_hlth_by_size_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_size_df_path)
@@ -225,7 +225,7 @@ for level in levels:
         if sum_hlth_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Vertical Composition Summary')
             sum_hlth_by_vertcomp_df = fcalc.tpa_ba_qmdbh_level_by_multi_case_long(tree_table, None, ['TR_HLTH', 'VERT_COMP'], level)
-            sum_hlth_by_vertcomp_df_name = level + "_Adv_HealthByVertComp_Summary"
+            sum_hlth_by_vertcomp_df_name = level + "_ZAdv_HealthByVertComp_Summary"
             sum_hlth_by_vertcomp_df_path = os.path.join(out_gdb, sum_hlth_by_vertcomp_df_name)
             sum_hlth_by_vertcomp_df.spatial.to_table(location=sum_hlth_by_vertcomp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_vertcomp_df_path)
