@@ -1,11 +1,4 @@
 # Tool to assemble the summary tables into a set of feature classes for public visualization
-# From Age Table: AGE_ORIG
-# From Management: SP_RICH
-# From General Descriptive: OV_CLSR_MEAN, UND_HT_RG, INV_PRESENT, LIVE_BA, INVT_YEAR, INV_SP
-# From Health: DEAD_TPA, SD_TPA, STR_TPA, HLTH_TPA
-# From Mast: HM_TPA
-# From Vert Comp: CNP_DOM_HLTH, CNP_DOM_HLTH_PCMP, CNP_TPA, CNP_D_TPA, MID_DOM_HLTH, MID_DOM_HLTH_PCMP,
-# MID_DOM_SP, MID_DOM_SP_PCMP, INT_DOM_SP, INT_DOM_SP_PCMP, INT_DOM_HLTH, INT_DOM_HLTH_PCMP
 
 # Do Imports
 import os
@@ -28,15 +21,13 @@ unit_view = arcpy.GetParameterAsText(3)
 comp_view = arcpy.GetParameterAsText(5)
 pool_view = arcpy.GetParameterAsText(7)
 
-# Define FMG Hierarchy polygon feature class parameters (use validation to turn these on based on output levels
-# selected above. See link for script tool validation code examples.
-# https://pro.arcgis.com/en/pro-app/latest/arcpy/geoprocessing_and_python/customizing-script-tool-behavior.htm
+# Define FMG Hierarchy polygon feature class parameters
 SITE = arcpy.GetParameterAsText(2)
 UNIT = arcpy.GetParameterAsText(4)
 COMP = arcpy.GetParameterAsText(6)
 POOL = arcpy.GetParameterAsText(8)
 
-# Define output geodatabase (default to input geodatabase)
+# Define output geodatabase
 out_view_gdb = arcpy.GetParameterAsText(9)
 arcpy.AddMessage('Input parameters defined')
 
@@ -117,7 +108,7 @@ for level in levels:
     reindex_cols = fcalc.fmg_column_reindex_list(level=level,
                                                  col_csv='resources/public_view_cols.csv')
     out_df = df_clean.reindex(labels=reindex_cols,
-                            axis='columns')
+                              axis='columns')
     arcpy.AddMessage('    Create and reindex output dataframe')
 
     # Handle nan values appropriately
@@ -167,7 +158,3 @@ arcpy.AddMessage('Complete: Create FMG Public View')
 
 # Set output parameter from out_feature_classes list
 arcpy.SetParameter(10, out_feature_classes)
-
-
-
-
