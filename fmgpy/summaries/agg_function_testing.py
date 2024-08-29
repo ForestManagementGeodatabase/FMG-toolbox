@@ -108,6 +108,10 @@ import pandas as pd
 # TR_SP = [Typical Species]
 # TR_SP = [Non Typical Species]
 
+# Work on importance values and forest community types
+
+
+
 
 
 
