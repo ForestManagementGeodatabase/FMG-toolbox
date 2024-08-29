@@ -217,5 +217,5 @@ MID_DOM_SP,Midstory Dominant Species,string,NONE,Yes,,No,Vertical
 MID_DOM_SP_PCMP,Midstory Dominant Species % Composition,float64,,No,0,Yes,Vertical
 INT_DOM_HLTH,Intermediate Dominant Health Class,string,NONE,Yes,,No,Vertical
 INT_DOM_HLTH_PCMP,Intermediate Dominant Health Class % Composition,float64,,No,0,Yes,Vertical
-INT_DOM_SP,Intermidiate Dominant Species,string,NONE,Yes,,No,Vertical
+INT_DOM_SP,Intermediate Dominant Species,string,NONE,Yes,,No,Vertical
 INT_DOM_SP_PCMP,Intermediate Dominant Species % Composition,float64,,No,0,Yes,Vertical

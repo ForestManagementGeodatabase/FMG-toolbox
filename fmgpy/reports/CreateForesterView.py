@@ -13,26 +13,26 @@ import summaries.forest_calcs as fcalc
 
 # Define input geodatabase with summary tables parameter
 arcpy.AddMessage('Starting: Create FMG Forester View')
-in_summary_gdb = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb' #arcpy.GetParameterAsText(0)
+in_summary_gdb = arcpy.GetParameterAsText(0)
 
 # Define FMG hierarchy levels for output parameters (script tool radio buttons)
-plot_view = 'True' # arcpy.GetParamaterAsText(1)
-stand_view = 'True' #arcpy.GetParamaterAsText(3)
-site_view = 'True' #arcpy.GetParameterAsText(5)
-unit_view = 'True' #arcpy.GetParameterAsText(7)
-comp_view = 'False' #arcpy.GetParameterAsText(9)
-pool_view = 'False' #arcpy.GetParameterAsText(11)
+plot_view = arcpy.GetParamaterAsText(1)
+stand_view = arcpy.GetParamaterAsText(3)
+site_view = arcpy.GetParameterAsText(5)
+unit_view = arcpy.GetParameterAsText(7)
+comp_view = arcpy.GetParameterAsText(9)
+pool_view = arcpy.GetParameterAsText(11)
 
 # Define FMG Hierarchy polygon feature class parameters
-PLOT = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb\PLOT_CENTERS' #arcpy.GetParamaterAsText(2)
-STAND = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb\STAND' #arcpy.GetParamaterAsText(4)
-SITE = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb\SITE' #arcpy.GetParameterAsText(6)
-UNIT = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb\UNIT' #arcpy.GetParameterAsText(8)
+PLOT = arcpy.GetParamaterAsText(2)
+STAND = arcpy.GetParamaterAsText(4)
+SITE = arcpy.GetParameterAsText(6)
+UNIT = arcpy.GetParameterAsText(8)
 COMP = arcpy.GetParameterAsText(10)
 POOL = arcpy.GetParameterAsText(12)
 
 # Define output geodatabase
-out_view_gdb = r'C:\Users\B5PMMCCH\Desktop\Pool18_Forestry_2024\Pool18_Forestry_Summaries\Pool18_Forestry_Summaries.gdb' #arcpy.GetParameterAsText(9)
+out_view_gdb = arcpy.GetParameterAsText(13)
 arcpy.AddMessage('Input parameters defined')
 
 # Build list of levels and dict of geometries
@@ -68,7 +68,7 @@ out_feature_classes = []
 arcpy.AddMessage('Level list, workspace, and summary geometries defined')
 
 # import field definitions
-df_field_ref = pd.read_csv('fmgpy/reports/resources/forester_view_cols.csv')
+df_field_ref = pd.read_csv('resources/forester_view_cols.csv')
 
 # Start work loop
 for level in levels:
@@ -139,20 +139,20 @@ for level in levels:
 
     # Reindex output df
     reindex_cols = fcalc.fmg_column_reindex_list(level=level,
-                                                 col_csv='fmgpy/reports/resources/forester_view_cols.csv')
+                                                 col_csv='resources/forester_view_cols.csv')
     out_df = df_clean.reindex(labels=reindex_cols,
                               axis='columns')
     arcpy.AddMessage('    Create and reindex output dataframe')
 
     # Handle nan values appropriately
-    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='fmgpy/reports/resources/forester_view_cols.csv')
+    nan_fill_dict = fcalc.fmg_nan_fill(col_csv='resources/forester_view_cols.csv')
     out_df = out_df\
         .fillna(value=nan_fill_dict)\
         .drop(columns=['index'], errors='ignore')
     arcpy.AddMessage('    Output dataframe nan values filled')
 
     # Enforce ESRI Compatible Dtypes
-    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='fmgpy/reports/resources/forester_view_cols.csv')
+    dtype_dict = fcalc.fmg_dtype_enforce(col_csv='resources/forester_view_cols.csv')
     out_df = out_df.astype(dtype=dtype_dict, copy=False)
     arcpy.AddMessage('    Output dataframe ESRI-compatible dtypes enforced')
 
@@ -166,11 +166,9 @@ for level in levels:
     arcpy.AddMessage('    Output dataframe exported to {0}'.format(out_fc))
 
 # Make pretty ESRI land data
-# Create dict from CSV
-# import the column definition csv
-
 arcpy.AddMessage('Setting field aliases for exported public views')
-# Create dictionary for field name: field alias
+
+# Create dictionary for field name: field alias from field reference csv import
 alias_dict = None
 if len(df_field_ref.index) > 0:
     alias_keys = df_field_ref['COL_NAME'].values.tolist()
@@ -190,5 +188,5 @@ for feature_class in out_feature_classes:
 arcpy.AddMessage('Complete: Create FMG Public View')
 
 # Set output parameter from out_feature_classes list
-arcpy.SetParameter(10, out_feature_classes)
+arcpy.SetParameter(14, out_feature_classes)
 
