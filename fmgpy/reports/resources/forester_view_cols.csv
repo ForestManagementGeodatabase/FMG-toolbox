@@ -1,0 +1,221 @@
+COL_NAME,ALIAS,OUTPUT_DTYPE,VALUE_NAN_STR,REQ_NAN_STR_FILL,VALUE_NAN_NUM,REQ_NAN_NUM_FILL,SRC_TAB
+SHAPE,SHAPE,,,No,,No,
+AGE_ORIG,Mean Origin Year,int32,,No,0,Yes,Age
+AGE_GRW,Mean Age Tree Growth Rate,int32,,No,0,Yes,Age
+HM_ORIG,Hard Mast Mean Origin Year,int32,,No,0,Yes,Age
+AGE_DBH,Mean Age Tree DBH,int32,,No,0,Yes,Age
+AGE_UND_COV,Mean Understory Cover,int32,,No,0,Yes,Age
+AREA_AC,Area (Acres),float64,,No,0,Yes,General
+INVT_YEAR,Inventory Year or Years,string,,No,,No,General
+PLOT_CT,Total Number of Plots,float64,,No,0,Yes,General
+TR_CT,Total Number of Trees,float64,,No,0,Yes,General
+TR_LV_CT,Total Number of Live Trees,float64,,No,0,Yes,General
+TR_D_CT,Total Number of Dead Trees,float64,,No,0,Yes,General
+TR_AGE_CT,Total Number of Age Trees,float64,,No,0,Yes,General
+LIVE_BA,BA for Live Trees,float64,,No,0,Yes,General
+LIVE_TPA,TPA for Live Trees,float64,,No,0,Yes,General
+LIVE_QMDBH,QMDBH For Live Trees,float64,,No,0,Yes,General
+LIVE_AMD,Average Diameter for Live Trees,float64,,No,0,Yes,General
+LIVE_MAX_DBH,Max DBH for Live Trees,int32,,No,0,Yes,General
+INV_PRESENT,Invasive Species Present,string,No,Yes,,No,General
+INV_SP,List of Invasive Species Identified,string,NONE,Yes,,No,General
+OV_CLSR_MEAN,Overstory Closure,int32,,No,0,Yes,General
+OV_CLSR_STD,Overstory Closure Standard Deviation,int32,,No,0,Yes,General
+OV_HT_MEAN,Overstory Height,float64,,No,0,Yes,General
+OV_HT_STD,Overstory Height Standard Deviation,float64,,No,0,Yes,General
+UND_COV_MEAN,Understory Cover,float64,,No,0,Yes,General
+UND_COV_STD,Understory Cover Standard Deviation,float64,,No,0,Yes,General
+UND_HT_MEAN,Understory Height Mean,float64,,No,0,Yes,General
+UND_HT_RG,Understory Height Range,string,,No,,No,General
+UND_HT_STD,Understory Height Standard Deviation,float64,,No,0,Yes,General
+STOCK_PCT,Stocking Percent,float64,,No,0,Yes,Management
+STOCK_PCT_HM,Hard Mast Stocking Percent,float64,,No,0,Yes,Management
+COMP_SP_RICH,Compound Species Richness,string,NONE,Yes,,No,Management
+SP_RICH,Species Richness,float64,,No,0,Yes,Management
+DEAD_TPA,Dead TPA,float64,,No,0,Yes,Health
+DEAD_BA,Dead BA,float64,,No,0,Yes,Health
+DEAD_QMDBH,Dead QM DBH,float64,,No,0,Yes,Health
+DEAD_DOM_SP,Dead Dominant Species,string,NONE,Yes,,No,Health
+DEAD_DOM_SP_PCMP,Dead Dominant Species % Composition,float64,,No,0,Yes,Health
+SD_TPA,Significant Decline TPA,float64,,No,0,Yes,Health
+SD_BA,Significant Decline BA,float64,,No,0,Yes,Health
+SD_QMDBH,Significant Decline QM DBH,float64,,No,0,Yes,Health
+SD_DOM_SP,Significant Decline Dominant Species,string,NONE,Yes,,No,Health
+SD_DOM_SP_PCMP,Significant Decline Dominant Species % Composition,float64,,No,0,Yes,Health
+STR_TPA,Stressed TPA,float64,,No,0,Yes,Health
+STR_BA,Stressed BA,float64,,No,0,Yes,Health
+STR_QMDBH,Stressed QM DBH,float64,,No,0,Yes,Health
+STR_DOM_SP,Stressed Dominant Species,string,NONE,Yes,,No,Health
+STR_DOM_SP_PCMP,Stressed Dominant Species % Composition,float64,,No,0,Yes,Health
+HLTH_TPA,Healthy TPA,float64,,No,0,Yes,Health
+HLTH_BA,Healthy BA,float64,,No,0,Yes,Health
+HLTH_QMDBH,Healthy QM DBH,float64,,No,0,Yes,Health
+HLTH_DOM_SP,Healthy Dominant Species,string,NONE,Yes,,No,Health
+HLTH_DOM_SP_PCMP,Healthy Dominant Species % Composition,float64,,No,0,Yes,Health
+LG_D_TPA,"Large Snag/Dead TPA (>20"" Dia.)",float64,,No,0,Yes,Health
+DOM_HLTH,Dominant Health Class,string,NONE,Yes,,No,Health
+DOM_HLTH_PCMP,Dominant Health Class % Composition,float64,,No,0,Yes,Health
+DOM_SP,Dominant Species,string,NONE,Yes,,No,Health
+DOM_SP_PCMP,Dominant Species % Composition,float64,,No,0,Yes,Health
+TYP_SP_DOM_HLTH,Typical Species Dominant Health Class,string,NONE,Yes,,No,Health
+TYP_SP_DOM_HLTH_PCMP,Typical Species Dominant Health Class % Composition,float64,,No,0,Yes,Health
+TYP_DOM_SP,Typical Dominant Species,string,NONE,Yes,,No,Health
+TYP_DOM_SP_PCMP,Typical Dominant Species % Composition,float64,,No,0,Yes,Health
+NTYP_SP_DOM_HLTH,Non-Typical Species Dominant Health Class,string,NONE,Yes,,No,Health
+NTYP_SP_DOM_HLTH_PCMP,Non-Typical Species Dominant Health Class % Composition,float64,,No,0,Yes,Health
+NTYP_DOM_SP,Non-Typical Dominant Species,string,NONE,Yes,,No,Health
+NTYP_DOM_SP_PCMP,Non-Typical Dominant Species % Composition,float64,,No,0,Yes,Health
+HM_TPA,Hard Mast TPA,float64,,No,0,Yes,Mast
+HM_BA,Hard Mast BA,float64,,No,0,Yes,Mast
+HM_QMDBH,Hard Mast QM DBH,float64,,No,0,Yes,Mast
+HM_DOM_HLTH,Hard Mast Dominant Health Class,string,NONE,Yes,,No,Mast
+HM_DOM_HLTH_PCMP,Hard Mast Dominant Health Class % Composition,float64,,No,0,Yes,Mast
+HM_DOM_SP,Hard Mast Dominant Species,string,NONE,Yes,,No,Mast
+HM_DOM_SP_PCMP,Hard Mast Dominant Species % Composition,float64,,No,0,Yes,Mast
+SM_TPA,Soft Mast TPA,float64,,No,0,Yes,Mast
+SM_BA,Soft Mast BA,float64,,No,0,Yes,Mast
+SM_QMDBH,Soft Mast QM DBH,float64,,No,0,Yes,Mast
+SM_DOM_HLTH,Soft Mast Dominant Health Class,string,NONE,Yes,,No,Mast
+SM_DOM_HLTH_PCMP,Soft Mast Dominant Health Class % Composition,float64,,No,0,Yes,Mast
+SM_DOM_SP,Soft Mast Dominant Species,string,NONE,Yes,,No,Mast
+SM_DOM_SP_PCMP,Soft Mast Dominant Species % Composition,float64,,No,0,Yes,Mast
+LM_TPA,Lightseed Mast TPA,float64,,No,0,Yes,Mast
+LM_BA,Lightseed Mast BA,float64,,No,0,Yes,Mast
+LM_QMDBH,Lightseed Mast QM DBH,float64,,No,0,Yes,Mast
+LM_DOM_HLTH,Lightseed Mast Dominant Health Class,string,NONE,Yes,,No,Mast
+LM_DOM_HLTH_PCMP,Lightseed Mast Dominant Health Class % Composition,float64,,No,0,Yes,Mast
+LM_DOM_SP,Lightseed Mast Dominant Species,string,NONE,Yes,,No,Mast
+LM_DOM_SP_PCMP,Lightseed Mast Dominant Species % Composition,float64,,No,0,Yes,Mast
+SAP_TPA,Sapling TPA,float64,,No,0,Yes,Size
+SAP_BA,Sapling BA,float64,,No,0,Yes,Size
+SAP_QMDBH,Sapling QM DBH,float64,,No,0,Yes,Size
+SAP_DOM_HLTH,Sapling Dominant Health Class,string,NONE,Yes,,No,Size
+SAP_DOM_HLTH_PCMP,Sapling Dominant Health Class % Composition,float64,,No,0,Yes,Size
+SAP_DOM_SP,Sapling Dominant Species,string,NONE,Yes,,No,Size
+SAP_DOM_SP_PCMP,Sapling Dominant Species % Composition,float64,,No,0,Yes,Size
+SAP_D_TPA,Dead Sapling TPA,float64,,No,0,Yes,Size
+SAP_D_BA,Dead Sapling BA,float64,,No,0,Yes,Size
+SAP_D_QMDBH,Dead Sapling QM DBH,float64,,No,0,Yes,Size
+POL_TPA,Pole Timber TPA,float64,,No,0,Yes,Size
+POL_BA,Pole Timber BA,float64,,No,0,Yes,Size
+POL_QMDBH,Pole Timber QM DBH,float64,,No,0,Yes,Size
+POL_DOM_HLTH,Pole Timber Dominant Health Class,string,NONE,Yes,,No,Size
+POL_DOM_HLTH_PCMP,Pole Timber Dominant Health Class % Composition,float64,,No,0,Yes,Size
+POL_DOM_SP,Pole Timber Dominant Species,string,NONE,Yes,,No,Size
+POL_DOM_SP_PCMP,Pole Timber Dominant Species % Composition,float64,,No,0,Yes,Size
+POL_D_TPA,Dead Pole Timber TPA,float64,,No,0,Yes,Size
+POL_D_BA,Dead Pole Timber BA,float64,,No,0,Yes,Size
+POL_D_QMDBH,Dead Pole Timber QM DBH,float64,,No,0,Yes,Size
+SAW_TPA,Saw Timber TPA,float64,,No,0,Yes,Size
+SAW_BA,Saw Timber BA,float64,,No,0,Yes,Size
+SAW_QMDBH,Saw Timber QM DBH,float64,,No,0,Yes,Size
+SAW_DOM_HLTH,Saw Timber Dominant Health Class,string,NONE,Yes,,No,Size
+SAW_DOM_HLTH_PCMP,Saw Timber Dominant Health Class % Composition,float64,,No,0,Yes,Size
+SAW_DOM_SP,Saw Timber Dominant Species,string,NONE,Yes,,No,Size
+SAW_DOM_SP_PCMP,Saw Timber Dominant Species % Composition,float64,,No,0,Yes,Size
+SAW_D_TPA,Dead Saw Timber TPA,float64,,No,0,Yes,Size
+SAW_D_BA,Dead Saw Timber BA,float64,,No,0,Yes,Size
+SAW_D_QMDBH,Dead Saw Timber QM DBH,float64,,No,0,Yes,Size
+MAT_TPA,Mature Timber TPA,float64,,No,0,Yes,Size
+MAT_BA,Mature Timber BA,float64,,No,0,Yes,Size
+MAT_QMDBH,Mature Timber QM DBH,float64,,No,0,Yes,Size
+MAT_DOM_HLTH,Mature Timber Dominant Health Class,string,NONE,Yes,,No,Size
+MAT_DOM_HLTH_PCMP,Mature Timber Dominant Health Class % Composition,float64,,No,0,Yes,Size
+MAT_DOM_SP,Mature Timber Dominant Species,string,NONE,Yes,,No,Size
+MAT_DOM_SP_PCMP,Mature Timber Dominant Species % Composition,float64,,No,0,Yes,Size
+MAT_D_TPA,Dead Mature Timber TPA,float64,,No,0,Yes,Size
+MAT_D_BA,Dead Mature Timber BA,float64,,No,0,Yes,Size
+MAT_D_QMDBH,Dead Mature Timber QM DBH,float64,,No,0,Yes,Size
+OVM_TPA,Overmature TPA,float64,,No,0,Yes,Size
+OVM_BA,Overmature BA,float64,,No,0,Yes,Size
+OVM_QMDBH,Overmature QM DBH,float64,,No,0,Yes,Size
+OVM_DOM_HLTH,Overmature Dominant Health Class,string,NONE,Yes,,No,Size
+OVM_DOM_HLTH_PCMP,Overmature Dominant Health Class % Composition,float64,,No,0,Yes,Size
+OVM_DOM_SP,Overmature Dominant Species,string,NONE,Yes,,No,Size
+OVM_DOM_SP_PCMP,Overmature Dominant Species % Composition,float64,,No,0,Yes,Size
+OVM_D_TPA,Dead Overmature TPA,float64,,No,0,Yes,Size
+OVM_D_BA,Dead Overmature BA,float64,,No,0,Yes,Size
+OVM_D_QMDBH,Dead Overmature QM DBH,float64,,No,0,Yes,Size
+LWT_TPA,Large Wildlife Tree TPA,float64,,No,0,Yes,Size
+LWT_BA,Large Wildlife Tree BA,float64,,No,0,Yes,Size
+LWT_QMDBH,Large Wildlife Tree QM DBH,float64,,No,0,Yes,Size
+LWT_DOM_HLTH,Large Wildlife Tree Dominant Health Class,string,NONE,Yes,,No,Size
+LWT_DOM_HLTH_PCMP,Large Wildlife Tree Dominant Health Class % Composition,float64,,No,0,Yes,Size
+LWT_DOM_SP,Large Wildlife Tree Dominant Species,string,NONE,Yes,,No,Size
+LWT_DOM_SP_PCMP,Large Wildlife Tree Dominant Species % Composition,float64,,No,0,Yes,Size
+LWT_D_TPA,Dead Large Wildlife Tree TPA,float64,,No,0,Yes,Size
+LWT_D_BA,Dead Large Wildlife Tree BA,float64,,No,0,Yes,Size
+LWT_D_QMDBH,Dead Large Wildlife Tree QM DBH,float64,,No,0,Yes,Size
+UND_SP1,Understory Sp 1,string,NONE,Yes,,No,Species
+UND_SP2,Understory Sp 2,string,NONE,Yes,,No,Species
+UND_SP3,Understory Sp 3,string,NONE,Yes,,No,Species
+GRD_SP1,Ground Sp 1,string,NONE,Yes,,No,Species
+GRD_SP2,Ground Sp 2,string,NONE,Yes,,No,Species
+GRD_SP3,Ground Sp 3,string,NONE,Yes,,No,Species
+NOT_SP1,Notable Sp 1,string,NONE,Yes,,No,Species
+NOT_SP2,Notable Sp 2,string,NONE,Yes,,No,Species
+NOT_SP3,Notable Sp 3,string,NONE,Yes,,No,Species
+OV_SP1,Overstory Sp 1,string,NONE,Yes,,No,Species
+OV_SP1_TPA,Overstory Sp 1 TPA,float64,,No,0,Yes,Species
+OV_SP1_BA,Overstory Sp 1 BA,float64,,No,0,Yes,Species
+OV_SP1_QMDBH,Overstory Sp 1 QM DBH,float64,,No,0,Yes,Species
+OV_SP1_DOM_HLTH,Overstory Sp 1 Dominant Health Class,string,NONE,Yes,,No,Species
+OV_SP1_DOM_HLTH_PCMP,Overstory Sp 1 Dominant Health Class % Composition,float64,,No,0,Yes,Species
+OV_SP1_DOM_HLTH_TPA,Overstory Sp 1 TPA for Dominant Health Class,float64,,No,0,Yes,Species
+OV_SP1_D_TPA,Overstory Sp 1 Dead TPA,float64,,No,0,Yes,Species
+OV_SP2,Overstory Sp 2,string,NONE,Yes,,No,Species
+OV_SP2_TPA,Overstory Sp 2 TPA,float64,,No,0,Yes,Species
+OV_SP2_BA,Overstory Sp 2 BA,float64,,No,0,Yes,Species
+OV_SP2_QMDBH,Overstory Sp 2 QM DBH,float64,,No,0,Yes,Species
+OV_SP2_DOM_HLTH,Overstory Sp 2 Dominant Health Class,string,NONE,Yes,,No,Species
+OV_SP2_DOM_HLTH_PCMP,Overstory Sp 2 Dominant Health Class % Composition,float64,,No,0,Yes,Species
+OV_SP2_DOM_HLTH_TPA,Overstory Sp 2 TPA for Dominant Health Class,float64,,No,0,Yes,Species
+OV_SP2_D_TPA,Overstory Sp 2 Dead TPA,float64,,No,0,Yes,Species
+OV_SP3,Overstory Sp 3,string,NONE,Yes,,No,Species
+OV_SP3_TPA,Overstory Sp 3 TPA,float64,,No,0,Yes,Species
+OV_SP3_BA,Overstory Sp 3 BA,float64,,No,0,Yes,Species
+OV_SP3_QMDBH,Overstory Sp 3 QM DBH,float64,,No,0,Yes,Species
+OV_SP3_DOM_HLTH,Overstory Sp 3 Dominant Health Class,string,NONE,Yes,,No,Species
+OV_SP3_DOM_HLTH_PCMP,Overstory Sp 3 Dominant Health Class % Composition,float64,,No,0,Yes,Species
+OV_SP3_DOM_HLTH_TPA,Overstory Sp 3 TPA for Dominant Health Class,float64,,No,0,Yes,Species
+OV_SP3_D_TPA,Overstory Sp 3 Dead TPA,float64,,No,0,Yes,Species
+OV_SP4,Overstory Sp 4,string,NONE,Yes,,No,Species
+OV_SP4_TPA,Overstory Sp 4 TPA,float64,,No,0,Yes,Species
+OV_SP4_BA,Overstory Sp 4 BA,float64,,No,0,Yes,Species
+OV_SP4_QMDBH,Overstory Sp 4 QM DBH,float64,,No,0,Yes,Species
+OV_SP4_DOM_HLTH,Overstory Sp 4 Dominant Health Class,string,NONE,Yes,,No,Species
+OV_SP4_DOM_HLTH_PCMP,Overstory Sp 4 Dominant Health Class % Composition,float64,,No,0,Yes,Species
+OV_SP4_DOM_HLTH_TPA,Overstory Sp 4 TPA for Dominant Health Class,float64,,No,0,Yes,Species
+OV_SP4_D_TPA,Overstory Sp 4 Dead TPA,float64,,No,0,Yes,Species
+OV_SP5,Overstory Sp 5,string,NONE,Yes,,No,Species
+OV_SP5_TPA,Overstory Sp 5 TPA,float64,,No,0,Yes,Species
+OV_SP5_BA,Overstory Sp 5 BA,float64,,No,0,Yes,Species
+OV_SP5_QMDBH,Overstory Sp 5 QM DBH,float64,,No,0,Yes,Species
+OV_SP5_DOM_HLTH,Overstory Sp 5 Dominant Health Class,string,NONE,Yes,,No,Species
+OV_SP5_DOM_HLTH_PCMP,Overstory Sp 5 Dominant Health Class % Composition,float64,,No,0,Yes,Species
+OV_SP5_DOM_HLTH_TPA,Overstory Sp 5 TPA for Dominant Health Class,float64,,No,0,Yes,Species
+OV_SP5_D_TPA,Overstory Sp 5 Dead TPA,float64,,No,0,Yes,Species
+CNP_TPA,Canopy TPA,float64,,No,0,Yes,Vertical
+CNP_BA,Canopy BA,float64,,No,0,Yes,Vertical
+CNP_QMDBH,Canopy QM DBH,float64,,No,0,Yes,Vertical
+CNP_D_TPA,Dead Canopy TPA,float64,,No,0,Yes,Vertical
+CNP_D_BA,Dead Canopy BA,float64,,No,0,Yes,Vertical
+CNP_D_QMDBH,Dead Canopy QM DBH,float64,,No,0,Yes,Vertical
+CNP_DOM_HLTH,Canopy Dominant Health Class,string,NONE,Yes,,No,Vertical
+CNP_DOM_HLTH_PCMP,Canopy Dominant Health Class % Composition,float64,,No,0,Yes,Vertical
+CNP_DOM_SP,Canopy Dominant Species,string,NONE,Yes,,No,Vertical
+CNP_DOM_SP_PCMP,Canopy Dominant Species % Composition,float64,,No,0,Yes,Vertical
+MID_TPA,Midstory TPA,float64,,No,0,Yes,Vertical
+MID_BA,Midstory BA,float64,,No,0,Yes,Vertical
+MID_QMDBH,Midstory QM DBH,float64,,No,0,Yes,Vertical
+MID_D_TPA,Dead Midstory TPA,float64,,No,0,Yes,Vertical
+MID_D_BA,Dead Midstory BA,float64,,No,0,Yes,Vertical
+MID_D_QMDBH,Dead Midstory QM DBH,float64,,No,0,Yes,Vertical
+MID_DOM_HLTH,Midstory Dominant Health Class,string,NONE,Yes,,No,Vertical
+MID_DOM_HLTH_PCMP,Midstory Dominant Health Class % Composition,float64,,No,0,Yes,Vertical
+MID_DOM_SP,Midstory Dominant Species,string,NONE,Yes,,No,Vertical
+MID_DOM_SP_PCMP,Midstory Dominant Species % Composition,float64,,No,0,Yes,Vertical
+INT_DOM_HLTH,Intermediate Dominant Health Class,string,NONE,Yes,,No,Vertical
+INT_DOM_HLTH_PCMP,Intermediate Dominant Health Class % Composition,float64,,No,0,Yes,Vertical
+INT_DOM_SP,Intermidiate Dominant Species,string,NONE,Yes,,No,Vertical
+INT_DOM_SP_PCMP,Intermediate Dominant Species % Composition,float64,,No,0,Yes,Vertical
