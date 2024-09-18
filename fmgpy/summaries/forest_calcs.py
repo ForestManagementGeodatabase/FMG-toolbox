@@ -2434,3 +2434,53 @@ def create_sp_richness(tree_table, plot_table, level):
     return sp_richness
 
 
+# Check for and correct ESRI Big Integer data type
+def remove_esri_big_int(in_feature_class):
+    arcpy.AddMessage('Begin on {}'.format(in_feature_class))
+    # create field list
+    field_list = arcpy.ListFields(dataset=in_feature_class,
+                                  field_type='BIGINTEGER')
+    arcpy.AddMessage('Created field list')
+
+    # Loop through describe object doing stuff
+
+    arcpy.AddMessage('Start field reformatting loop')
+
+    if len(field_list) == 0:
+        arcpy.AddMessage('No Big Int dtypes found')
+
+    elif len(field_list) > 0:
+        for field in field_list:
+            # define some local variables
+            new_name = str(field.name) + '_2'
+            new_alias = str(field.aliasName)
+            source_name = str(field.name)
+
+            # add new field with correct data type
+            arcpy.management.AddField(in_table=in_feature_class,
+                                      field_name=new_name,
+                                      field_type='LONG',
+                                      field_alias=new_alias)
+            arcpy.AddMessage('  Added field {}'.format(new_name))
+
+            # calculate values for new field
+            arcpy.management.CalculateField(in_table=in_feature_class,
+                                            field=new_name,
+                                            expression='!{}!'.format(source_name))
+
+            arcpy.AddMessage('  Calculated field {}'.format(new_name))
+
+            # delete old field
+            arcpy.management.DeleteField(in_table=in_feature_class,
+                                         drop_field=source_name)
+            arcpy.AddMessage('  Deleted field {}'.format(source_name))
+
+            # rename new field
+            arcpy.management.AlterField(in_table=in_feature_class,
+                                        field=new_name,
+                                        new_field_name=source_name,
+                                        new_field_alias=new_alias)
+            arcpy.AddMessage('  Renamed field {} to {}'.format(new_name, source_name))
+
+    arcpy.AddMessage('Complete, check output')
+
