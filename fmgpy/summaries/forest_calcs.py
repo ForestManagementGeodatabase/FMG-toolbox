@@ -2484,3 +2484,61 @@ def remove_esri_big_int(in_feature_class):
 
     arcpy.AddMessage('Complete, check output')
 
+
+# Create species importance values
+def sp_importance_vals_plot(tree_table):
+
+    # Create DF for level metrics
+    iv_level_df = fcalc.tpa_ba_qmdbh_plot(tree_table=tree_table,
+                                    filter_statement=None)
+
+    iv_level_df = iv_level_df\
+        .rename(columns={'BA': 'Level_BA',
+                         'TPA': 'Level_TPA'})\
+        .set_index('PID')
+
+    # Create DF for species metrics
+    iv_species_df = fcalc.tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
+                                                   filter_statement=None,
+                                                   case_column='TR_SP')
+
+    iv_species_df = iv_species_df\
+        .rename(columns={'BA': 'Species_BA',
+                         'TPA': 'Species_TPA'})\
+        .set_index('PID')
+
+    # Join level metrics to species metrics DF by PID
+    iv_df = iv_species_df\
+        .join([iv_level_df],
+              how='left')\
+        .reset_index()
+
+    # Add & populate relative BA col
+    iv_df['Relative_BA'] = ((iv_df['Species_BA'] / iv_df['Level_BA']) * 100)
+
+    # Add and populate relative TPA col
+    iv_df['Relative_TPA'] = ((iv_df['Species_TPA'] / iv_df['Level_TPA']) * 100)
+
+    # Add and populate Plot Importance Val Column
+    iv_df['PLOT_IMPVAL'] = (iv_df['Relative_BA'] + iv_df['Relative_TPA'])
+
+
+def sp_importance_vals_level(tree_table, level):
+    tpa_ba_qmdbh_plot(tree_table, filter_statement=None)
+    # Create DF for level plot count
+    # Create DF for species metrics
+    # tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_columns)
+    # Create DF for species plot count
+    # join level plot count to species plot count
+    # add Species Frequency column
+    # populate species frequency column as (species plots / level plots)
+    # create DF for relative frequency, sum all species freq by level
+    # Join level metrics, relative frequency to species metrics DF by level
+    # Add relative Frequency col
+    # populate as (
+    # Add relative BA col
+    # populate as (species BA / level BA) * 100
+    # Add relative TPA col
+    # populate as (species TPA / level TPA) * 100
+    # Add Plot Importance Val Column
+    # Populate as relative BA + relative TPA
