@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import itertools
 import importlib
-import summaries.forest_calcs as fcalc
+import fmgpy.summaries.forest_calcs as fcalc
 
 
 # Define Some input data - pool 12 full
