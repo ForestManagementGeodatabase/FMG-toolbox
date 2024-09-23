@@ -630,7 +630,7 @@ def create_tree_table(prism_df):
     tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+    crosswalk_df = pd.read_csv('fmgpy/summaries/resources/MAST_SP_TYP_Crosswalk.csv')\
         .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
 
     tree_table = tree_table\
@@ -2482,6 +2482,8 @@ def remove_esri_big_int(in_feature_class):
                                         new_field_alias=new_alias)
             arcpy.AddMessage('  Renamed field {} to {}'.format(new_name, source_name))
 
+    return in_feature_class
+
     arcpy.AddMessage('Complete, check output')
 
 
@@ -2489,22 +2491,26 @@ def remove_esri_big_int(in_feature_class):
 def sp_importance_vals_plot(tree_table):
 
     # Create DF for level metrics
-    iv_level_df = fcalc.tpa_ba_qmdbh_plot(tree_table=tree_table,
+    iv_level_df = tpa_ba_qmdbh_plot(tree_table=tree_table,
                                     filter_statement=None)
 
     iv_level_df = iv_level_df\
         .rename(columns={'BA': 'Level_BA',
                          'TPA': 'Level_TPA'})\
+        .drop(columns=['index', 'tree_count', 'plot_count', 'QM_DBH'],
+              errors='ignore')\
         .set_index('PID')
 
     # Create DF for species metrics
-    iv_species_df = fcalc.tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
+    iv_species_df = tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
                                                    filter_statement=None,
                                                    case_column='TR_SP')
 
     iv_species_df = iv_species_df\
         .rename(columns={'BA': 'Species_BA',
                          'TPA': 'Species_TPA'})\
+        .drop(columns=['index', 'plot_count', 'tree_count', 'QM_DBH'],
+              errors='ignore')\
         .set_index('PID')
 
     # Join level metrics to species metrics DF by PID
@@ -2521,6 +2527,15 @@ def sp_importance_vals_plot(tree_table):
 
     # Add and populate Plot Importance Val Column
     iv_df['PLOT_IMPVAL'] = (iv_df['Relative_BA'] + iv_df['Relative_TPA'])
+
+    # Tweak dtypes
+    iv_df = iv_df.astype(dtype={'Level_TPA': 'float64', 'PLOT_IMPVAL': 'float64', 'Relative_TPA': 'float64',
+                                'Species_TPA': 'float64'})
+
+    # Fill NAs
+    iv_df = iv_df.fillna(value={'Relative_BA': 0, 'Relative_TPA': 0, 'PLOT_IMPVAL': 0})
+
+    return iv_df
 
 
 def sp_importance_vals_level(tree_table, level):
