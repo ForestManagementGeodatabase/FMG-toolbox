@@ -2491,7 +2491,7 @@ def remove_esri_big_int(in_feature_class):
 def sp_importance_vals_plot(tree_table):
 
     # Create DF for level metrics
-    iv_level_df = tpa_ba_qmdbh_plot(tree_table=tree_table,
+    iv_level_df = fcalc.tpa_ba_qmdbh_plot(tree_table=tree_table,
                                     filter_statement=None)
 
     iv_level_df = iv_level_df\
@@ -2502,7 +2502,7 @@ def sp_importance_vals_plot(tree_table):
         .set_index('PID')
 
     # Create DF for species metrics
-    iv_species_df = tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
+    iv_species_df = fcalc.tpa_ba_qmdbh_plot_by_case_long(tree_table=tree_table,
                                                    filter_statement=None,
                                                    case_column='TR_SP')
 
@@ -2539,11 +2539,67 @@ def sp_importance_vals_plot(tree_table):
 
 
 def sp_importance_vals_level(tree_table, level):
-    tpa_ba_qmdbh_plot(tree_table, filter_statement=None)
-    # Create DF for level plot count
-    # Create DF for species metrics
-    # tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_columns)
-    # Create DF for species plot count
+
+    # Create DF for level metrics
+    iv_level_df = fcalc.tpa_ba_qmdbh_level(tree_table=tree_table, filter_statement=None, level=level)
+
+    iv_level_df = iv_level_df\
+        .rename(columns={'BA': 'Level_BA',
+                         'TPA': 'Level_TPA',
+                         'plot_count': 'Level_PLT_CT'})\
+        .drop(columns=['index', 'tree_count', 'QM_DBH', 'stand_dens'],
+              errors='ignore')\
+        .set_index(level)
+
+    # Create DF for species BA & TPA metrics
+    iv_species_ba_df = fcalc.tpa_ba_qmdbh_level_by_case_long(tree_table=tree_table,
+                                                          filter_statement=None,
+                                                          case_column='TR_SP',
+                                                          level=level)
+
+    iv_species_ba_df = iv_species_ba_df\
+        .rename(columns={'BA': 'Species_BA',
+                         'TPA': 'Species_TPA'})\
+        .drop(columns=['index', 'tree_count', 'stand_dens', 'plot_count', 'QM_DBH'],
+              errors='ignore')\
+        .set_index([level, 'TR_SP'])
+
+    # Create Species plot count DF
+    iv_species_pltct_df = tree_table\
+        .groupby([level, 'TR_SP'], as_index=False)\
+        .agg(Species_PLT_CT=('PID', fcalc.agg_plot_count))\
+        .set_index([level, 'TR_SP'])
+
+    # Combine component species tables
+    iv_species_df = iv_species_ba_df\
+        .join([iv_species_pltct_df],
+              how='left')\
+        .reset_index()\
+        .set_index(level)
+
+    # Join level metrics to species metrics DF by level
+    iv_df = iv_species_df\
+        .join([iv_level_df],
+              how='left')
+
+    # Add & populate species frequency
+    iv_df['Species_FREQ'] = (iv_df['Species_PLT_CT'] / iv_df['Level_PLT_CT'])
+
+    # Create level frequency
+    iv_level_freq = iv_df.groupby(level).agg(Level_FREQ=('Species_FREQ', 'sum'))
+
+    # Join level freq to back to iv df
+    iv_df = iv_df.join([iv_level_freq], how='left').reset_index()
+
+    # Calc importance value
+    iv_df['Relative_FREQ'] = ((iv_df['Species_FREQ'] / iv_df['Level_FREQ']) * 100)
+    iv_df['Relative_BA'] = ((iv_df['Species_BA'] / iv_df['Level_BA']) * 100)
+    iv_df['Relative_TPA'] = ((iv_df['Species_TPA'] / iv_df['Level_TPA']) * 100)
+    iv_df['SP_IMP_VAL'] = (iv_df['Relative_FREQ'] + iv_df['Relative_BA'] + iv_df['Relative_TPA'])
+
+
+
+
     # join level plot count to species plot count
     # add Species Frequency column
     # populate species frequency column as (species plots / level plots)
