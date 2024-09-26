@@ -3,7 +3,7 @@
 import arcpy
 import importlib
 from os.path import split, join
-import clean_inputs
+from fmglib import clean_inputs
 
 importlib.reload(clean_inputs)
 
@@ -24,6 +24,6 @@ if not split(fc_prism)[0]:
 
 # check each field collected dataset for required fields
 result = clean_inputs.check_required_fields_prism(fc_prism, plot_name, species_name, dia_name,
-                                     class_name, health_name, misc_name, crew_name, date_name)
+                                                  class_name, health_name, misc_name, crew_name, date_name)
 
 arcpy.SetParameterAsText(9, result)

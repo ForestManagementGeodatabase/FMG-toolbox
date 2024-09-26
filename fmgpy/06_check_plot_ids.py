@@ -3,7 +3,7 @@
 import arcpy
 import importlib
 from os.path import split, join
-import clean_inputs
+from fmglib import clean_inputs
 
 importlib.reload(clean_inputs)
 
@@ -32,25 +32,25 @@ if not split(fc_age)[0]:
 
 # check plot IDs - PRISM
 result_prism = clean_inputs.check_plot_ids(fc_center,
-                              center_plot_id_field,
-                              fc_prism,
-                              prism_plot_id_field)
+                                           center_plot_id_field,
+                                           fc_prism,
+                                           prism_plot_id_field)
 
 arcpy.SetParameterAsText(8, result_prism)
 
 # check plot IDs - FIXED
 result_fixed = clean_inputs.check_plot_ids(fc_center,
-                              center_plot_id_field,
-                              fc_fixed,
-                              fixed_plot_id_field)
+                                           center_plot_id_field,
+                                           fc_fixed,
+                                           fixed_plot_id_field)
 
 arcpy.SetParameterAsText(9, result_fixed)
 
 # check plot IDs - AGE
 result_age = clean_inputs.check_plot_ids(fc_center,
-                            center_plot_id_field,
-                            fc_age,
-                            age_plot_id_field)
+                                         center_plot_id_field,
+                                         fc_age,
+                                         age_plot_id_field)
 
 arcpy.SetParameterAsText(10, result_age)
 

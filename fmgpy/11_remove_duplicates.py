@@ -3,7 +3,7 @@
 import arcpy
 import importlib
 from os.path import split, join
-import clean_inputs
+from fmglib import clean_inputs
 
 importlib.reload(arcpy)
 importlib.reload(clean_inputs)

@@ -3,7 +3,7 @@
 import arcpy
 import importlib
 from os.path import split, join
-import clean_inputs
+from fmglib import clean_inputs
 
 importlib.reload(clean_inputs)
 
@@ -26,6 +26,6 @@ if not split(fc_fixed)[0]:
 
 # check each field collected dataset for required fields
 result = clean_inputs.check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, un_ht_name, un_cover_name,
-                                     un_sp_name, gr_sp_name, misc_name, crew_name, date_name)
+                                                  un_sp_name, gr_sp_name, misc_name, crew_name, date_name)
 
 arcpy.SetParameterAsText(11, result)
