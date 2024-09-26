@@ -2,7 +2,7 @@
 import os
 import arcpy
 import pandas as pd
-from fmgpy.fmglib import forest_calcs as fcalc
+from fmglib import forest_calcs as fcalc
 
 # Define Required Input Parameters
 prism_fc = arcpy.GetParameterAsText(0)

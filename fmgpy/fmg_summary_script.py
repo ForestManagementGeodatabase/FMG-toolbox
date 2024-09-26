@@ -1,7 +1,7 @@
-﻿# Do some imports
+# Do some imports
 import arcpy
 import pandas as pd
-from fmgpy.fmglib import forest_calcs as fcalc, forest_summaries as fsum
+from fmglib import forest_calcs as fcalc, forest_summaries as fsum
 import importlib
 
 importlib.reload(fcalc)
