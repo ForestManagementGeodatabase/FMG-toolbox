@@ -2,12 +2,12 @@ import pytest
 import os
 import pandas as pd
 import fmgpy.fmglib.forest_calcs
-import test.test_data
+import fmgpy.test.test_data
 
 # Arrange
 @pytest.fixture
 def fmg_gdb():
-    fmg_gdb = os.path.join(test.test_data.data_folder(), "FMG_OracleSchema.gdb")
+    fmg_gdb = os.path.join(fmgpy.test.test_data.data_folder(), "FMG_OracleSchema.gdb")
     return fmg_gdb
 
 

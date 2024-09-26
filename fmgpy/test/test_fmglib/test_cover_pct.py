@@ -1,14 +1,14 @@
 import pytest
 import os
 import pandas as pd
-import test.test_data
+import fmgpy.test.test_data
 import fmgpy.fmglib.forest_calcs
 
 
 # Arrange
 @pytest.fixture
 def fmg_gdb():
-    fmg_gdb = os.path.join(test.test_data.data_folder(), "Pool12.gdb")
+    fmg_gdb = os.path.join(fmgpy.test.test_data.data_folder(), "Pool12.gdb")
     return fmg_gdb
 
 
