@@ -2,7 +2,7 @@
 import os
 import arcpy
 import pandas as pd
-from fmgpy.fmglib import forest_calcs as fcalc
+from fmglib import forest_calcs as fcalc
 
 
 def general_summary(plot_table, tree_table, out_gdb, level):
