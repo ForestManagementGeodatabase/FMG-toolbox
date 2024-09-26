@@ -7,9 +7,7 @@ import sys
 import arcgis
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
-import pathlib
-sys.path.append(str(pathlib.Path(__file__).resolve().parent.parent))
-import summaries.forest_calcs as fcalc
+import fmglib.forest_calcs as fcalc
 
 # Define input geodatabase with summary tables parameter
 arcpy.AddMessage('Starting: Create FMG Forester View')
