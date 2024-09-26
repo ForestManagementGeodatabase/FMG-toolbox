@@ -1,13 +1,8 @@
 # Do some imports
 import os
-import sys
 import arcpy
-import arcgis
-import math
 import pandas as pd
-import numpy as np
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
-import forest_calcs as fcalc
+from fmgpy.fmglib import forest_calcs as fcalc
 
 
 def general_summary(plot_table, tree_table, out_gdb, level):

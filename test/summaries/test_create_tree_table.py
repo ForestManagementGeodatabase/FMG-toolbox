@@ -1,9 +1,7 @@
 import pytest
 import os
-import arcpy
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
-import fmgpy.summaries.forest_calcs
+
 
 # Arrange
 @pytest.fixture

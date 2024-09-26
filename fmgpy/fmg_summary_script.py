@@ -1,14 +1,7 @@
 ﻿# Do some imports
-import os
-import sys
 import arcpy
-import arcgis
-import math
 import pandas as pd
-import numpy as np
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
-import forest_calcs as fcalc
-import forest_summaries as fsum
+from fmgpy.fmglib import forest_calcs as fcalc, forest_summaries as fsum
 import importlib
 
 importlib.reload(fcalc)

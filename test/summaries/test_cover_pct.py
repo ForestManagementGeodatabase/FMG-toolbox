@@ -1,10 +1,8 @@
 import pytest
 import os
-import arcpy
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
 import test.test_data
-import fmgpy.summaries.forest_calcs
+import fmgpy.fmglib.forest_calcs
 
 
 # Arrange
@@ -22,5 +20,5 @@ def fixed_df(fmg_gdb):
 
 
 def test_cover_pct(fixed_df):
-    cover_pct_df = fmgpy.summaries.forest_calcs.cover_pct(fixed_df, "site")
+    cover_pct_df = fmgpy.fmglib.forest_calcs.cover_pct(fixed_df, "site")
     assert isinstance(cover_pct_df, pd.DataFrame)

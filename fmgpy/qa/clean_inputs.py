@@ -496,7 +496,7 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
         prism_df.drop(columns=['MAST_TYPE'])
     else:
         pass
-    crosswalk_df = pd.read_csv('../summaries/resources/MAST_SP_TYP_Crosswalk.csv') \
+    crosswalk_df = pd.read_csv('../resources/MAST_SP_TYP_Crosswalk.csv') \
         .filter(items=['TR_SP', 'MAST_TYPE'])
 
     prism_df = prism_df.merge(right=crosswalk_df, how='left', on='TR_SP')
@@ -616,7 +616,7 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
         age_df.drop(columns=['MAST_TYPE'])
     else:
         pass
-    crosswalk_df = pd.read_csv('../summaries/resources/MAST_SP_TYP_Crosswalk.csv') \
+    crosswalk_df = pd.read_csv('../resources/MAST_SP_TYP_Crosswalk.csv') \
         .filter(items=['TR_SP', 'MAST_TYPE']) \
         .rename(columns={'TR_SP': 'AGE_SP'})
 

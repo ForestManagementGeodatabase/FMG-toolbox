@@ -1,9 +1,7 @@
 import pytest
 import os
-import arcpy
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
 import pandas as pd
-import fmgpy.summaries.forest_calcs
+import fmgpy.fmglib.forest_calcs
 import test.test_data
 
 # Arrange
@@ -21,5 +19,5 @@ def fixed_df(fmg_gdb):
 
 
 def test_plot_count(fixed_df):
-    plots = fmgpy.summaries.forest_calcs.plot_count(fixed_df)
+    plots = fmgpy.fmglib.forest_calcs.plot_count(fixed_df)
     assert isinstance(plots, int)

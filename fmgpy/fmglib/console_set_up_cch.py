@@ -1,16 +1,7 @@
 ### Console Testing Set Up Start
 # Do Some Imports
-import os
-import sys
-import arcpy
-import arcgis
-from arcgis.features import GeoAccessor, GeoSeriesAccessor
-import math
 import pandas as pd
-import numpy as np
-import itertools
-import importlib
-import fmgpy.summaries.forest_calcs as fcalc
+import fmgpy.fmglib.forest_calcs as fcalc
 
 
 # Define Some input data - pool 12 full
