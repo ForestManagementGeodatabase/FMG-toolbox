@@ -5,7 +5,7 @@
 <img src="images/FMG-hex_400.png" width=150 align="right" />
 <img src="images/USACE_200.png" width=150 align="right" />
 
-The Forest Management Geodatabase (FMG), FMG toolbox provides a set of python-based ESRI ArcGIS Toolbox tools that allow users to accomplish the following:
+The Forest Management Geodatabase (FMG), FMG-toolbox provides a set of python-based ArcGIS script tools that allow users to accomplish the following:
 - Quality control and assure field collected prism, fixed, and age plot surveys
 - Calculate a wide range of forest statistics at multiple spatial resolutions
 - Generate reports and spatial views of the statistics
@@ -15,16 +15,16 @@ The Forest Management Geodatabase (FMG), FMG toolbox provides a set of python-ba
 ## Project Status
 [![Maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle)
 [![Project Status: Active The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg?style=flat-square)](commits/main)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2022--11--23-yellowgreen.svg)](/commits/main)
+[![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg?style=flat-square)](commits/master)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2022--11--23-yellowgreen.svg)](/commits/master)
 [![Licence](https://img.shields.io/badge/licence-CC0-blue.svg)](http://choosealicense.com/licenses/cc0-1.0/)
+
+
 
 ## Description
 <img src="images/ArcGISToolbox.jpg" width=125 align="left"  />
 
-The FMG toolbox is an ESRI ArcGIS Python toolbox used to process FMG forestry field surveys into a geodatabase and produce summary reports. The FMG toolbox was developed by USACE foresters and geographers to implement the forest monitoring protocols established by the [Upper Mississippi River Systemic Forest Stewardship Plan](https://www.mvd.usace.army.mil/Portals/52/docs/regional_flood_risk_management/our_mississippi/UMRSystemicFSP7-26-12.pdf), [Executive Summary](https://www.mvd.usace.army.mil/Portals/52/docs/regional_flood_risk_management/our_mississippi/UMR/UMR%20Systemic%20FSP%20-%20Exec%20Summary%20Aug%202012.pdf).  
-
-***
+The FMG toolbox is an ESRI ArcGIS toolbox, referencing python scripts configured to run in ArcGIS Pro v3.0 or higher. The tools are used to QA/QC field collected prism, fixed, and age plot surveys, calcualte a wide range of statistics across multiple spatial scales, and generate reports and spatial views of the statistics. The tooling developed is designed to support the specific data collection protocols defined by the [Upper Mississippi River Systemic Forest Stewardship Plan](https://www.mvd.usace.army.mil/Portals/52/docs/regional_flood_risk_management/our_mississippi/UMRSystemicFSP7-26-12.pdf), [Executive Summary](https://www.mvd.usace.army.mil/Portals/52/docs/regional_flood_risk_management/our_mississippi/UMR/UMR%20Systemic%20FSP%20-%20Exec%20Summary%20Aug%202012.pdf) and requires certain data schema definitions to be met. More information can be found in the technical and user manuals.  
 
 
 
@@ -37,12 +37,12 @@ Funding for development and maintenance of the FMG-toolbox has been provided by 
 * [Navigation and Ecosystem Sustainability Program (NESP)](https://www.mvr.usace.army.mil/Rock-Island-District/Programs/NESP/)
 * [Upper Mississippi River Restoration Program (UMRR)](https://www.mvr.usace.army.mil/Missions/Environmental-Stewardship/Upper-Mississippi-River-Restoration/)
 
-***
+
 
 ## Latest Updates
 Check out the [NEWS](NEWS.md) for details on the latest updates.  
 
-***  
+
 
 ## Authors
 * [Christopher Hawes](mailto:Christopher.C.Hawes@usace.army.mil), Geographer, Rock Island District, U.S. Army Corps of Engineers
@@ -52,12 +52,15 @@ Check out the [NEWS](NEWS.md) for details on the latest updates.
 * [Ben Vandermyde](mailto:Benjamin.J.Vandermyde@usace.army.mil), Forester, Rock Island District, U.S. Army Corps of Engineers
 * [Brian Stoff](Brian.W.Stoff@usace.army.mil), Forester, St. Louis District, U.S. Army Corps of Engineers
 
+
+
 ## Bug Reports
 If you find any bugs while using the FMG toolbox toolbox, please open an [issue](https://github.com/ForestManagementGeodatabase/FMG-toolbox/issues) in this repository. 
 
-*** 
 
-## Configure PyCharm (Devs)
+
+## Developer Note: Configuring PyCharm
+These notes are meant for developers actively working on the project or interested in extending the project. They ensure that PyCharm is using the default python environment installed alongside ArcGIS Pro.
 1. Set Python Interpreter - Go to File | Setings | Project <Project Name> | Python Interpreter. Configure the source to the ArcGIS Pro python interpreter installed alongside your Pro install. Generally at this path: "C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe"
 2. Set Python Terminal - Go to File | Settings | Tools | Terminal. Set the shell path to C:\Program Files\ArcGIS\Pro\bin\Python\Scripts\proenv.bat.
 3. Set Python Console - Go to File | Settings | Build, Execution, Deployment | Console. Uncheck the radio button next to 'Use IPython if available'. Note this changes the console to a more IDLE like experience, to continue using the console in a python-notebook like experience, ignore this step.
