@@ -1,4 +1,4 @@
-<img src="images/FMG-hex_400.png" width=250 align="center" />
+<img src="images/FMG-hex_400.png" width=250 align="middle" />
 
 # FMG-toolbox
 
