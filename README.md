@@ -2,8 +2,8 @@
 
 # FMG-toolbox
 
-<img src="images/FMG-hex_400.png" width=250 align="right" />
-<img src="images/USACE_200.png" width=125 align="right" />
+<img src="images/FMG-hex_400.png" width=150 align="right" />
+<img src="images/USACE_200.png" width=150 align="right" />
 
 The Forest Management Geodatabase (FMG), FMG toolbox provides a set of tools for processing forestry field surveys into a geodatabase and produce summary reports.
 
