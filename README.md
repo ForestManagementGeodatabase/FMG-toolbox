@@ -5,8 +5,10 @@
 <img src="images/FMG-hex_400.png" width=150 align="right" />
 <img src="images/USACE_200.png" width=150 align="right" />
 
-The Forest Management Geodatabase (FMG), FMG toolbox provides a set of tools for processing forestry field surveys into a geodatabase and produce summary reports.
-
+The Forest Management Geodatabase (FMG), FMG toolbox provides a set of python-based ESRI ArcGIS Toolbox tools that allow users to accomplish the following:
+- Quality control and assure field collected prism, fixed, and age plot surveys
+- Calculate a wide range of forest statistics at multiple spatial resolutions
+- Generate reports and spatial views of the statistics
 
 
 
