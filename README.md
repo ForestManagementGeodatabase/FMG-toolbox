@@ -1,6 +1,9 @@
-<img src="images/FMG-hex_400.png" width=250 align="middle" />
+
 
 # FMG-toolbox
+
+<img src="images/FMG-hex_400.png" width=250 align="right" />
+<img src="images/USACE_200.png" width=125 align="right" />
 
 The Forest Management Geodatabase (FMG), FMG toolbox provides a set of tools for processing forestry field surveys into a geodatabase and produce summary reports.
 
@@ -18,7 +21,7 @@ The FMG toolbox is an ESRI ArcGIS Python toolbox used to process FMG forestry fi
 
 ***
 
-<img src="images/USACE_200.png" width=125 align="right" />
+
 
 ## Funding
 Funding for development and maintenance of the FMG-toolbox has been provided by the following US Army Corps of Engineers (USACE) programs:
