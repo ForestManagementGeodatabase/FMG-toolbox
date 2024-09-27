@@ -16,7 +16,7 @@ The Forest Management Geodatabase (FMG), FMG-toolbox provides a set of python-ba
 [![Maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle)
 [![Project Status: Active The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![packageversion](https://img.shields.io/badge/Package%20version-0.0.1-orange.svg?style=flat-square)](commits/main)
-[![Last-changedate](https://img.shields.io/badge/last%20change-2022--11--23-yellowgreen.svg)](commits/main)
+[![Last-changedate](https://img.shields.io/badge/last%20change-2024--09--27-yellowgreen.svg)](commits/main)
 [![Licence](https://img.shields.io/badge/licence-CC0-blue.svg)](http://choosealicense.com/licenses/cc0-1.0/)
 
 
@@ -39,11 +39,6 @@ Funding for development and maintenance of the FMG-toolbox has been provided by 
 
 
 
-## Latest Updates
-Check out the [NEWS](NEWS.md) for details on the latest updates.  
-
-
-
 ## Authors
 * [Christopher Hawes](mailto:Christopher.C.Hawes@usace.army.mil), Geographer, Rock Island District, U.S. Army Corps of Engineers
 * [Alden Ross](mailto:alden.g.ross@usace.army.mil), Geographer, Rock Island District, U.S. Army Corps of Engineers
@@ -51,6 +46,20 @@ Check out the [NEWS](NEWS.md) for details on the latest updates.
 * [Andy Meier](Andrew.R.Meier@usace.army.mil), Forester, St. Paul District, U.S. Army Corps of Engineers
 * [Ben Vandermyde](mailto:Benjamin.J.Vandermyde@usace.army.mil), Forester, Rock Island District, U.S. Army Corps of Engineers
 * [Brian Stoff](Brian.W.Stoff@usace.army.mil), Forester, St. Louis District, U.S. Army Corps of Engineers
+
+
+
+## Install and Use
+To use the FMG-Toolbox:
+- Download the most recent release
+- Unzip the download (locally or to a network location)
+- In ArcGIS Pro navigate to the location of the unzipped directory then FMG-Toolbox/toolbox which contains the ArcGIS Toolbox file(.atbx)
+- Run the relevant script tools from ArcGIS Pro v3.0 or later.
+
+
+
+## Latest Updates
+Check out the [NEWS](NEWS.md) for details on the latest updates.  
 
 
 

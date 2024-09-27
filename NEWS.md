@@ -1,7 +1,7 @@
-# FMG-toolbox v0.0.1 (Release date: 2021-11-01)
+# FMG-toolbox v2024.9.1 (Release date: 2024-09-27)
 
 ## Major Changes
-* Add major change here.  
+* Initial release. Contains QA, Summary, and Reporting tools.  
 
 ## Bug Fixes
-* Add bug fix here. 
+* Initial release. Contains QA, Summary, and Reporting tools.
