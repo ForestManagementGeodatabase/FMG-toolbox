@@ -1,11 +1,8 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 
 import arcpy
-import importlib
 from os.path import split, join
 from fmglib import clean_inputs
-
-importlib.reload(clean_inputs)
 
 # run this tool AFTER running check_plot_ids
 

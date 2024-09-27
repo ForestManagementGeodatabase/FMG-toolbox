@@ -1,11 +1,8 @@
-# -*- coding: UTF-8 -*-
+﻿# -*- coding: UTF-8 -*-
 
 import arcpy
-import importlib
 from os.path import split, join
 from fmglib import clean_inputs
-
-importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_age = arcpy.GetParameterAsText(0)

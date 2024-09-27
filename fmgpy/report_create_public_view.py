@@ -1,4 +1,4 @@
-# Tool to assemble the summary tables into a set of feature classes for public visualization
+﻿# Tool to assemble the summary tables into a set of feature classes for public visualization
 
 # Do Imports
 import os

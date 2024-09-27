@@ -1,11 +1,7 @@
-# Do some imports
+﻿# Do some imports
 import arcpy
 import pandas as pd
 from fmglib import forest_calcs as fcalc, forest_summaries as fsum
-import importlib
-
-importlib.reload(fcalc)
-importlib.reload(fsum)
 
 # Define Required Input Parameters
 prism_fc = arcpy.GetParameterAsText(0)
