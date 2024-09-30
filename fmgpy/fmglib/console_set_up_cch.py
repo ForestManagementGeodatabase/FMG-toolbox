@@ -15,9 +15,9 @@ filter_statement = None
 # Define some input data - null return on inv_sp
 output_gdb = r'C:\LocalProjects\FMG\LocalWorking\FMG_Code_Testing.gdb'
 level = 'SID'
-age = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Age_QA_20231013'
-fixed = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Fixed_QA_20231013'
-prism = r'C:\LocalProjects\FMG\FMG-toolbox\test\data\FMG_FieldData_QA_20231013.gdb\Prism_QA_20231013'
+age = r'C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_FieldData_QA_20240930.gdb\Age_QA_20240930'
+fixed = r'C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_FieldData_QA_20240930.gdb\Fixed_QA_20240930'
+prism = r'C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_FieldData_QA_20240930.gdb\Prism_QA_20240930'
 filter_statement = None
 
 # Reimport statements for dev changes
