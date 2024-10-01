@@ -880,7 +880,9 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Pivot sizes and metrics to columns
         pivot_df = filtered_df\
@@ -919,7 +921,9 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Pivot sizes and metrics to columns
         pivot_df = filtered_df \
@@ -989,7 +993,9 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
@@ -1014,7 +1020,9 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
@@ -1073,7 +1081,9 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
@@ -1103,7 +1113,9 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
@@ -1167,7 +1179,9 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Set index for merge
         filtered_df.set_index(level)
@@ -1202,7 +1216,9 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Set index for merge
         filtered_df.set_index(level)
@@ -1216,7 +1232,7 @@ def tpa_ba_qmdbh_level(tree_table, filter_statement, level):
             .fillna(0) \
             .reset_index()
 
-    return out_df
+        return out_df
 
 
 # Generate TPA, BA, QM DBH given a case field at non-PID levels (pivots on case field to wide)
@@ -1271,7 +1287,9 @@ def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level)
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Pivot sizes and metrics to columns
         pivot_df = filtered_df \
@@ -1316,7 +1334,9 @@ def tpa_ba_qmdbh_level_by_case(tree_table, filter_statement, case_column, level)
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Pivot sizes and metrics to columns
         pivot_df = filtered_df \
@@ -1394,7 +1414,9 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of level polygons
         out_df = plotcount_df \
@@ -1425,7 +1447,9 @@ def tpa_ba_qmdbh_level_by_case_long(tree_table, filter_statement, case_column, l
         baf = 10
         filtered_df['TPA'] = filtered_df['stand_dens'] / filtered_df['plot_count']
         filtered_df['BA'] = (filtered_df['tree_count'] * baf) / filtered_df['plot_count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of level polygons and fill nan with 0
         out_df = plotcount_df \
@@ -1492,7 +1516,9 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
         baf = 10
         filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
         filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of level polygons
         out_df = plotcount_df \
@@ -1528,7 +1554,9 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
         baf = 10
         filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
         filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Join results back to full set of level polygons and fill nan with 0
         out_df = plotcount_df \
