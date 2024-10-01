@@ -20,6 +20,10 @@ fixed = r'C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_FieldData_QA_20
 prism = r'C:\LocalProjects_ProWorkspace\FMG_Testing_20240724\FMG_FieldData_QA_20240930.gdb\Prism_QA_20240930'
 filter_statement = None
 
+age = r'\\mvd.ds.usace.army.mil\mvr\EGIS\Work\FMG\MVR_Working\Summaries\Pool_18\Pool18_Forest_Summaries_HREP_20241001.gdb\AGE_PLOTS'
+fixed = r'\\mvd.ds.usace.army.mil\mvr\EGIS\Work\FMG\MVR_Working\Summaries\Pool_18\Pool18_Forest_Summaries_HREP_20241001.gdb\FIXED_PLOTS'
+prism = r'\\mvd.ds.usace.army.mil\mvr\EGIS\Work\FMG\MVR_Working\Summaries\Pool_18\Pool18_Forest_Summaries_HREP_20241001.gdb\PRISM_PLOTS'
+
 # Reimport statements for dev changes
 # importlib.reload(arcpy)
 # importlib.reload(fcalc)

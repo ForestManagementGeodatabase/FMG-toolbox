@@ -504,8 +504,6 @@ def qm_dbh(ba, tpa):
     This becomes convenient in that we often have basal area per acre and trees per acre but
     not the diameters of all the trees.
     """
-    #assert isinstance(ba, (float, np.float64)), "basal area must be a float"
-    #assert isinstance(tpa, float, np.float64), "tpa must be a float"
 
     try:
         qmdbh = np.sqrt((ba / tpa) / 0.005454154)
@@ -627,7 +625,10 @@ def create_tree_table(prism_df):
     tree_table.loc[tree_table.TR_SP.isin(["NONE", "NoTree", "NOTREE"]), 'TR_BA'] = 0
 
     # Add and calculate density column (TPA)
-    tree_table['TR_DENS'] = (forester_constant * (tree_table['TR_DIA'] ** 2)) / plot_count
+    tree_table['TR_DENS'] = np.where(tree_table['TR_DIA'] > 0,
+                                     (baf / (forester_constant * (tree_table['TR_DIA'] ** 2))),
+                                     0)
+    tree_table = tree_table.astype({'TR_DENS': 'float64'})
 
     # Add SP_TYPE Column
     crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
@@ -770,7 +771,9 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Enforce dtypes
         filtered_df = filtered_df.astype({'tree_count': 'int32',
@@ -811,7 +814,9 @@ def tpa_ba_qmdbh_plot(tree_table, filter_statement):
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = qm_dbh(filtered_df['BA'], filtered_df['TPA'])
+        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+                                         (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
+                                         0)
 
         # Enforce QM_DBH dtype
         filtered_df = filtered_df.astype({'QM_DBH': 'float64'})
