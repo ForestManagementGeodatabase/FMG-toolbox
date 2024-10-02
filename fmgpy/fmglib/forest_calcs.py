@@ -1081,13 +1081,13 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+        filtered_df['QM_DBH'] = np.where(filtered_df['Tree_Count'] > 0,
                                          (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
                                          0)
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
-            .drop(columns=['plot_count']) \
+            .drop(columns=['Plot_Count']) \
             .merge(right=filtered_df,
                    how='inner',
                    on='PID') \
@@ -1113,7 +1113,7 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
             )
 
         # Add and Calculate QM DBH
-        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+        filtered_df['QM_DBH'] = np.where(filtered_df['Tree_Count'] > 0,
                                          (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
                                          0)
 
@@ -1516,7 +1516,7 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
         baf = 10
         filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
         filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
-        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+        filtered_df['QM_DBH'] = np.where(filtered_df['Tree_Count'] > 0,
                                          (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
                                          0)
 
@@ -1554,7 +1554,7 @@ def tpa_ba_qmdbh_level_by_multi_case_long(tree_table, filter_statement, case_col
         baf = 10
         filtered_df['TPA'] = filtered_df['Stand_Dens'] / filtered_df['Plot_Count']
         filtered_df['BA'] = (filtered_df['Tree_Count'] * baf) / filtered_df['Plot_Count']
-        filtered_df['QM_DBH'] = np.where(filtered_df['tree_count'] > 0,
+        filtered_df['QM_DBH'] = np.where(filtered_df['Tree_Count'] > 0,
                                          (np.sqrt((filtered_df['BA'] / filtered_df['TPA']) / 0.005454154)),
                                          0)
 

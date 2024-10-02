@@ -35,4 +35,40 @@ fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
 prism_df = pd.DataFrame.spatial.from_featureclass(prism)
 tree_table = fcalc.create_tree_table(prism_df)
 plot_table = fcalc.create_plot_table(fixed_df, age_df)
-### Console Testing Set Up End
+
+pid_sum = 'True'
+sid_sum = 'True'
+site_sum = 'False'
+unit_sum = 'false'
+comp_sum = 'true'
+pool_sum = 'True'
+
+if pid_sum.lower() == 'true':
+    levels.append('PID')
+else:
+    pass
+
+if sid_sum.lower() == 'true':
+    levels.append('SID')
+else:
+    pass
+
+if site_sum.lower() == 'true':
+    levels.append('SITE')
+else:
+    pass
+
+if unit_sum.lower() == 'true':
+    levels.append('UNIT')
+else:
+    pass
+
+if comp_sum.lower() == 'true':
+    levels.append('COMP')
+else:
+    pass
+
+if pool_sum.lower() == 'true':
+    levels.append('POOL')
+else:
+    pass

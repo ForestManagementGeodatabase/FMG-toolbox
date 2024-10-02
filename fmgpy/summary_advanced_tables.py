@@ -35,16 +35,33 @@ pool_sum = arcpy.GetParameterAsText(20)
 levels = []
 if pid_sum.lower() == 'true':
     levels.append('PID')
+else:
+    pass
+
 if sid_sum.lower() == 'true':
     levels.append('SID')
+else:
+    pass
+
 if site_sum.lower() == 'true':
     levels.append('SITE')
+else:
+    pass
+
 if unit_sum.lower() == 'true':
     levels.append('UNIT')
+else:
+    pass
+
 if comp_sum.lower() == 'true':
     levels.append('COMP')
+else:
+    pass
+
 if pool_sum.lower() == 'true':
     levels.append('POOL')
+else:
+    pass
 arcpy.AddMessage('Begin FMG Summaries on ' + str(levels))
 
 # Import ESRI feature classes as pandas dataframes
@@ -85,6 +102,8 @@ for level in levels:
             sum_sp_path = os.path.join(out_gdb, sum_sp_name)
             sum_sp_df.spatial.to_table(location=sum_sp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_path)
+        else:
+            pass
 
         if sum_sp_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species by Mast Types Summary')
@@ -93,6 +112,8 @@ for level in levels:
             sum_sp_by_mast_path = os.path.join(out_gdb, sum_sp_by_mast_name)
             sum_sp_by_mast_df.spatial.to_table(location=sum_sp_by_mast_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_mast_path)
+        else:
+            pass
 
         if sum_sp_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Size Summary')
@@ -101,6 +122,8 @@ for level in levels:
             sum_sp_by_size_path = os.path.join(out_gdb, sum_sp_by_size_name)
             sum_sp_by_size_df.spatial.to_table(location=sum_sp_by_size_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_size_path)
+        else:
+            pass
 
         if sum_sp_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Vertical Composition Summary')
@@ -109,6 +132,8 @@ for level in levels:
             sum_sp_by_vertcomp_path = os.path.join(out_gdb, sum_sp_by_vertcomp_name)
             sum_sp_by_vertcomp_df.spatial.to_table(location=sum_sp_by_vertcomp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_vertcomp_path)
+        else:
+            pass
 
         if sum_hlth.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health Summary')
@@ -117,6 +142,8 @@ for level in levels:
             sum_hlth_df_path = os.path.join(out_gdb, sum_hlth_df_name)
             sum_hlth_df.spatial.to_table(location=sum_hlth_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_df_path)
+        else:
+            pass
 
         if sum_hlth_by_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Species Summary')
@@ -125,6 +152,8 @@ for level in levels:
             sum_hlth_by_sp_df_path = os.path.join(out_gdb, sum_hlth_by_sp_df_name)
             sum_hlth_by_sp_df.spatial.to_table(location=sum_hlth_by_sp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_sp_df_path)
+        else:
+            pass
 
         if sum_hlth_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Mast Types Summary')
@@ -133,6 +162,8 @@ for level in levels:
             sum_hlth_by_mast_df_path = os.path.join(out_gdb, sum_hlth_by_mast_df_name)
             sum_hlth_by_mast_df.spatial.to_table(location=sum_hlth_by_mast_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_mast_df_path)
+        else:
+            pass
 
         if sum_hlth_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Size Summary')
@@ -141,6 +172,8 @@ for level in levels:
             sum_hlth_by_size_df_path = os.path.join(out_gdb, sum_hlth_by_size_df_name)
             sum_hlth_by_size_df.spatial.to_table(location=sum_hlth_by_size_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_size_df_path)
+        else:
+            pass
 
         if sum_hlth_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Vertical Composition Summary')
@@ -149,6 +182,8 @@ for level in levels:
             sum_hlth_by_vertcomp_df_path = os.path.join(out_gdb, sum_hlth_by_vertcomp_df_name)
             sum_hlth_by_vertcomp_df.spatial.to_table(location=sum_hlth_by_vertcomp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_vertcomp_df_path)
+        else:
+            pass
 
     elif level != 'PID':
         arcpy.AddMessage('Work on level {0}'.format(level))
@@ -160,6 +195,8 @@ for level in levels:
             sum_sp_path = os.path.join(out_gdb, sum_sp_name)
             sum_sp_df.spatial.to_table(location=sum_sp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_path)
+        else:
+            pass
 
         if sum_sp_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species by Mast Types Summary')
@@ -168,6 +205,8 @@ for level in levels:
             sum_sp_by_mast_path = os.path.join(out_gdb, sum_sp_by_mast_name)
             sum_sp_by_mast_df.spatial.to_table(location=sum_sp_by_mast_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_mast_path)
+        else:
+            pass
 
         if sum_sp_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Size Summary')
@@ -176,6 +215,8 @@ for level in levels:
             sum_sp_by_size_path = os.path.join(out_gdb, sum_sp_by_size_name)
             sum_sp_by_size_df.spatial.to_table(location=sum_sp_by_size_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_size_path)
+        else:
+            pass
 
         if sum_sp_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Species By Vertical Composition Summary')
@@ -184,6 +225,8 @@ for level in levels:
             sum_sp_by_vertcomp_path = os.path.join(out_gdb, sum_sp_by_vertcomp_name)
             sum_sp_by_vertcomp_df.spatial.to_table(location=sum_sp_by_vertcomp_path, sanitize_columns=False)
             sum_sp_out_list.append(sum_sp_by_vertcomp_path)
+        else:
+            pass
 
         if sum_hlth.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health Summary')
@@ -192,6 +235,8 @@ for level in levels:
             sum_hlth_df_path = os.path.join(out_gdb, sum_hlth_df_name)
             sum_hlth_df.spatial.to_table(location=sum_hlth_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_df_path)
+        else:
+            pass
 
         if sum_hlth_by_sp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Species Summary')
@@ -200,6 +245,8 @@ for level in levels:
             sum_hlth_by_sp_df_path = os.path.join(out_gdb, sum_hlth_by_sp_df_name)
             sum_hlth_by_sp_df.spatial.to_table(location=sum_hlth_by_sp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_sp_df_path)
+        else:
+            pass
 
         if sum_hlth_by_mast.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Mast Types Summary')
@@ -208,6 +255,8 @@ for level in levels:
             sum_hlth_by_mast_df_path = os.path.join(out_gdb, sum_hlth_by_mast_df_name)
             sum_hlth_by_mast_df.spatial.to_table(location=sum_hlth_by_mast_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_mast_df_path)
+        else:
+            pass
 
         if sum_hlth_by_size.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Size Summary')
@@ -216,6 +265,8 @@ for level in levels:
             sum_hlth_by_size_df_path = os.path.join(out_gdb, sum_hlth_by_size_df_name)
             sum_hlth_by_size_df.spatial.to_table(location=sum_hlth_by_size_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_size_df_path)
+        else:
+            pass
 
         if sum_hlth_by_vertcomp.lower() == 'true':
             arcpy.AddMessage('    Create Advanced Health by Vertical Composition Summary')
@@ -224,6 +275,8 @@ for level in levels:
             sum_hlth_by_vertcomp_df_path = os.path.join(out_gdb, sum_hlth_by_vertcomp_df_name)
             sum_hlth_by_vertcomp_df.spatial.to_table(location=sum_hlth_by_vertcomp_df_path, sanitize_columns=False)
             sum_hlth_out_list.append(sum_hlth_by_vertcomp_df_path)
+        else:
+            pass
 
 if exp_enhanced_fixed.lower() == 'true':
     arcpy.AddMessage('Exporting Enhanced Fixed Plots')
@@ -231,6 +284,8 @@ if exp_enhanced_fixed.lower() == 'true':
     plot_table_path = os.path.join(out_gdb, plot_table_name)
     plot_table.spatial.to_featureclass(location=plot_table_path, sanitize_columns=False)
     arcpy.SetParameter(21, plot_table_path)
+else:
+    pass
 
 if exp_enhanced_prism.lower() == 'true':
     arcpy.AddMessage('Exporting Enhanced Prism Plots')
@@ -238,6 +293,8 @@ if exp_enhanced_prism.lower() == 'true':
     tree_table_path = os.path.join(out_gdb, tree_table_name)
     tree_table.spatial.to_featureclass(location=tree_table_path, sanitize_columns=False)
     arcpy.SetParameter(22, tree_table_path)
+else:
+    pass
 
 arcpy.SetParameter(23, sum_sp_out_list)
 arcpy.SetParameter(24, sum_hlth_out_list)
