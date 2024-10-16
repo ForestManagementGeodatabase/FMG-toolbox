@@ -15,11 +15,12 @@ arcpy.env.overwriteOutput = True
 def fmg_level(level):
     """Get the FMG level field
 
-    :param: level   str; The FMG hierarchical level. One of: "unit", "site",
-                    "stand", "plot".
-
-    :return: The Field name of the FMG level.
+    :param level: The FMG hierarchical level. One of: "unit", "site", "stand", "plot"
+    :type level: string
+    :returns: The Field name of the FMG level
+    :rtype: str
     """
+
     assert level in ["unit", "site", "stand", "plot"], "supply correct level"
 
     if level == "unit":
@@ -39,9 +40,12 @@ def create_level_df(level, plot_table):
     """ Creates a data frame to be used as a merge base, it aggregates the plot table based
     on a given level and includes all the upstream level columns
 
-    Keyword Args:
-        level  --  FMG level, use to group input dataframe
-        plot_table -- dataframe produced by the create_plot_table function
+    :param level: FMG level, used to group input dataframe
+    :type level: str
+    :param plot_table: Specific dataframe produced by the create_plot_table function
+    :type plot_table: pandas.DataFrame
+    :returns: Data frame with level IDs
+    :rtype: pandas.DataFrame
     """
 
     if level == 'SID':
@@ -114,14 +118,15 @@ def create_level_df(level, plot_table):
 
 # Create ordered list of columns for output gdb tables
 def fmg_column_reindex_list(level, col_csv):
-    """ Creates a list of hierarchy and statistic columns in a specific order
-    used when thematic output tables are created.
+    """ Creates a list of hierarchy and statistic columns in a specific order. Primarily used when creating
+    thematic output tables for use in GIS
 
-    Keyword Args:
-        level -- FMG hierarchy level, string
-        col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
-
-    Details: None
+    :param level: FMG level, one of any PID, SID, SITE, UNIT, COMP, POOL
+    :type level: str
+    :param col_csv: csv defining the table schema
+    :type col_csv: csv
+    :returns: a list of column names to be used in a reindex method
+    :rtype: list
     """
 
     # Create list of upstream levels based on current level
@@ -154,10 +159,10 @@ def fmg_nan_fill(col_csv):
     """ Creates a dictionary with key value pairs of field name and nan fill value.
     Used to clean up the data frame prior to export to ArcGIS GDB table
 
-    Keyword Args:
-          col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
-
-    Details: None
+    :param col_csv: csv defining the table schema
+    :type col_csv: csv
+    :returns: a dictionary of column names (keys) and their nan fill values (values)
+    :rtype: dict
     """
 
     # import the column definition csv
@@ -194,10 +199,10 @@ def fmg_nan_fill(col_csv):
 def fmg_dtype_enforce(col_csv):
     """ Creates a dictionary of dtypes for each column name as defined by the columns in the csv.
 
-    Keyword Args:
-        col_csv -- relative path to a column definition csv in fmgpy/summaries/resources
-
-    Details: None
+    :param col_csv: csv defining the correct data types by column name
+    :type col_csv: csv
+    :returns: a dictionary of column names (keys) and their dtypes (values)
+    :rtype: dict
     """
 
     # Import the column csv
@@ -213,26 +218,25 @@ def fmg_dtype_enforce(col_csv):
 
 # Plot count: use with group by - agg
 def agg_plot_count(PID):
-    """Counts unique plots, including no tree plots.
+    """Generates a count of unique plots. Designed to be used in a group by, agg pattern with a pandas dataframe.
 
-    Keyword Arguments:
-    PID -- Input plot ID column.
-
-    Details: Function returns a single value and is to be used within a
-    dataframe to create a plot count column (.groupby, .agg).
+    :param PID: data frame column name for plot IDs
+    :type PID: str
+    :returns: a count of unique plots
+    :rtype: float
     """
     return float(PID.nunique())
 
 
 # Tree count: use with group by - agg
 def agg_tree_count(tr_sp):
-    """Counts trees, excluding no tree records.
+    """Generates a count of trees, excluding no tree records. Designed to be used in a group by, agg pattern with a
+    pandas dataframe.
 
-    Keyword Arguments:
-    tr_sp -- Input tree species column.
-
-    Details: Function returns a single value and is to be used within a
-    dataframe to create a tree count column (.groupby, .agg).
+    :param tr_sp: data frame column name for tree species
+    :type tr_sp: str
+    :returns: a count of trees
+    :rtype: float
     """
     trees = []
     for val in tr_sp:
@@ -258,8 +262,15 @@ def agg_tree_count(tr_sp):
 
 
 # List of invasive species: use with group by - agg
-# TODO: add function description
 def agg_inv_sp(inv_sp):
+    """Builds a list of unique invasive species from a pandas group by object. Designed to be used in a group by,
+       agg pattern with a pandas dataframe.
+
+       :param inv_sp: data frame column name for invasive species
+       :type inv_sp: str
+       :returns: A string formatted as a comma-seperated list of unique invasive species
+       :rtype: str
+    """
 
     sp_temp = []
 
@@ -282,6 +293,14 @@ def agg_inv_sp(inv_sp):
 
 # Create function to return YES if invasive species are present
 def agg_inv_present(inv_present):
+    """Generates a single yes/no value based on items in a pandas group by object. Designed to be used in a group by,
+       agg pattern with a pandas dataframe.
+
+       :param inv_present: data frame column name indicating if invasive species are present
+       :type inv_present: str
+       :returns: a single yes or no value
+       :rtype: str
+    """
     inv_pres = []
     for val in inv_present:
         if val == 'No':
@@ -305,6 +324,7 @@ def agg_count_notes(note_column):
     return notecount
 
 
+# Convert catergory and object dtypes to string
 def clean_dtypes_for_esri(df):
     # Convert dataframe dtypes which are not compatible with ArcGIS
     # Use builtin Pandas dtype conversion
@@ -2520,7 +2540,7 @@ def remove_esri_big_int(in_feature_class):
     arcpy.AddMessage('Complete, check output')
 
 
-# Create species importance values
+# Create species importance values at plot level
 def sp_importance_vals_plot(tree_table):
 
     # Create DF for level metrics
@@ -2571,6 +2591,7 @@ def sp_importance_vals_plot(tree_table):
     return iv_df
 
 
+# Create species importance values for non-plot levels
 def sp_importance_vals_level(tree_table, level):
 
     # Create DF for level metrics
