@@ -315,8 +315,15 @@ def agg_inv_present(inv_present):
 
 
 # Count of notes: use with group by - agg
-# TODO: add function description
 def agg_count_notes(note_column):
+    """Generates a single value representing a count of strings present in a single column in a pandas group by
+       object. Designed to be used in a group by, agg pattern with a pandas dataframe
+
+       :param note_column: Data frame column name containing notes
+       :type note_column: str
+       :returns: a single integer representing rows with strings
+       :rtype: int
+    """
     note_column.replace('', pd.NA, inplace=True)
     note_column.replace(' ', pd.NA, inplace=True)
     note_column_clean = note_column.dropna()
@@ -324,40 +331,15 @@ def agg_count_notes(note_column):
     return notecount
 
 
-# Convert catergory and object dtypes to string
-def clean_dtypes_for_esri(df):
-    # Convert dataframe dtypes which are not compatible with ArcGIS
-    # Use builtin Pandas dtype conversion
-    df = df.convert_dtypes(infer_objects=True)
-    # Then str convert any remaining special object/category fields
-    for col in df.columns:
-        # print(col, '/', df[col].dtype)
-        if df[col].dtype == 'object' or df[col].dtype == 'category':
-            df[col] = df[col].astype('str')
-    # Return modified df
-    return df
-
-
-# Plot count: use with group by - apply
-def plot_count(df):
-    """Count the number unique plots
-
-    :param: df   DataFrame; An FMG "Age", Fixed", or "Prism" plot dataset.
-
-    :return: An integer count of unique plots.
-    """
-    plot_num = df.PID.nunique()
-
-    return plot_num
-
-
 # Tree count: use with group by - apply
 def tree_count(df):
-    """Count the number of trees
+    """Generates a count of trees excluding none or no tree records. Designed to be used in a pandas group by, apply
+       pattern. Assumes a column named TR_SP exists.
 
-    :param: df   DataFrame; An FMG "Prism" plot dataset.
-
-    :return: An integer count of trees
+       :param df: A dataframe containing individual tree records (prism plots)
+       :type df: pandas.DataFrame
+       :returns: a single integer representing number of trees
+       :rtype: int
     """
     # boolean series
     trees = ~df.TR_SP.isin(["NONE", "NoTree", "", " ", None])
@@ -369,14 +351,15 @@ def tree_count(df):
 
 # Populate column with list of invasive species codes: use with apply - lambda
 def inv_sp_list(col_list):
-    """Takes in a list of species columns and returns a list of unique invasive species
-    formatted as a string. To be used in conjunction with .apply(lambda).
+    """Generates a list of unique invasive species codes found in the provided list of pandas dataframe columns.
+       Designed to be used in a pandas group by, apply pattern. Function should be passed as a lambda function.
+       Curently, this only looks for the invasive species HUJA, PHAR3, and PHAU7.
 
-    Keyword Args:
-        col_list -- list of dataframe columns that should be searched for invasive species
-                    codes. Columns should contain USDA species codes.
-
-    Details: None"""
+       :params col_list: a list of column names from a pandas dataframe
+       :type col_list: pandas.Index
+       :returns: a string listing the invasive species codes
+       :rtype: str
+    """
 
     sp_list = []
     for col in col_list:
@@ -393,12 +376,15 @@ def inv_sp_list(col_list):
 
 # Create a column with year or year range: use with apply - lambda
 def date_range(min_year, max_year):
-    """ Creates a value that is either a single year or year range, based on provided min and max year
-    paramaters
+    """Generates a single year or year range for a pandas group by object. Designed to be used in a pandas group by,
+       apply pattern and passed in as a lambda function.
 
-    Keywork Args:
-        min_year  -- minimum year value
-        max_year  -- maximum year value
+       :param min_year: pandas dataframe column containing the minimum year
+       :type min_year: pandas.Index
+       :param max_year: pandas dataframe column containing the maximum year
+       :type max_year: pandas.Index
+       :returns: a single year or year range formatted as a string value
+       :rtype: str
     """
     if min_year == max_year:
         return str(min_year)

@@ -18,6 +18,3 @@ def fixed_df(fmg_gdb):
     return fixed_df
 
 
-def test_plot_count(fixed_df):
-    plots = fmgpy.fmglib.forest_calcs.plot_count(fixed_df)
-    assert isinstance(plots, int)
