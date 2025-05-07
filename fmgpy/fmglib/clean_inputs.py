@@ -5,6 +5,7 @@ import os
 import sys
 import arcpy
 import pandas as pd
+from pathlib import Path
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 
@@ -459,19 +460,19 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
 
     # populate MIS_FIELDS with list of fields missing values
     # if TR_SP is 'NONE' or 'NoTree', check that TR_CREW and TR_DATE fields are filled out
-    prism_df.loc[prism_df.TR_SP.isin(["NONE", "NoTree"]), 'MIS_FIELDS'] = prism_df[["COL_CREW",
-                                                                                    "COL_DATE"]].apply(
+    prism_df.loc[prism_df.TR_SP.isin(["NONE", "NoTree", "NO TREES"]), 'MIS_FIELDS'] = prism_df[["COL_CREW",
+                                                                                                "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     arcpy.AddMessage("    MIS_FIELDS populated for no tree records")
 
     # if TR_SP is not 'NONE' or 'NoTree', or is null, check that all fields are filled out
-    prism_df.loc[~prism_df.TR_SP.isin(["NONE", "NoTree"]), 'MIS_FIELDS'] = prism_df[["TR_SP",
-                                                                                     "TR_DIA",
-                                                                                     "TR_CL",
-                                                                                     "TR_HLTH",
-                                                                                     "COL_CREW",
-                                                                                     "COL_DATE"]].apply(
+    prism_df.loc[~prism_df.TR_SP.isin(["NONE", "NoTree", "NO TREES"]), 'MIS_FIELDS'] = prism_df[["TR_SP",
+                                                                                                 "TR_DIA",
+                                                                                                 "TR_CL",
+                                                                                                 "TR_HLTH",
+                                                                                                 "COL_CREW",
+                                                                                                 "COL_DATE"]].apply(
         lambda x: ', '.join(x[x.isnull()].index), axis=1)
 
     prism_df.loc[prism_df['TR_SP'].isnull(), 'MIS_FIELDS'] = prism_df[["TR_SP",
@@ -496,7 +497,10 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
         prism_df.drop(columns=['MAST_TYPE'])
     else:
         pass
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv') \
+
+    # crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv') \
+    mast_csv = Path(__file__).parent / "../resources/MAST_SP_TYP_Crosswalk.csv"
+    crosswalk_df = pd.read_csv(mast_csv) \
         .filter(items=['TR_SP', 'MAST_TYPE'])
 
     prism_df = prism_df.merge(right=crosswalk_df, how='left', on='TR_SP')
@@ -616,7 +620,9 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
         age_df.drop(columns=['MAST_TYPE'])
     else:
         pass
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv') \
+
+    mast_csv = Path(__file__).parent / "../resources/MAST_SP_TYP_Crosswalk.csv"
+    crosswalk_df = pd.read_csv(mast_csv) \
         .filter(items=['TR_SP', 'MAST_TYPE']) \
         .rename(columns={'TR_SP': 'AGE_SP'})
 
@@ -769,6 +775,7 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     arcpy.AddMessage("\nChecking for and flagging duplicates")
 
     # create dataframes
+    center_df = pd.DataFrame.spatial.from_featureclass(fc_center)
     prism_df = pd.DataFrame.spatial.from_featureclass(fc_prism)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fc_fixed)
     age_df = pd.DataFrame.spatial.from_featureclass(fc_age)
@@ -777,14 +784,21 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     cast_as_int(age_df)
 
     # generate dataframes of duplicate rows
+    center_duplicates = center_df[center_df.duplicated(["SHAPE"])]
     prism_duplicates = prism_df[prism_df.duplicated(["SHAPE"])]
     fixed_duplicates = fixed_df[fixed_df.duplicated(["SHAPE"])]
     age_duplicates = age_df[age_df.duplicated(["SHAPE"])]
 
     # add boolean DUPLICATE field
+    center_df["DUPLICATE"] = center_df['OBJECTID'].isin(center_duplicates['OBJECTID'])
     prism_df["DUPLICATE"] = prism_df['OBJECTID'].isin(prism_duplicates['OBJECTID'])
     fixed_df["DUPLICATE"] = fixed_df['OBJECTID'].isin(fixed_duplicates['OBJECTID'])
     age_df["DUPLICATE"] = age_df['OBJECTID'].isin(age_duplicates['OBJECTID'])
+
+    yes_no(center_df, "DUPLICATE")
+    yes_no(prism_df, "DUPLICATE")
+    yes_no(fixed_df, "DUPLICATE")
+    yes_no(age_df, "DUPLICATE")
 
     # subset rows where DUPLICATE is false and drop field
     # *** skip this for now, Tate wants to just flag duplicates
@@ -794,6 +808,9 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     # age_df = age_df[(~age_df.DUPLICATE)].drop(columns=['DUPLICATE'])
 
     # overwrite input FCs
+    center_df.spatial.to_featureclass(fc_center,
+                                      overwrite=True,
+                                      sanitize_columns=False)
     prism_df.spatial.to_featureclass(fc_prism,
                                      overwrite=True,
                                      sanitize_columns=False)
@@ -805,9 +822,10 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
                                    sanitize_columns=False)
 
     arcpy.AddMessage("Check complete"
-                     f"\nRemoved {len(prism_duplicates.index)} duplicates from prism plots"
-                     f"\nRemoved {len(fixed_duplicates.index)} duplicates from fixed plots"
-                     f"\nRemoved {len(age_duplicates.index)} duplicates from age plots")
+                     f"\nFlagged {len(center_duplicates.index)} duplicate plot centers"
+                     f"\nFlagged {len(prism_duplicates.index)} duplicates from prism plots"
+                     f"\nFlagged {len(fixed_duplicates.index)} duplicates from fixed plots"
+                     f"\nFlagged {len(age_duplicates.index)} duplicates from age plots")
 
     return fc_prism, fc_fixed, fc_age, fc_center
 

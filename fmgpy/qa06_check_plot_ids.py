@@ -3,6 +3,9 @@
 import arcpy
 from os.path import split, join
 from fmglib import clean_inputs
+import importlib
+
+importlib.reload(clean_inputs)
 
 # get parameter arguments for script tool
 fc_center = arcpy.GetParameterAsText(0)
