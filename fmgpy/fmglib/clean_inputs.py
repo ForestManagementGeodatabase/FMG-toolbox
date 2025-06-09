@@ -4,8 +4,10 @@
 import os
 import sys
 import arcpy
+import re
 import pandas as pd
 from pathlib import Path
+from pandas.api.types import is_string_dtype, is_numeric_dtype
 import numpy as np
 from arcgis.features import GeoAccessor, GeoSeriesAccessor
 
@@ -65,7 +67,7 @@ def rename_fields(df, user_field, field_name):
     return df
 
 
-def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_field):
+def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_field, plot_id_string):
     """Checks plot IDs on a given input FMG field dataset (Fixed, Prism, Age) based on a list
     of plot IDs generated from a primary set of plot IDs, this primary set of plot IDs can be the
     target shapefile of plot locations used in TerraSync, the target Plot feature class used in
@@ -93,19 +95,34 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
     cast_as_int(center_df)
     cast_as_int(check_df)
 
-    # check main plot ID field to ensure it is integer
-    if center_df[center_plot_id_field].dtype == 'int64':
-        pass
-    else:
-        try:
-            center_df[center_plot_id_field] = center_df[center_plot_id_field].astype(int)
-        except:
-            arcpy.AddError(f"    {os.path.basename(fc_center)} plot ID field type must be short "
-                           f"or long integer, quitting.")
-            center_df.spatial.to_featureclass(fc_center,
-                                              overwrite=True,
-                                              sanitize_columns=False)
-            sys.exit(0)
+    if plot_id_string.lower() == 'false':
+        # check main plot ID field to ensure it is integer
+        if center_df[center_plot_id_field].dtype == 'int64':
+            pass
+        else:
+            try:
+                center_df[center_plot_id_field] = center_df[center_plot_id_field].astype(int)
+            except:
+                arcpy.AddError(f"    {os.path.basename(fc_center)} plot ID field type must be short "
+                               f"or long integer, quitting.")
+                center_df.spatial.to_featureclass(fc_center,
+                                                  overwrite=True,
+                                                  sanitize_columns=False)
+                sys.exit(0)
+
+        # check input plot ID field to ensure it is integer
+        if check_df[check_plot_id_field].dtype == 'int64':
+            arcpy.AddMessage(f"    {os.path.basename(fc_check)} plot ID field type is correct")
+        else:
+            try:
+                check_df[check_plot_id_field] = check_df[check_plot_id_field].astype(int)
+            except:
+                arcpy.AddError(f"    {os.path.basename(fc_check)} plot ID field type must be short "
+                               f"or long integer, quitting.")
+                check_df.spatial.to_featureclass(fc_check,
+                                                 overwrite=True,
+                                                 sanitize_columns=False)
+                sys.exit(0)
 
     # check main plot ID field for duplicate values
     # if duplicates found, quit with message
@@ -121,20 +138,6 @@ def check_plot_ids(fc_center, center_plot_id_field, fc_check, check_plot_id_fiel
                                           overwrite=True,
                                           sanitize_columns=False)
         sys.exit(0)
-
-    # check input plot ID field to ensure it is integer
-    if check_df[check_plot_id_field].dtype == 'int64':
-        arcpy.AddMessage(f"    {os.path.basename(fc_check)} plot ID field type is correct")
-    else:
-        try:
-            check_df[check_plot_id_field] = check_df[check_plot_id_field].astype(int)
-        except:
-            arcpy.AddError(f"    {os.path.basename(fc_check)} plot ID field type must be short "
-                           f"or long integer, quitting.")
-            check_df.spatial.to_featureclass(fc_check,
-                                             overwrite=True,
-                                             sanitize_columns=False)
-            sys.exit(0)
 
     # flag plot IDs not in main fc (returns boolean)
     check_df["VALID_PLOT_ID"] = check_df[check_plot_id_field].isin(center_df[center_plot_id_field])
@@ -211,7 +214,7 @@ def check_fixed_center(fc_center, center_plot_id_field, fc_fixed, fixed_plot_id_
     return fc_fixed
 
 
-def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
+def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb, plot_id_string):
     """Checks to make sure there is a prism plot for every fixed plot and that there is a
     fixed plot for each prism plot. This is accomplished by comparing unique sets of plot
     IDs present for each feature class and populating fields indicating if this relationship
@@ -291,9 +294,14 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     # rename field before merging with fixed
     prism_accuracy = prism_accuracy.rename("PRISM_ID_MATCHES")
 
-    # change series to dataframe, add index (PLOT) as series and cast as int
+    # change series to dataframe, add index (PLOT) as series and cast as int/str
     prism_count = prism_accuracy.to_frame()
-    prism_count[fixed_plot_id] = prism_count.index.astype(int)
+    if plot_id_string.lower() == 'false':
+        # cast plot ID as int
+        prism_count[fixed_plot_id] = prism_count.index.astype(int)
+    else:
+        # cast plot ID as str
+        prism_count[fixed_plot_id] = prism_count.index.astype(str)
 
     def unique_val(x):
         if x == 1:
@@ -319,7 +327,7 @@ def check_prism_fixed(fc_prism, prism_plot_id, fc_fixed, fixed_plot_id, in_gdb):
     return fc_prism, fc_fixed
 
 
-def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, fc_age, age_plot_id):
+def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, fc_age, age_plot_id, plot_id_string):
     """Checks prescribed age plots against collected age plots. Returns the prescribed age
     plots with a flag field indicating if an age plot was collected.
 
@@ -348,8 +356,12 @@ def check_contractor_age_plots(fc_center, center_plot_id_field, age_flag_field, 
 
     center_df.loc[center_df[age_flag_field] != 'A', 'HAS_AGE'] = 'N/A'
 
-    # reset plot to int
-    center_df["PLOT"] = center_df["PLOT"].astype(int)
+    # reset plot to int if not flagged as varchar
+    if plot_id_string.lower() == 'false':
+        # check main plot ID field to ensure it is integer
+        center_df["PLOT"] = center_df["PLOT"].astype(int)
+    else:
+        pass
 
     arcpy.AddMessage("HAS_AGE populated, check complete")
 
@@ -492,9 +504,14 @@ def check_required_fields_prism(fc_prism, plot_name, species_name, dia_name, cla
     arcpy.AddMessage("    HAS_MIS_FIELDS populated for tree records")
 
     # add mast type field
+    # add mast type field
     if 'MAST_TYPE' in prism_df.columns:
         # delete field if already in dataset
-        prism_df.drop(columns=['MAST_TYPE'])
+        prism_df = prism_df.drop(columns=['MAST_TYPE'])
+    elif 'MAST_TYPE_y' in prism_df.columns:
+        prism_df = prism_df.drop(columns=['MAST_TYPE_y'])
+    elif 'MAST_TYPE_x' in prism_df.columns:
+        prism_df = prism_df.drop(columns=['MAST_TYPE_x'])
     else:
         pass
 
@@ -617,7 +634,11 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     # add mast type field
     if 'MAST_TYPE' in age_df.columns:
         # delete field if already in dataset
-        age_df.drop(columns=['MAST_TYPE'])
+        prism_df = age_df.drop(columns=['MAST_TYPE'])
+    elif 'MAST_TYPE_y' in age_df.columns:
+        prism_df = age_df.drop(columns=['MAST_TYPE_y'])
+    elif 'MAST_TYPE_x' in age_df.columns:
+        prism_df = age_df.drop(columns=['MAST_TYPE_x'])
     else:
         pass
 
@@ -697,6 +718,14 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
         fixed_df.loc[fixed_df[i] == ' ', i] = None
         fixed_df.loc[fixed_df[i] == '', i] = None
 
+    # replace UND_SP1 = NONE with 0
+    fixed_df.loc[fixed_df.UND_SP1.isin([" ", ""]), 'UND_HT'] = 0
+    fixed_df.loc[fixed_df.UND_SP1.str.contains('none', flags=re.IGNORECASE, regex=True), 'UND_HT'] = 0
+    fixed_df.loc[fixed_df['UND_SP1'].isnull(), 'UND_HT'] = 0
+
+    # if UND_SP1 not null or NONE (i.e. contains species code) and UND_HT = 0, set UND_HT to null
+    fixed_df.loc[(~fixed_df.UND_SP1.isin(["NONE", "NONE ", "None", " ", ""])) & (fixed_df.UND_HT == 0), 'UND_HT'] = None
+
     # populate MIS_FIELDS with list of fields missing values
     fixed_df['MIS_FIELDS'] = fixed_df[["OV_CLSR",
                                        "OV_HT",
@@ -751,7 +780,24 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
                }
 
     # return average of height range
-    fixed_df['UND_HT2'] = fixed_df.apply(lambda x: get_value(heights, x['UND_HT']), axis=1)
+    if is_string_dtype(fixed_df.UND_HT):
+        # if UND_HT is string, use get_value function to convert string range to number using the heights dictionary
+        fixed_df['UND_HT2'] = fixed_df.apply(
+            lambda x: get_value(heights, x['UND_HT']) if (pd.notnull(x['UND_HT'])) else None, axis=1)
+    elif is_numeric_dtype(fixed_df.UND_HT):
+        # if UND_HT is numeric (int/float), copy value to UND_HT2
+        fixed_df['UND_HT2'] = fixed_df['UND_HT']
+    else:
+        pass
+
+    # fixed_df.loc[fixed_df['UND_HT'].notna(), 'UND_HT2'] = fixed_df.apply(lambda x: get_value(heights, x['UND_HT']),
+    #                                                                      axis=1)
+    # fixed_df['UND_HT2'] = fixed_df[fixed_df['UND_HT'].notna()].apply(lambda x: get_value(heights, x['UND_HT']),
+    #                                                                  axis=1)
+    # fixed_df['UND_HT2'] = fixed_df.loc[~fixed_df.MIS_FIELDS.isin(["UND_HT"])].apply(lambda x: get_value(heights, x['UND_HT']), axis=1)
+    # fixed_df['UND_HT2'] = fixed_df.apply(lambda x: get_value(heights, x['UND_HT']), axis=1)
+
+    # fixed_df['UND_HT2'] = fixed_df.apply(lambda x: get_value(heights, x['UND_HT']) if (pd.notnull(x['UND_HT'])) else 0, axis=1)
 
     arcpy.AddMessage("Check complete")
 
@@ -784,8 +830,9 @@ def remove_duplicates(fc_prism, fc_fixed, fc_age, fc_center):
     cast_as_int(age_df)
 
     # generate dataframes of duplicate rows
+    # if checking for duplicate shape fields, cannot include other fields
     center_duplicates = center_df[center_df.duplicated(["SHAPE"])]
-    prism_duplicates = prism_df[prism_df.duplicated(["SHAPE"])]
+    prism_duplicates = prism_df[prism_df.duplicated(['PLOT', 'TR_SP', 'TR_DIA', 'TR_CL', 'TR_HLTH'])]
     fixed_duplicates = fixed_df[fixed_df.duplicated(["SHAPE"])]
     age_duplicates = age_df[age_df.duplicated(["SHAPE"])]
 

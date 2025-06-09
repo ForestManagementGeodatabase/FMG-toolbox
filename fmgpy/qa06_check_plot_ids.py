@@ -16,6 +16,7 @@ fc_fixed = arcpy.GetParameterAsText(4)
 fixed_plot_id_field = arcpy.GetParameterAsText(5)
 fc_age = arcpy.GetParameterAsText(6)
 age_plot_id_field = arcpy.GetParameterAsText(7)
+plot_id_string = arcpy.GetParameterAsText(12)
 
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_center)[0]:
@@ -34,7 +35,8 @@ if not split(fc_age)[0]:
 result_prism = clean_inputs.check_plot_ids(fc_center,
                                            center_plot_id_field,
                                            fc_prism,
-                                           prism_plot_id_field)
+                                           prism_plot_id_field,
+                                           plot_id_string)
 
 arcpy.SetParameterAsText(8, result_prism)
 
@@ -42,7 +44,8 @@ arcpy.SetParameterAsText(8, result_prism)
 result_fixed = clean_inputs.check_plot_ids(fc_center,
                                            center_plot_id_field,
                                            fc_fixed,
-                                           fixed_plot_id_field)
+                                           fixed_plot_id_field,
+                                           plot_id_string)
 
 arcpy.SetParameterAsText(9, result_fixed)
 
@@ -50,7 +53,8 @@ arcpy.SetParameterAsText(9, result_fixed)
 result_age = clean_inputs.check_plot_ids(fc_center,
                                          center_plot_id_field,
                                          fc_age,
-                                         age_plot_id_field)
+                                         age_plot_id_field,
+                                           plot_id_string)
 
 arcpy.SetParameterAsText(10, result_age)
 

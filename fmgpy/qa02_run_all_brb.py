@@ -59,6 +59,9 @@ unit = arcpy.GetParameterAsText(36)
 site = arcpy.GetParameterAsText(37)
 stand = arcpy.GetParameterAsText(38)
 
+# numeric plot ID flag
+plot_id_string = arcpy.GetParameterAsText(43)
+
 # check if input is a file path or feature layer, if layer, get file path
 if not split(fc_center)[0]:
     fc_center = join(arcpy.Describe(fc_center).path, arcpy.Describe(fc_center).name)
@@ -86,18 +89,18 @@ clean_inputs.check_required_fields_age(fc_age, age_plot_name, age_species_name, 
                                        age_crew_name, age_date_name)
 
 # check plot IDs
-clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_prism, 'PLOT')
-clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_fixed, 'PLOT')
-clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_age, 'PLOT')
+clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_prism, 'PLOT', plot_id_string)
+clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_fixed, 'PLOT', plot_id_string)
+clean_inputs.check_plot_ids(fc_center, 'PLOT', fc_age, 'PLOT', plot_id_string)
 
 # check fixed offsets
 clean_inputs.check_fixed_center(fc_center, 'PLOT', fc_fixed, 'PLOT', in_gdb)
 
 # verify age plots
-clean_inputs.check_contractor_age_plots(fc_center, 'PLOT', 'TYPE', fc_age, 'PLOT')
+clean_inputs.check_contractor_age_plots(fc_center, 'PLOT', 'TYPE', fc_age, 'PLOT', plot_id_string)
 
 # check prism/fixed match
-clean_inputs.check_prism_fixed(fc_prism, 'PLOT', fc_fixed, 'PLOT', in_gdb)
+clean_inputs.check_prism_fixed(fc_prism, 'PLOT', fc_fixed, 'PLOT', in_gdb, plot_id_string)
 
 # import hierarchies
 hierarchy_result = clean_inputs.import_hierarchy(fc_polygons, fc_center, fc_prism, fc_fixed,
