@@ -718,10 +718,17 @@ def check_required_fields_fixed(fc_fixed, plot_name, closure_name, height_name, 
         fixed_df.loc[fixed_df[i] == ' ', i] = None
         fixed_df.loc[fixed_df[i] == '', i] = None
 
-    # replace UND_SP1 = NONE with 0
-    fixed_df.loc[fixed_df.UND_SP1.isin([" ", ""]), 'UND_HT'] = 0
-    fixed_df.loc[fixed_df.UND_SP1.str.contains('none', flags=re.IGNORECASE, regex=True), 'UND_HT'] = 0
-    fixed_df.loc[fixed_df['UND_SP1'].isnull(), 'UND_HT'] = 0
+    # if UND_SP1 = NONE, UND_HT = 0
+    if is_string_dtype(fixed_df.UND_HT):
+        fixed_df.loc[fixed_df.UND_SP1.isin([" ", ""]), 'UND_HT'] = '0'
+        fixed_df.loc[fixed_df.UND_SP1.str.contains('none', flags=re.IGNORECASE, regex=True), 'UND_HT'] = '0'
+        fixed_df.loc[fixed_df['UND_SP1'].isnull(), 'UND_HT'] = '0'
+    elif is_numeric_dtype(fixed_df.UND_HT):
+        fixed_df.loc[fixed_df.UND_SP1.isin([" ", ""]), 'UND_HT'] = 0
+        fixed_df.loc[fixed_df.UND_SP1.str.contains('none', flags=re.IGNORECASE, regex=True), 'UND_HT'] = 0
+        fixed_df.loc[fixed_df['UND_SP1'].isnull(), 'UND_HT'] = 0
+    else:
+        pass
 
     # if UND_SP1 not null or NONE (i.e. contains species code) and UND_HT = 0, set UND_HT to null
     fixed_df.loc[(~fixed_df.UND_SP1.isin(["NONE", "NONE ", "None", " ", ""])) & (fixed_df.UND_HT == 0), 'UND_HT'] = None
