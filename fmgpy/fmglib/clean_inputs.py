@@ -634,11 +634,11 @@ def check_required_fields_age(fc_age, plot_name, species_name, dia_name, height_
     # add mast type field
     if 'MAST_TYPE' in age_df.columns:
         # delete field if already in dataset
-        prism_df = age_df.drop(columns=['MAST_TYPE'])
+        age_df = age_df.drop(columns=['MAST_TYPE'])
     elif 'MAST_TYPE_y' in age_df.columns:
-        prism_df = age_df.drop(columns=['MAST_TYPE_y'])
+        age_df = age_df.drop(columns=['MAST_TYPE_y'])
     elif 'MAST_TYPE_x' in age_df.columns:
-        prism_df = age_df.drop(columns=['MAST_TYPE_x'])
+        age_df = age_df.drop(columns=['MAST_TYPE_x'])
     else:
         pass
 
