@@ -1,8 +1,8 @@
-import fmgpy.fmglib.forest_calcs as fc
+import fmgpy.fmglib.forest_calcs as fcalc
 
 
 def test_fmg_level():
-    assert fc.fmg_level("unit") == "UNIT"
-    assert fc.fmg_level("site") == "SITE"
-    assert fc.fmg_level("stand") == "SID"
-    assert fc.fmg_level("plot") == "PID"
+    assert fcalc.fmg_level("unit") == "UNIT"
+    assert fcalc.fmg_level("site") == "SITE"
+    assert fcalc.fmg_level("stand") == "SID"
+    assert fcalc.fmg_level("plot") == "PID"

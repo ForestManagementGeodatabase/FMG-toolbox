@@ -637,8 +637,12 @@ def create_tree_table(prism_df):
     tree_table = tree_table.astype({'TR_DENS': 'float64'})
 
     # Add SP_TYPE Column
-    crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
-        .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
+    try:
+        crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
+            .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
+    except FileNotFoundError:
+        crosswalk_df = pd.read_csv('./fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
+            .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
 
     tree_table = tree_table\
         .merge(right=crosswalk_df, how='left', on='TR_SP')\
@@ -1038,7 +1042,7 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
                    on='PID') \
             .reset_index()
 
-        return out_df
+        return out
 
 
 # Generate TPA, BA, QM DBH given multiple case fields at PID level (no pivot, stays long)

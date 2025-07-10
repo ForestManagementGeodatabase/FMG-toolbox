@@ -1,14 +1,14 @@
-import fmgpy.fmglib.forest_calcs as fc
+import fmgpy.fmglib.forest_calcs as fcalc
 def test_fmg_column_reindex_list():
     csv1 = './../../../resources/age_summary_cols.csv'
     csv2 = './../../../resources/health_summary_cols.csv'
     csv3 = './../../../resources/size_summary_cols.csv'
 
-    assert fc.fmg_column_reindex_list('PID', csv1) == ['POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID', 'AGE_ORIG',
+    assert fcalc.fmg_column_reindex_list('PID', csv1) == ['POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'PID', 'AGE_ORIG',
                                                        'AGE_DBH', 'AGE_GRW', 'AGE_UND_COV', 'HM_ORIG', 'SM_ORIG',
                                                        'LM_ORIG']
 
-    assert fc.fmg_column_reindex_list('SITE', csv2) == ['POOL', 'COMP', 'UNIT', 'SITE', 'DEAD_TPA', 'DEAD_BA',
+    assert fcalc.fmg_column_reindex_list('SITE', csv2) == ['POOL', 'COMP', 'UNIT', 'SITE', 'DEAD_TPA', 'DEAD_BA',
                                                         'DEAD_QMDBH', 'DEAD_DOM_SP', 'DEAD_DOM_SP_PCMP', 'SD_TPA',
                                                         'SD_BA', 'SD_QMDBH', 'SD_DOM_SP', 'SD_DOM_SP_PCMP', 'STR_TPA',
                                                         'STR_BA', 'STR_QMDBH', 'STR_DOM_SP', 'STR_DOM_SP_PCMP',
@@ -19,7 +19,7 @@ def test_fmg_column_reindex_list():
                                                         'NTYP_SP_DOM_HLTH', 'NTYP_SP_DOM_HLTH_PCMP', 'NTYP_DOM_SP',
                                                         'NTYP_DOM_SP_PCMP']
 
-    assert fc.fmg_column_reindex_list('POOL', csv3) == ['POOL', 'SAP_TPA', 'SAP_BA', 'SAP_QMDBH', 'SAP_DOM_HLTH',
+    assert fcalc.fmg_column_reindex_list('POOL', csv3) == ['POOL', 'SAP_TPA', 'SAP_BA', 'SAP_QMDBH', 'SAP_DOM_HLTH',
                                                         'SAP_DOM_HLTH_PCMP', 'SAP_DOM_SP', 'SAP_DOM_SP_PCMP',
                                                         'SAP_D_TPA', 'SAP_D_BA', 'SAP_D_QMDBH', 'POL_TPA', 'POL_BA',
                                                         'POL_QMDBH', 'POL_DOM_HLTH', 'POL_DOM_HLTH_PCMP', 'POL_DOM_SP',

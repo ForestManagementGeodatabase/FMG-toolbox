@@ -1,4 +1,4 @@
-import fmgpy.fmglib.forest_calcs as fc
+import fmgpy.fmglib.forest_calcs as fcalc
 
 def test_fmg_dtype_enforce():
 
@@ -22,6 +22,5 @@ def test_fmg_dtype_enforce():
         'SP_RICH' : 'float64'
     }
 
-
-    assert fc.fmg_dtype_enforce(csv1) == csv1_dict;
-    assert fc.fmg_dtype_enforce(csv2) == csv2_dict;
+    assert fcalc.fmg_dtype_enforce(csv1) == csv1_dict;
+    assert fcalc.fmg_dtype_enforce(csv2) == csv2_dict;
