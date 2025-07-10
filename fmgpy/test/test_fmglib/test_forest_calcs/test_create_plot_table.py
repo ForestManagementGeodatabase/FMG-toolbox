@@ -39,3 +39,17 @@ def test_create_plot_table():
     assert plot_subset_3.equals(fixed_subset_3)
     pd.testing.assert_frame_equal(plot_subset_4, fixed_subset_4)
     pd.testing.assert_frame_equal(plot_subset_5, fixed_subset_5)
+
+
+    # check merged age_df section
+    i = 0
+    i_length = len(age_df)
+    while(i < i_length):
+
+        j = 0
+        j_length = len(plot_table)
+        while(j < j_length):
+            if age_df.iat[i, 1] == plot_table.iat[j, 1]:
+                assert age_df.iat[i, 2] == plot_table.iat[j, 37]
+            j += 1
+        i += 1
