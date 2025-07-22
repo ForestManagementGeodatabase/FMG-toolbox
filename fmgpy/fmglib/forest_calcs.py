@@ -639,10 +639,14 @@ def create_tree_table(prism_df):
     # Add SP_TYPE Column
     try:
         crosswalk_df = pd.read_csv('resources/MAST_SP_TYP_Crosswalk.csv')\
-            .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
+            .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used in ArcGIS Pro? Confirm with Alden.
     except FileNotFoundError:
-        crosswalk_df = pd.read_csv('./fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
-            .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])
+        try:
+            crosswalk_df = pd.read_csv('./MAST_SP_TYP_Crosswalk.csv') \
+                .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used when running an individual test file
+        except FileNotFoundError:
+            crosswalk_df = pd.read_csv('./fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
+                .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used when running in python console
 
     tree_table = tree_table\
         .merge(right=crosswalk_df, how='left', on='TR_SP')\
