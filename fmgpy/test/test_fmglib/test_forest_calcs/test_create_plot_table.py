@@ -14,7 +14,7 @@ def test_dataframe_size():
 
     assert plot_table.shape[0] == fixed_df.shape[0] # test number of rows
 
-def test_column_names():
+def test_column_existence():
     age = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Age_QA_20250513'
     fixed = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Fixed_QA_20250513'
 
@@ -23,15 +23,15 @@ def test_column_names():
 
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
-    cols_to_check = ['PID', 'PLOT', 'OV_CLSR', 'OV_HT', 'UND_HT', 'UND_COV', 'UND_SP1', 'UND_SP2', 'UND_SP3', 'GRD_SP1',
+    asserted_columns = ['PID', 'PLOT', 'OV_CLSR', 'OV_HT', 'UND_HT', 'UND_COV', 'UND_SP1', 'UND_SP2', 'UND_SP3', 'GRD_SP1',
                      'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5', 'FX_MISC', 'COL_CREW',
                      'COL_DATE', 'FP_TIME', 'MIS_FIELDS', 'HAS_MIS_FIELD', 'UND_HT2', 'VALID_PLOT_ID',
                      'METERS_FROM_PLOT_CENTER', 'CORRECT_PLOT_ID', 'HAS_PRISM', 'DUPLICATE', 'PRISM_ID_MATCHES', 'POOL',
                      'COMP', 'UNIT', 'SITE', 'SID', 'VALID_SID', 'SHAPE', 'AGE_SP', 'AGE_DIA', 'AGE_ORIG', 'AGE_GRW',
                      'AGE_MISC', 'MAST_TYPE', 'INV_SP', 'INV_PRESENT']
 
-    assert set(cols_to_check).issubset(plot_table.columns)
-    assert len(cols_to_check) == len(plot_table.columns)
+    assert set(asserted_columns).issubset(plot_table.columns)
+    assert len(asserted_columns) == len(plot_table.columns)
 
 def test_data_types():
     # define test data location
@@ -45,7 +45,7 @@ def test_data_types():
     # create tree and plot tables from age, fixed, and prism dataframes
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
-    output_dtypes = pd.Series({
+    asserted_dtypes = pd.Series({
         'PID': 'string[python]', 'PLOT': 'Int32', 'OV_CLSR': 'string[python]', 'OV_HT': 'string[python]',
         'UND_HT': 'string[python]', 'UND_COV': 'string[python]', 'UND_SP1': 'string[python]',
         'UND_SP2': 'string[python]', 'UND_SP3': 'string[python]', 'GRD_SP1': 'string[python]',
@@ -63,4 +63,4 @@ def test_data_types():
     })
     plot_table_dtypes = plot_table.dtypes
 
-    assert (output_dtypes.loc[plot_table_dtypes.index] == plot_table_dtypes).all()
+    assert (asserted_dtypes.loc[plot_table_dtypes.index] == plot_table_dtypes).all()
