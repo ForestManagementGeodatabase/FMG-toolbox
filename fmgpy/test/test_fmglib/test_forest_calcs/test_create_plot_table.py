@@ -23,12 +23,12 @@ def test_column_existence():
 
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
-    asserted_columns = ['PID', 'PLOT', 'OV_CLSR', 'OV_HT', 'UND_HT', 'UND_COV', 'UND_SP1', 'UND_SP2', 'UND_SP3', 'GRD_SP1',
-                     'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5', 'FX_MISC', 'COL_CREW',
-                     'COL_DATE', 'FP_TIME', 'MIS_FIELDS', 'HAS_MIS_FIELD', 'UND_HT2', 'VALID_PLOT_ID',
-                     'METERS_FROM_PLOT_CENTER', 'CORRECT_PLOT_ID', 'HAS_PRISM', 'DUPLICATE', 'PRISM_ID_MATCHES', 'POOL',
-                     'COMP', 'UNIT', 'SITE', 'SID', 'VALID_SID', 'SHAPE', 'AGE_SP', 'AGE_DIA', 'AGE_ORIG', 'AGE_GRW',
-                     'AGE_MISC', 'MAST_TYPE', 'INV_SP', 'INV_PRESENT']
+    asserted_columns = ['PID', 'PLOT', 'OV_CLSR', 'OV_HT', 'UND_HT', 'UND_COV', 'UND_SP1', 'UND_SP2', 'UND_SP3',
+                        'GRD_SP1', 'GRD_SP2', 'GRD_SP3', 'NOT_SP1', 'NOT_SP2', 'NOT_SP3', 'NOT_SP4', 'NOT_SP5',
+                        'FX_MISC', 'COL_CREW', 'COL_DATE', 'FP_TIME', 'MIS_FIELDS', 'HAS_MIS_FIELD', 'UND_HT2',
+                        'VALID_PLOT_ID', 'METERS_FROM_PLOT_CENTER', 'CORRECT_PLOT_ID', 'HAS_PRISM', 'DUPLICATE',
+                        'PRISM_ID_MATCHES', 'POOL', 'COMP', 'UNIT', 'SITE', 'SID', 'VALID_SID', 'SHAPE', 'AGE_SP',
+                        'AGE_DIA', 'AGE_ORIG', 'AGE_GRW', 'AGE_MISC', 'MAST_TYPE', 'INV_SP', 'INV_PRESENT']
 
     assert set(asserted_columns).issubset(plot_table.columns)
     assert len(asserted_columns) == len(plot_table.columns)
