@@ -1046,7 +1046,7 @@ def tpa_ba_qmdbh_plot_by_case_long(tree_table, filter_statement, case_column):
                    on='PID') \
             .reset_index()
 
-        return out
+        return out_df
 
 
 # Generate TPA, BA, QM DBH given multiple case fields at PID level (no pivot, stays long)
