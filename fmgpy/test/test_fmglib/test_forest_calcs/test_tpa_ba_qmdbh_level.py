@@ -1,20 +1,53 @@
 import fmgpy.fmglib.forest_calcs as fcalc
 import pandas as pd
+import pandas.testing as pdt
 
-def test_dataframe_size():
+def test_itself():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
-    filter_statement = None
-    level = 'PID'
-
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
-    tbq_table = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, level)
 
-    print(tbq_table.dtypes)
+    csv_folder_path = './dataframe_test_csvs/ta_ba_qmdbh_level/'
+    none_pid = csv_folder_path + 'none.csv'
+    mastType_hard_pool = csv_folder_path + 'mastType_hard.csv'
 
-    #TODO: Figure out how to test for correct row number. I believe the number of rows can vary depending on the filter
-    # statement. Maybe create a couple tests with different filter statements where we know the correct number of rows
-    # and assert those.
+
+    filter_statement = None
+    tbq_table_none = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'SID')
+    tbq_table_none.to_csv(none_pid, index=False)
+
+    filter_statement = tree_table.MAST_TYPE == 'Hard'
+    tbq_table_mastType_hard = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'POOL')
+    tbq_table_mastType_hard.to_csv(mastType_hard_pool, index=False)
+
+    thing1 = tbq_table_none.dtypes
+    thing2 = tbq_table_mastType_hard.dtypes
+    asserted_dataframe_none = pd.read_csv(none_pid)
+    asserted_dataframe_mastType_hard = pd.read_csv(mastType_hard_pool)
+
+    asserted_dataframe_none = asserted_dataframe_none.astype({
+        'index': 'int64',
+        'SID': 'string[python]',
+        'tree_count': 'float64',
+        'stand_dens': 'float64',
+        'plot_count': 'float64',
+        'TPA': 'float64',
+        'BA': 'float64',
+        'QM_DBH': 'float64'
+    })
+    asserted_dataframe_mastType_hard = asserted_dataframe_mastType_hard.astype({
+        'index': 'int64',
+        'POOL': 'string[python]',
+        'tree_count': 'float64',
+        'stand_dens': 'float64',
+        'plot_count': 'float64',
+        'TPA': 'float64',
+        'BA': 'float64',
+        'QM_DBH': 'float64'
+    })
+
+    pdt.assert_frame_equal(tbq_table_none, asserted_dataframe_none)
+    pdt.assert_frame_equal(tbq_table_mastType_hard, asserted_dataframe_mastType_hard)
 
 def test_column_existence():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
