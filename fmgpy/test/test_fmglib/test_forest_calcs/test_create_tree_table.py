@@ -1,11 +1,41 @@
 # Do Some Imports
 import pandas as pd
-import math
-
 import fmgpy.fmglib.forest_calcs as fcalc
-import arcpy
+import pandas.testing as pdt
+
+def test_itself():
+    # define test data location
+    prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
+    prism_df = pd.DataFrame.spatial.from_featureclass(prism)
+    tree_table = fcalc.create_tree_table(prism_df)
+
+    csv_folder_path = './dataframe_test_csvs/create_tree_table/'
+    saved_copy_path = csv_folder_path + 'tree_table.csv'
+
+    asserted_dataframe = pd.read_csv(saved_copy_path)
+
+    tree_table = tree_table.drop('SHAPE', axis=1)
+    asserted_dataframe = asserted_dataframe.drop('SHAPE', axis=1)
 
 
+    tree_table = tree_table.replace('', pd.NA)
+    asserted_dataframe = asserted_dataframe.replace('', pd.NA)
+
+
+    asserted_dataframe = asserted_dataframe.astype({
+        'OBJECTID': 'Int64', 'PLOT': 'Int32', 'TR_SP': 'object', 'TR_DIA': 'Int32', 'TR_CL': 'string[python]',
+        'TR_HLTH': 'string[python]', 'TR_UNUS': 'string[python]', 'TR_BDWK': 'string[python]', 'MISC': 'string[python]',
+        'COL_CREW': 'string[python]', 'COL_DATE': 'datetime64[us]', 'TR_TIME': 'string[python]',
+        'MIS_FIELDS': 'string[python]', 'HAS_MIS_FIELD': 'string[python]', 'CANOPY_DBH_FLAG': 'string[python]',
+        'VALID_PLOT_ID': 'string[python]', 'HAS_FIXED': 'string[python]', 'METERS_FROM_FIXED_PLOT': 'Float64',
+        'CORRECT_PLOT_ID': 'string[python]', 'DUPLICATE': 'string[python]', 'MAST_TYPE': 'string[python]',
+        'POOL': 'string[python]', 'COMP': 'string[python]', 'UNIT': 'string[python]', 'SITE': 'string[python]',
+        'SID': 'string[python]', 'PID': 'string[python]', 'VALID_SID': 'string[python]',
+        'TR_SIZE': 'object', 'VERT_COMP': 'object', 'TR_TYPE': 'object', 'TR_BA': 'float64', 'TR_DENS': 'float64',
+        'SP_TYPE': 'object', 'SP_RICH_TYPE': 'object'
+    })
+
+    pdt.assert_frame_equal(tree_table, asserted_dataframe)
 def test_column_existence():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
@@ -53,16 +83,16 @@ def test_value_correctness():
     TR_TYPE = tree_table["TR_TYPE"]
     TR_BA = tree_table["TR_BA"]
     TR_DENS = tree_table["TR_DENS"]
-    SP_TYPE = tree_table["SP_TYPE"]
-    SP_RICH_TYPE = tree_table["SP_RICH_TYPE"]
+    SP_TYPE = tree_table["SP_TYPE"].fillna("NAN")
+    SP_RICH_TYPE = tree_table["SP_RICH_TYPE"].fillna("NAN")
 
     TR_SIZE_acceptable_values = pd.Series(["Saw", "Pole", "Mature", "Sapling", "Over Mature", None])
     VERT_COMP_acceptable_values = pd.Series(["Canopy", "Midstory", None])
     TR_TYPE_acceptable_values = pd.Series(["Wildlife", "None", None])
     TR_BA_acceptable_values = pd.Series([10, 0.0])
     TR_DENS_low, TR_DENS_high = 0, 1834
-    SP_TYPE_acceptable_values = pd.Series(["Common", "Uncommon"])
-    SP_RICH_TYPE_acceptable_values = pd.Series(["Typical", "Other", "Hard"])
+    SP_TYPE_acceptable_values = pd.Series(["Common", "Uncommon", "NAN"])
+    SP_RICH_TYPE_acceptable_values = pd.Series(["Typical", "Other", "Hard", "NAN"])
 
 
     invalid_vals = [val for val in TR_SIZE if val not in TR_SIZE_acceptable_values.values]
