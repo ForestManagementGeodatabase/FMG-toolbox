@@ -83,16 +83,16 @@ def test_value_correctness():
     TR_TYPE = tree_table["TR_TYPE"]
     TR_BA = tree_table["TR_BA"]
     TR_DENS = tree_table["TR_DENS"]
-    SP_TYPE = tree_table["SP_TYPE"].fillna("NAN")
-    SP_RICH_TYPE = tree_table["SP_RICH_TYPE"].fillna("NAN")
+    SP_TYPE = tree_table["SP_TYPE"].fillna("NAN")            # String versions of NaN are used because of
+    SP_RICH_TYPE = tree_table["SP_RICH_TYPE"].fillna("NAN")  # restrictions on comparing NaN values
 
     TR_SIZE_acceptable_values = pd.Series(["Saw", "Pole", "Mature", "Sapling", "Over Mature", None])
     VERT_COMP_acceptable_values = pd.Series(["Canopy", "Midstory", None])
     TR_TYPE_acceptable_values = pd.Series(["Wildlife", "None", None])
     TR_BA_acceptable_values = pd.Series([10, 0.0])
     TR_DENS_low, TR_DENS_high = 0, 1834
-    SP_TYPE_acceptable_values = pd.Series(["Common", "Uncommon", "NAN"])
-    SP_RICH_TYPE_acceptable_values = pd.Series(["Typical", "Other", "Hard", "NAN"])
+    SP_TYPE_acceptable_values = pd.Series(["Common", "Uncommon", "NAN"]) # String versions of NaN are used because of
+    SP_RICH_TYPE_acceptable_values = pd.Series(["Typical", "Other", "Hard", "NAN"]) # restrictions on comparing NaN
 
 
     invalid_vals = [val for val in TR_SIZE if val not in TR_SIZE_acceptable_values.values]
