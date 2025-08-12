@@ -15,12 +15,12 @@ def test_itself():
     # create dataframe with no filter
     filter_statement = None
     none_df = fcalc.species_dom_plot(tree_table, filter_statement)
-    none_df.to_csv(none_csv, index=False)
+    # none_df.to_csv(none_csv, index=False)
 
     # create dataframe with filter on VERT_COMP
     filter_statement = tree_table.VERT_COMP == 'Midstory'
     vertComp_df = fcalc.species_dom_plot(tree_table, filter_statement)
-    vertComp_df.to_csv(vertComp_csv, index=False)
+    # vertComp_df.to_csv(vertComp_csv, index=False)
 
     # Read dataframes from csvs
     none_csv_df = pd.read_csv(none_csv)
