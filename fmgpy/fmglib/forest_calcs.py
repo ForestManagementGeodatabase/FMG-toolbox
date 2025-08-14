@@ -1075,7 +1075,7 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
     """
     # Check input parameters are valid
     assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
-    assert tree_table.columns.isin(case_columns).any(), "df must contain column specified as group column param"
+    assert tree_table.columns.isin(case_columns).any(), "df must contain columns specified as group column param"
     assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
 
     # Create data frame that preserves unfiltered count of plots by level
@@ -1107,7 +1107,7 @@ def tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_colu
 
         # Join results back to full set of PIDs
         out_df = plotcount_df \
-            .drop(columns=['Plot_Count']) \
+            .drop(columns=['plot_count']) \
             .merge(right=filtered_df,
                    how='inner',
                    on='PID') \
