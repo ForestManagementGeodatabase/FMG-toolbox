@@ -645,8 +645,13 @@ def create_tree_table(prism_df):
             crosswalk_df = pd.read_csv('./../../../resources/MAST_SP_TYP_Crosswalk.csv') \
                 .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used when running an individual test file
         except FileNotFoundError:
-            crosswalk_df = pd.read_csv('./fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
-                .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used when running in python console
+            try:
+                crosswalk_df = pd.read_csv('./fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
+                    .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE']) # used when running in python console
+            except FileNotFoundError:
+                crosswalk_df = pd.read_csv('./../../../../../../../Users/b5ecdiws/Documents/FMG/FMG-toolbox/fmgpy/resources/MAST_SP_TYP_Crosswalk.csv') \
+                    .filter(items=['TR_SP', 'TYP_FOR_MVR', 'SP_RICH_TYPE'])  # used when running test suite on
+                                                                             # Isaiah's machine.
 
     tree_table = tree_table\
         .merge(right=crosswalk_df, how='left', on='TR_SP')\
@@ -871,6 +876,7 @@ def tpa_ba_qmdbh_plot_by_case(tree_table, filter_statement, case_column):
     """
     # Check input parameters are valid
     assert isinstance(tree_table, pd.DataFrame), "must be a pandas DataFrame"
+    print(tree_table.columns)
     assert tree_table.columns.isin([case_column]).any(), "df must contain column specified as group column param"
     assert tree_table.columns.isin(["PID"]).any(), "df must contain column PID"
 
