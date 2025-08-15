@@ -17,19 +17,19 @@ def test_itself():
     filter_statement = None
     case_column = ['MAST_TYPE']
     tbq_table_1 = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_column)
-    #tbq_table_1.to_csv(tbq_csv_1, index=False)
+    #tbq_table_1.to_csv(tbq_csv_1, index=False) # Uncomment to generate new csvs
 
     # create dataframe with no filter and case of SP_TYPE
     filter_statement = None
     case_column = ['MAST_TYPE', 'SP_TYPE']
     tbq_table_2 = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_column)
-    #tbq_table_2.to_csv(tbq_csv_2, index=False)
+    #tbq_table_2.to_csv(tbq_csv_2, index=False) # Uncomment to generate new csvs
 
     # create dataframe with filter of tree diameter above 10 and case of SP_TYPE
     filter_statement = tree_table.TR_DIA > 10
     case_column = ['MAST_TYPE', 'SP_TYPE']
     tbq_table_3 = fcalc.tpa_ba_qmdbh_plot_by_multi_case_long(tree_table, filter_statement, case_column)
-    #tbq_table_3.to_csv(tbq_csv_3, index=False)
+    #tbq_table_3.to_csv(tbq_csv_3, index=False) # Uncomment to generate new csvs
 
 
     # Read dataframes from csvs

@@ -4,32 +4,35 @@ import pandas.testing as pdt
 
 
 def test_itself():
+    # Define folder paths
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
+    csv_folder_path = './dataframe_test_csvs/health_dom_level/'
+    df_1_csv = csv_folder_path + 'df_1.csv'
+    df_2_csv = csv_folder_path + 'df_2.csv'
+
+    # Create necessary dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
 
-    csv_folder_path = './dataframe_test_csvs/health_dom_level/'
-    none_pid = csv_folder_path + 'none_pid.csv'
-    mastType_hard_pool = csv_folder_path + 'mastType_hard_pool.csv'
-
+    # Create first dataframe
     filter_statement = None
-    health_dom_level_none_pid = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'SID')
-    #health_dom_level_none_pid.to_csv('./dataframe_test_csvs/health_dom_level/none_pid.csv', index=False)
+    df_1 = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'SID')
+    #df_1.to_csv(df_1_csv, index=False) # Uncomment to generate new csvs
 
+    # Create second dataframe
     filter_statement = tree_table.MAST_TYPE == 'Hard'
-    health_dom_level_mastType_hard_pool = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'POOL')
-    #health_dom_level_mastType_hard_pool.to_csv('./dataframe_test_csvs/health_dom_level/mastType_hard_pool.csv', index=False)
+    df_2 = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'POOL')
+    #df_2.to_csv(df_2_csv, index=False) # Uncomment to generate new csvs
 
-    asserted_dataframe_none_pid = pd.read_csv(none_pid)
-    asserted_dataframe_mastType_hard_pool = pd.read_csv(mastType_hard_pool)
+    # Import dataframes from csvs
+    asserted_dataframe_1 = pd.read_csv(df_1_csv)
+    asserted_dataframe_2 = pd.read_csv(df_2_csv)
 
-    health_dom_level_none_pid = health_dom_level_none_pid.replace('', pd.NA)
-    asserted_dataframe_none_pid = asserted_dataframe_none_pid.replace('', pd.NA)
+    # Clean up empty spaces/NaN values for easier comparison
+    df_1 = df_1.replace('', pd.NA)
+    df_2 = df_2.replace('', pd.NA)
 
-    health_dom_level_mastType_hard_pool = health_dom_level_mastType_hard_pool.replace('', pd.NA)
-    asserted_dataframe_mastType_hard_pool = asserted_dataframe_mastType_hard_pool.replace('', pd.NA)
-
-    asserted_dataframe_none_pid = asserted_dataframe_none_pid.astype({
+    asserted_dataframe_1 = asserted_dataframe_1.astype({
         'index': 'int64',
         'SID': 'string[python]',
         'tree_count': 'float64',
@@ -39,7 +42,7 @@ def test_itself():
         'BA': 'float64',
         'QM_DBH': 'float64'
     })
-    asserted_dataframe_mastType_hard_pool = asserted_dataframe_mastType_hard_pool.astype({
+    asserted_dataframe_2 = asserted_dataframe_2.astype({
         'index': 'int64',
         'POOL': 'string[python]',
         'tree_count': 'float64',
@@ -50,8 +53,8 @@ def test_itself():
         'QM_DBH': 'float64'
     })
 
-    pdt.assert_frame_equal(health_dom_level_none_pid, asserted_dataframe_none_pid)
-    pdt.assert_frame_equal(health_dom_level_mastType_hard_pool, asserted_dataframe_mastType_hard_pool)
+    pdt.assert_frame_equal(df_1, asserted_dataframe_1)
+    pdt.assert_frame_equal(df_2, asserted_dataframe_2)
 
 
 def test_dataframe_size():

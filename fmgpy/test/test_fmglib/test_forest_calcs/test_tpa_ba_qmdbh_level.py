@@ -7,21 +7,17 @@ def test_itself():
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
 
-    csv_folder_path = './dataframe_test_csvs/ta_ba_qmdbh_level/'
+    csv_folder_path = './dataframe_test_csvs/tpa_ba_qmdbh_level/'
     none_pid = csv_folder_path + 'none.csv'
     mastType_hard_pool = csv_folder_path + 'mastType_hard.csv'
 
 
     filter_statement = None
     tbq_table_none = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'SID')
-    tbq_table_none.to_csv(none_pid, index=False)
 
     filter_statement = tree_table.MAST_TYPE == 'Hard'
     tbq_table_mastType_hard = fcalc.tpa_ba_qmdbh_level(tree_table, filter_statement, 'POOL')
-    tbq_table_mastType_hard.to_csv(mastType_hard_pool, index=False)
 
-    thing1 = tbq_table_none.dtypes
-    thing2 = tbq_table_mastType_hard.dtypes
     asserted_dataframe_none = pd.read_csv(none_pid)
     asserted_dataframe_mastType_hard = pd.read_csv(mastType_hard_pool)
 
@@ -45,6 +41,11 @@ def test_itself():
         'BA': 'float64',
         'QM_DBH': 'float64'
     })
+
+    tbq_table_none = tbq_table_none.replace('', pd.NA)
+    asserted_dataframe_none = asserted_dataframe_none.replace('', pd.NA)
+    tbq_table_mastType_hard = tbq_table_mastType_hard.replace('', pd.NA)
+    asserted_dataframe_mastType_hard = asserted_dataframe_mastType_hard.replace('', pd.NA)
 
     pdt.assert_frame_equal(tbq_table_none, asserted_dataframe_none)
     pdt.assert_frame_equal(tbq_table_mastType_hard, asserted_dataframe_mastType_hard)

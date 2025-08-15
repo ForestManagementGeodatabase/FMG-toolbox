@@ -7,23 +7,29 @@ def test_itself():
     age = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Age_QA_20250513'
     fixed = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Fixed_QA_20250513'
 
+    # create essential dataframes
     age_df = pd.DataFrame.spatial.from_featureclass(age)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
-
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
+    # Define folder paths
     csv_folder_path = './dataframe_test_csvs/create_plot_table/'
     saved_copy_path = csv_folder_path + 'plot_table.csv'
 
+    # Read stored behavior from csv into dataframe
     asserted_dataframe = pd.read_csv(saved_copy_path)
 
+    # Drop the shape column simply because it is hard to compare. This means we have no current check to make
+    # sure these shapes are the same. We only know that the column exists in both dataframes.
     plot_table = plot_table.drop('SHAPE', axis=1)
     asserted_dataframe = asserted_dataframe.drop('SHAPE', axis=1)
 
+    # clean up spaces/NaN values for easier comparison
     plot_table = plot_table.replace('', pd.NA)
     asserted_dataframe = asserted_dataframe.replace('', pd.NA)
 
 
+    # Give dataframe from csv appropriate datatypes
     asserted_dataframe = asserted_dataframe.astype({
         'PID': 'string[python]', 'PLOT': 'Int32', 'OV_CLSR': 'string[python]', 'OV_HT': 'string[python]',
         'UND_HT': 'string[python]', 'UND_COV': 'string[python]', 'UND_SP1': 'string[python]',
@@ -50,7 +56,6 @@ def test_dataframe_size():
 
     age_df = pd.DataFrame.spatial.from_featureclass(age)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
-
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
     assert plot_table.shape[0] == fixed_df.shape[0] # test number of rows
@@ -61,7 +66,6 @@ def test_column_existence():
 
     age_df = pd.DataFrame.spatial.from_featureclass(age)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
-
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
     asserted_columns = ['PID', 'PLOT', 'OV_CLSR', 'OV_HT', 'UND_HT', 'UND_COV', 'UND_SP1', 'UND_SP2', 'UND_SP3',
@@ -79,11 +83,9 @@ def test_data_types():
     age = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Age_QA_20250513'
     fixed = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Fixed_QA_20250513'
 
-    # create age, fixed, and prism dataframes from test data
+    # create age, fixed, and plot_table dataframes
     age_df = pd.DataFrame.spatial.from_featureclass(age)
     fixed_df = pd.DataFrame.spatial.from_featureclass(fixed)
-
-    # create tree and plot tables from age, fixed, and prism dataframes
     plot_table = fcalc.create_plot_table(fixed_df, age_df)
 
     asserted_dtypes = pd.Series({
@@ -102,6 +104,7 @@ def test_data_types():
         'AGE_ORIG': 'Int32', 'AGE_GRW': 'Int32', 'AGE_MISC': 'string[python]', 'MAST_TYPE': 'string[python]',
         'INV_SP': 'string[python]', 'INV_PRESENT': 'string[python]'
     })
+
     plot_table_dtypes = plot_table.dtypes
 
     assert (asserted_dtypes.loc[plot_table_dtypes.index] == plot_table_dtypes).all()

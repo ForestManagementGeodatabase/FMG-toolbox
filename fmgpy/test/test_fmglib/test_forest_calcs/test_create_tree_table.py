@@ -4,24 +4,27 @@ import fmgpy.fmglib.forest_calcs as fcalc
 import pandas.testing as pdt
 
 def test_itself():
-    # define test data location
+    # Define appropriate folder paths
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
-    prism_df = pd.DataFrame.spatial.from_featureclass(prism)
-    tree_table = fcalc.create_tree_table(prism_df)
-
     csv_folder_path = './dataframe_test_csvs/create_tree_table/'
     saved_copy_path = csv_folder_path + 'tree_table.csv'
 
+    # Create necessary dataframes
+    prism_df = pd.DataFrame.spatial.from_featureclass(prism)
+    tree_table = fcalc.create_tree_table(prism_df)
+
+    # Read stored behavior from csv into dataframe
     asserted_dataframe = pd.read_csv(saved_copy_path)
 
+    # Drop shape columns simply because it is hard to compare. We currently don't have checking for this column.
     tree_table = tree_table.drop('SHAPE', axis=1)
     asserted_dataframe = asserted_dataframe.drop('SHAPE', axis=1)
 
-
+    # Clean up empty/NaN values for easier checking
     tree_table = tree_table.replace('', pd.NA)
     asserted_dataframe = asserted_dataframe.replace('', pd.NA)
 
-
+    # Give data types to csv from the dataframe.
     asserted_dataframe = asserted_dataframe.astype({
         'OBJECTID': 'Int64', 'PLOT': 'Int32', 'TR_SP': 'object', 'TR_DIA': 'Int32', 'TR_CL': 'string[python]',
         'TR_HLTH': 'string[python]', 'TR_UNUS': 'string[python]', 'TR_BDWK': 'string[python]', 'MISC': 'string[python]',
@@ -38,6 +41,8 @@ def test_itself():
     pdt.assert_frame_equal(tree_table, asserted_dataframe)
 def test_column_existence():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
+
+    # Create necessary dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
 
@@ -50,9 +55,9 @@ def test_column_existence():
     assert set(asserted_columns).issubset(tree_table.columns)
     assert len(asserted_columns) == len(tree_table.columns)
 
-
 def test_data_types():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
+
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
 
@@ -75,9 +80,12 @@ def test_data_types():
 
 def test_value_correctness():
     prism = r'C:\Users\b5ecdiws\Documents\FMG\fmg_test_data\FMG_FieldData_QA_20250513\FMG_FieldData_QA_20250513.gdb\Prism_QA_20250513'
+
+    # Create necessary dataframes
     prism_df = pd.DataFrame.spatial.from_featureclass(prism)
     tree_table = fcalc.create_tree_table(prism_df)
 
+    # Grab columns from tree_table and store as lists
     TR_SIZE = tree_table["TR_SIZE"]
     VERT_COMP = tree_table["VERT_COMP"]
     TR_TYPE = tree_table["TR_TYPE"]
@@ -86,6 +94,7 @@ def test_value_correctness():
     SP_TYPE = tree_table["SP_TYPE"].fillna("NAN")            # String versions of NaN are used because of
     SP_RICH_TYPE = tree_table["SP_RICH_TYPE"].fillna("NAN")  # restrictions on comparing NaN values
 
+    # Define acceptable values for the pulled columns above.
     TR_SIZE_acceptable_values = pd.Series(["Saw", "Pole", "Mature", "Sapling", "Over Mature", None])
     VERT_COMP_acceptable_values = pd.Series(["Canopy", "Midstory", None])
     TR_TYPE_acceptable_values = pd.Series(["Wildlife", "None", None])
@@ -94,7 +103,7 @@ def test_value_correctness():
     SP_TYPE_acceptable_values = pd.Series(["Common", "Uncommon", "NAN"]) # String versions of NaN are used because of
     SP_RICH_TYPE_acceptable_values = pd.Series(["Typical", "Other", "Hard", "NAN"]) # restrictions on comparing NaN
 
-
+    # Compare values in lists to acceptable values
     invalid_vals = [val for val in TR_SIZE if val not in TR_SIZE_acceptable_values.values]
     assert not invalid_vals, f"Invalid values found in TR_SIZE: {invalid_vals}"
 

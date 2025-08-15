@@ -15,12 +15,12 @@ def test_itself():
     # create dataframe with no filter
     filter_statement = None
     none_df = fcalc.species_dom_plot(tree_table, filter_statement)
-    # none_df.to_csv(none_csv, index=False)
+    # none_df.to_csv(none_csv, index=False) # Uncomment to generate new csvs
 
     # create dataframe with filter on VERT_COMP
     filter_statement = tree_table.VERT_COMP == 'Midstory'
     vertComp_df = fcalc.species_dom_plot(tree_table, filter_statement)
-    # vertComp_df.to_csv(vertComp_csv, index=False)
+    # vertComp_df.to_csv(vertComp_csv, index=False) # Uncomment to generate new csvs
 
     # Read dataframes from csvs
     none_csv_df = pd.read_csv(none_csv)
@@ -37,7 +37,6 @@ def test_itself():
     # Compare function output stored in csv to current function behavior.
     pdt.assert_frame_equal(none_csv_df, none_df)
     pdt.assert_frame_equal(vertComp_csv_df, vertComp_df)
-
 
 
 def test_dataframe_size():

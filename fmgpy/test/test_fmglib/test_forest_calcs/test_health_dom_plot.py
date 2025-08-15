@@ -15,9 +15,11 @@ def test_itself():
 
     filter_statement = None
     health_dom_table_none = fcalc.tpa_ba_qmdbh_plot(tree_table, filter_statement)
+    #health_dom_table_none.to_csv('./dataframe_test_csvs/health_dom_plot/none.csv', index=False)  # Uncomment to generate new csvs
 
     filter_statement = tree_table.MAST_TYPE == 'Hard'
     health_dom_table_mastType_hard = fcalc.tpa_ba_qmdbh_plot(tree_table, filter_statement)
+    #health_dom_table_mastType_hard.to_csv('./dataframe_test_csvs/health_dom_plot/mastType_hard.csv', index=False)  # Uncomment to generate new csvs
 
     asserted_dataframe_none = pd.read_csv(none)
     asserted_dataframe_mastType_hard = pd.read_csv(mastType_hard)

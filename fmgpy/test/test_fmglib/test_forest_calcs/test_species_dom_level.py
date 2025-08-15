@@ -15,12 +15,12 @@ def test_itself():
     # create dataframe with no filter
     filter_statement = None
     none_pid_df = fcalc.species_dom_level(tree_table, filter_statement, 'PID')
-    #none_pid_df.to_csv(none_pid_csv, index=False)
+    #none_pid_df.to_csv(none_pid_csv, index=False) # Uncomment to generate new csvs
 
     # create dataframe with filter on VERT_COMP
     filter_statement = tree_table.VERT_COMP == 'Midstory'
     vertComp_pool_df = fcalc.species_dom_level(tree_table, filter_statement, 'POOL')
-    #vertComp_pool_df.to_csv(vertComp_pool_csv, index=False)
+    #vertComp_pool_df.to_csv(vertComp_pool_csv, index=False) # Uncomment to generate new csvs
 
     # Read dataframes from csvs
     none_pid_csv_df = pd.read_csv(none_pid_csv)
